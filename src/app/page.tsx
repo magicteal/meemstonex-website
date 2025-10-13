@@ -1,9 +1,5 @@
-import { ResizableNavbar } from "@/components/ui/resizable-navbar";
+import Home from "@/components/Home";
 
-export default function Home() {
-  return (
-    <main className="min-h-screen">
-      <ResizableNavbar />
-    </main>
-  );
+export default function Page() {
+  return <Home />;
 }
