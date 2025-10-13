@@ -6,70 +6,9 @@ import {
   AnimatePresence,
   useScroll,
   useMotionValueEvent,
-} from "framer-motion";
+} from "motion/react";
 
 import React, { useRef, useState } from "react";
-
-export const ResizableNavbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const items = [
-    { name: "Home", link: "/" },
-    { name: "About", link: "/about" },
-    { name: "Services", link: "/services" },
-    { name: "Contact", link: "/contact" },
-  ];
-
-  return (
-    <>
-      <Navbar>
-        <NavBody>
-          <NavbarLogo />
-          <NavItems items={items} />
-          <div className="relative z-20 flex flex-row items-center">
-            <NavbarButton variant="gradient" href="/book-call">
-              Book a call
-            </NavbarButton>
-          </div>
-        </NavBody>
-      </Navbar>
-
-      {/* Mobile Navigation */}
-      <Navbar>
-        <MobileNav>
-          <MobileNavHeader>
-            <NavbarLogo />
-            <MobileNavToggle
-              isOpen={isOpen}
-              onClick={() => setIsOpen(!isOpen)}
-            />
-          </MobileNavHeader>
-          <MobileNavMenu isOpen={isOpen} onClose={() => setIsOpen(false)}>
-            {items.map((item, idx) => (
-              <a
-                key={idx}
-                href={item.link}
-                onClick={() => setIsOpen(false)}
-                className="w-full rounded-lg px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
-              >
-                {item.name}
-              </a>
-            ))}
-            <div className="flex w-full">
-              <NavbarButton
-                className="w-full"
-                variant="gradient"
-                href="/book-call"
-              >
-                Book a call
-              </NavbarButton>
-            </div>
-          </MobileNavMenu>
-        </MobileNav>
-      </Navbar>
-    </>
-  );
-};
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -294,7 +233,7 @@ export const NavbarLogo = () => {
   return (
     <a
       href="#"
-      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-white dark:text-white"
+      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
     >
       <img
         src="https://assets.aceternity.com/logo-dark.png"
@@ -302,7 +241,7 @@ export const NavbarLogo = () => {
         width={30}
         height={30}
       />
-      <span className="font-medium text-white dark:text-white">Meemstonex</span>
+      <span className="font-medium text-black dark:text-white">Startup</span>
     </a>
   );
 };
