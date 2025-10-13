@@ -1,32 +1,30 @@
 "use client";
 import { useRef } from "react";
-// import { ResizableNavbar } from "@/components/ui/resizable-navbar";
-import { Navbar } from "./ui/resizable-navbar";
+import { NavbarDemo } from "@/components/Navbar";
 import ImageTrailCursor from "@/components/ui/image-trail-cursor";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import Showcase from "@/components/ui/showcase";
 
 export default function Home() {
   const images = [
-    "/next.svg",
-    "/vercel.svg",
-    "/file.svg",
-    "/globe.svg",
-    "/window.svg",
+    "/images/one.jpg",
+    "/images/two.png",
+    "/images/three.jpeg",
+    "/images/four.jpeg",
+    "/images/five.jpg",
   ];
 
   const heroRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="bg-black relative z-0">
-      {" "}
-      {/* Add relative and z-0 */}
-      <ResizableNavbar />
+      <NavbarDemo />
+
       <WavyBackground ref={heroRef} className="max-w-4xl mx-auto pb-40">
         <ImageTrailCursor
           images={images}
           maxPoints={5}
-          containerRef={heroRef}
+          containerRef={heroRef as React.RefObject<HTMLElement>}
         />
         <div className="relative z-10">
           <p className="text-2xl md:text-4xl lg:text-7xl text-white font-bold inter-var text-center">
@@ -37,6 +35,7 @@ export default function Home() {
           </p>
         </div>
       </WavyBackground>
+
       <Showcase />
     </div>
   );
