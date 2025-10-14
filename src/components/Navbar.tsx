@@ -16,7 +16,7 @@ export function NavbarDemo() {
   const navItems = [
     {
       name: "Home",
-      link: "#features",
+      link: "/",
     },
     {
       name: "Products",
@@ -24,7 +24,7 @@ export function NavbarDemo() {
     },
     {
       name: "About Us",
-      link: "#contact",
+      link: "about",
     },
   ];
 

@@ -1,14 +1,12 @@
 "use client";
 import { useRef } from "react";
-import { NavbarDemo } from "@/components/Navbar";
 import ImageTrailCursor from "@/components/ui/image-trail-cursor";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import Showcase from "@/components/ui/showcase";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import WhatsAppButton from "@/components/ui/whatsapp-button";
 import TextReveal from "@/components/ui/text-reveal";
-import Faq from "@/components/ui/faq"; // Import the new FAQ component
-import Footer from "@/components/Footer";
+import Faq from "@/components/ui/faq";
 
 export default function Home() {
   const images = [
@@ -22,8 +20,8 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
 
   return (
+    // NavbarDemo and Footer have been removed from here
     <div className="bg-black/50 relative z-0">
-      <NavbarDemo />
       <WavyBackground ref={heroRef} className="max-w-4xl mx-auto pb-40">
         <ImageTrailCursor
           images={images}
@@ -40,7 +38,6 @@ export default function Home() {
         </div>
       </WavyBackground>
       <Showcase />
-      {/* 2. Add the new Text Reveal Section */}
       <section className="py-20 text-white">
         <div className="container mx-auto px-8">
           <TextReveal>
@@ -54,8 +51,7 @@ export default function Home() {
         </div>
       </section>
       <FeaturedProducts />
-      <Faq /> {/* Add the FAQ component here */}
-      <Footer />
+      <Faq />
       <WhatsAppButton />
     </div>
   );

@@ -1,0 +1,23 @@
+[
+  {
+    "id": 5,
+    "name": "Courtyard Water Feature",
+    "category": "Fountains",
+    "price": "₹95,000",
+    "image": "/images/five.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Onyx Backlit Bar",
+    "category": "Counters",
+    "price": "₹1,10,000",
+    "image": "/images/one.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Onyx Backlit Bar",
+    "category": "Counters",
+    "price": "₹1,10,000",
+    "image": "/images/one.jpg"
+}
+]

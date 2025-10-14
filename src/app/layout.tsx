@@ -43,7 +43,7 @@ export default function RootLayout({
           before:z-0
         `}
       >
-        {/* Content Wrapper */}
+        {/* Navbar aur Footer yahan se hata diye gaye hain */}
         <div className="relative z-10 backdrop-brightness-90">{children}</div>
       </body>
     </html>
