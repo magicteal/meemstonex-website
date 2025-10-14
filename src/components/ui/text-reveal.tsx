@@ -6,6 +6,12 @@ import {
   type MotionValue,
 } from "framer-motion";
 import React, { useRef } from "react";
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  weight: ["400", "600"],
+  subsets: ["latin"],
+});
 
 const TextReveal = ({ children }: { children: React.ReactNode }) => {
   const container = useRef(null);
@@ -19,7 +25,7 @@ const TextReveal = ({ children }: { children: React.ReactNode }) => {
   return (
     <p
       ref={container}
-      className="flex text-4xl text-white font-bold max-w-7xl flex-wrap"
+      className={`${poppins.className} flex text-2xl md:text-3xl text-white font-bold max-w-4xl flex-wrap justify-center mx-auto text-center`}
     >
       {words.map((word, i) => {
         const start = i / words.length;

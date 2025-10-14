@@ -123,7 +123,7 @@ const ImageTrailCursor: React.FC<ImageTrailCursorProps> = ({
               width={96}
               height={96}
               className={cn(
-                "w-24 h-24 object-cover rounded-md shadow-lg",
+                "w-36 h-36 object-cover rounded-md shadow-lg",
                 imageClassName
               )}
             />

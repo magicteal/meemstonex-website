@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Pacifico } from "next/font/google";
 import "./globals.css";
+import ScrollEffects from "@/components/ScrollEffects";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -10,6 +11,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const script = Pacifico({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-script",
 });
 
 export const metadata: Metadata = {
@@ -28,23 +35,16 @@ export default function RootLayout({
         className={`
           ${geistSans.variable}
           ${geistMono.variable}
+          ${script.variable}
           antialiased
           relative
           min-h-screen
-          bg-[url('/images/bg-texture-2.jpg')]
-          bg-cover
-          bg-center
-          bg-no-repeat
-          bg-fixed
-          before:absolute
-          before:inset-0
-          before:bg-black
-          before:opacity-50
-          before:z-0
+          bg-[#0f0e0e]
         `}
       >
         {/* Navbar aur Footer yahan se hata diye gaye hain */}
-        <div className="relative z-10 backdrop-brightness-90">{children}</div>
+        <ScrollEffects />
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );

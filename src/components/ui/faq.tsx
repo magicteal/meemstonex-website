@@ -3,6 +3,12 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IconPlus, IconMinus } from "@tabler/icons-react";
 import Image from "next/image";
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+});
 // removed unused cn import
 
 const faqData = [
@@ -41,21 +47,24 @@ const Faq = () => {
   };
 
   return (
-    <section className="py-20 text-white">
+    <section
+      className={`${poppins.className} py-20 my-24 text-white reveal-on-scroll`}
+    >
       <div className="container mx-auto px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
           {/* Left Column: Image and Title */}
           <div className="md:col-span-1">
             <p className="text-sm uppercase text-neutral-400 mb-4">FAQs</p>
-            <h2 className="text-5xl md:text-6xl font-bold leading-tight mb-8">
+            <h2 className="text-5xl md:text-5xl font-bold leading-tight mb-8">
               Any questions?
             </h2>
-            <div className="relative h-96 w-full rounded-lg overflow-hidden">
+            <div className="relative h-96 w-full rounded-none overflow-hidden border border-neutral-800">
               <Image
                 src="/images/one.jpg" // Using an existing image as a placeholder
                 alt="Abstract texture"
                 fill
-                className="object-cover opacity-75"
+                loading="lazy"
+                className="object-cover opacity-85"
               />
             </div>
           </div>
@@ -64,12 +73,21 @@ const Faq = () => {
           <div className="md:col-span-2">
             <div className="space-y-4">
               {faqData.map((faq, index) => (
-                <div key={index} className="border-b border-neutral-700 pb-4">
+                <div
+                  key={index}
+                  className="border-b border-neutral-700 pb-4 hover:bg-white/2 transition-colors rounded-md"
+                >
                   <button
                     onClick={() => toggleFaq(index)}
                     className="w-full flex justify-between items-center text-left py-4"
                   >
-                    <span className="text-xl font-medium">{faq.question}</span>
+                    <span
+                      className={`text-xl font-medium ${
+                        openIndex === index ? "text-teal-400" : ""
+                      }`}
+                    >
+                      {faq.question}
+                    </span>
                     {openIndex === index ? (
                       <IconMinus className="h-6 w-6" />
                     ) : (

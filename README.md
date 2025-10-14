@@ -34,3 +34,55 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Deployment (Custom)
+
+### Prerequisites
+* Node.js 20+
+* npm 10+ (or compatible package manager)
+* (Optional) Docker 24+
+
+### Environment Variables
+Copy `.env.example` to `.env` and fill in required values:
+
+```bash
+cp .env.example .env
+```
+
+Any variable prefixed with `NEXT_PUBLIC_` is exposed to the browser.
+
+### Production Build & Start
+```bash
+npm install
+npm run build
+npm start
+```
+This uses Next.js standalone output (see `next.config.ts`).
+
+### Docker
+Build a production image:
+```bash
+docker build -t meemstonex:latest .
+```
+Run the container:
+```bash
+docker run -p 3000:3000 --env-file .env meemstonex:latest
+```
+
+### Updating Dependencies
+```bash
+npm outdated
+npm update <package>
+```
+
+### Health Check Suggestion
+You can configure your platform (Kubernetes / Render / Railway) to hit `GET /` for a basic liveness probe.
+
+### Security Headers
+Basic security headers are added via `next.config.ts` (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`). Extend as needed with CSP.
+
+### Build Troubleshooting
+If memory issues occur during build inside Docker, increase Node memory:
+```bash
+NODE_OPTIONS="--max_old_space_size=2048" npm run build
+```

@@ -1,9 +1,8 @@
 "use client";
-import { useRef } from "react";
-import ImageTrailCursor from "@/components/ui/image-trail-cursor";
-import { WavyBackground } from "@/components/ui/wavy-background";
+import HeroMain from "@/components/ui/hero-main";
 import Showcase from "@/components/ui/showcase";
 import FeaturedProducts from "@/components/FeaturedProducts";
+import PricingCards from "@/components/ui/pricing-cards";
 import WhatsAppButton from "@/components/ui/whatsapp-button";
 import TextReveal from "@/components/ui/text-reveal";
 import Faq from "@/components/ui/faq";
@@ -17,26 +16,13 @@ export default function Home() {
     "/images/five.jpg",
   ];
 
-  const heroRef = useRef<HTMLDivElement>(null);
-
   return (
     // NavbarDemo and Footer have been removed from here
-    <div className="bg-black/50 relative z-0">
-      <WavyBackground ref={heroRef} className="max-w-4xl mx-auto pb-40">
-        <ImageTrailCursor
-          images={images}
-          maxPoints={5}
-          containerRef={heroRef as React.RefObject<HTMLElement>}
-        />
-        <div className="relative z-10">
-          <p className="text-2xl md:text-4xl lg:text-7xl text-white font-bold inter-var text-center">
-            Meemstonex
-          </p>
-          <p className="text-base md:text-lg mt-4 text-white font-normal inter-var text-center">
-            Leverage our expertise to build beautiful and functional websites.
-          </p>
-        </div>
-      </WavyBackground>
+    <div className=" relative z-0">
+      <HeroMain
+        images={images}
+        subtitle="Where magic meets creativity to craft extraordinary digital experiences"
+      />
       <Showcase />
       <section className="py-20 text-white">
         <div className="container mx-auto px-8">
@@ -51,6 +37,7 @@ export default function Home() {
         </div>
       </section>
       <FeaturedProducts />
+      <PricingCards />
       <Faq />
       <WhatsAppButton />
     </div>

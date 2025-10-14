@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* Global vertical rhythm for premium spacious feel */
+main > section,
+body > section,
+main > div.section-block,
+body > div.section-block {
+  margin-block: 6rem; /* 96px top and bottom */
+}
+
+/* Utility class for reveal animation trigger */
+.reveal-on-scroll {
+  will-change: opacity, transform;
+}

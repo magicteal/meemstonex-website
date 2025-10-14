@@ -19,22 +19,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
   return (
     <div
       className={cn(
-        "rounded-lg overflow-hidden group relative bg-neutral-900",
+        "rounded-none overflow-hidden group relative bg-neutral-900 border border-neutral-800",
         className
       )}
     >
       <Image
         src={product.image}
         alt={product.name}
-        width={400}
-        height={400}
-        className="object-cover w-full h-80 transition-transform duration-300 group-hover:scale-105"
+        width={360}
+        height={240}
+        loading="lazy"
+        className="object-cover w-full h-56 transition-transform duration-300 group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-      <div className="p-6 absolute bottom-0 left-0 right-0">
-        <p className="text-sm text-neutral-400">{product.category}</p>
-        <h3 className="text-2xl font-bold text-white mt-1">{product.name}</h3>
-        <p className="text-lg text-green-400 font-semibold mt-2">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+      <div className="p-4 absolute bottom-0 left-0 right-0">
+        <p className="text-xs text-neutral-400">{product.category}</p>
+        <h3 className="text-lg font-bold text-white mt-1">{product.name}</h3>
+        <p className="text-sm text-green-400 font-semibold mt-2">
           {product.price}
         </p>
       </div>

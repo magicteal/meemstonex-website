@@ -20,15 +20,17 @@ export function NavbarDemo() {
     },
     {
       name: "Products",
-      link: "products",
+      link: "/products",
     },
     {
       name: "About Us",
-      link: "about",
+      link: "/about",
     },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const activePath =
+    typeof window !== "undefined" ? window.location.pathname : "/";
 
   return (
     <div className="relative w-full pt-10">
@@ -36,9 +38,9 @@ export function NavbarDemo() {
         {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
-          <NavItems items={navItems} />
+          <NavItems items={navItems} activePath={activePath} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="gradient">Contact Us</NavbarButton>
+            <NavbarButton variant="primary">Let’s Talk</NavbarButton>
           </div>
         </NavBody>
 

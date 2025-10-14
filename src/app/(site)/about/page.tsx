@@ -4,7 +4,7 @@ import SectionHeader from "@/components/ui/section-header";
 
 const AboutPage = () => {
   return (
-    <div className="text-white">
+    <div className="text-white reveal-on-scroll">
       <SectionHeader
         title="Our"
         highlight="Story"
@@ -13,7 +13,7 @@ const AboutPage = () => {
 
       <div className="container mx-auto px-8 py-16">
         {/* Section 1: Vision */}
-        <div className="grid md:grid-cols-2 gap-16 items-center mb-24">
+        <div className="grid md:grid-cols-2 gap-16 items-center mb-24 reveal-on-scroll">
           <div>
             <h2 className="text-5xl font-bold mb-6 tracking-tighter">
               A Vision Carved in Stone
@@ -31,18 +31,20 @@ const AboutPage = () => {
               src="/images/one.jpg"
               alt="Illuminated Counter"
               fill
+              loading="lazy"
               className="object-cover"
             />
           </div>
         </div>
 
         {/* Section 2: Craftsmanship */}
-        <div className="grid md:grid-cols-2 gap-16 items-center">
+        <div className="grid md:grid-cols-2 gap-16 items-center reveal-on-scroll">
           <div className="h-96 relative rounded-lg overflow-hidden md:order-last">
             <Image
               src="/images/two.png"
               alt="Marble Fountain"
               fill
+              loading="lazy"
               className="object-cover"
             />
           </div>
