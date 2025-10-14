@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface ImageTrailCursorProps {
   images: string[];
@@ -116,9 +117,11 @@ const ImageTrailCursor: React.FC<ImageTrailCursorProps> = ({
             }}
             className="z-50"
           >
-            <img
+            <Image
               src={item.imageUrl}
               alt="cursor trail"
+              width={96}
+              height={96}
               className={cn(
                 "w-24 h-24 object-cover rounded-md shadow-lg",
                 imageClassName

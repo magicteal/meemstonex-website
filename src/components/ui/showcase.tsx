@@ -14,7 +14,7 @@ const Showcase = () => {
         <div>
           <video
             className="w-full rounded-xl shadow-2xl"
-            src="/showcase-video.mp4"
+            src="/videos/dummyVideo.mp4"
             autoPlay
             loop
             muted

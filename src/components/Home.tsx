@@ -4,6 +4,8 @@ import { NavbarDemo } from "@/components/Navbar";
 import ImageTrailCursor from "@/components/ui/image-trail-cursor";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import Showcase from "@/components/ui/showcase";
+import FeaturedProducts from "./FeaturedProducts";
+import WhatsAppButton from "@/components/ui/whatsapp-button";
 
 export default function Home() {
   const images = [
@@ -37,6 +39,8 @@ export default function Home() {
       </WavyBackground>
 
       <Showcase />
+      <FeaturedProducts />
+      <WhatsAppButton />
     </div>
   );
 }
