@@ -5,7 +5,6 @@ import {
   deleteProduct,
 } from "@/lib/productsStore";
 
-// Define a context type for async route handlers
 type AsyncRouteContext = {
   params: {
     id: string;
@@ -40,8 +39,9 @@ export async function PUT(
       updatedData
     );
     return NextResponse.json(updatedProduct);
-  } catch (e: any) {
-    return new NextResponse(e.message, { status: 404 });
+  } catch (e: unknown) { // Use unknown instead of any
+    const errorMessage = e instanceof Error ? e.message : "An unknown error occurred";
+    return new NextResponse(errorMessage, { status: 404 });
   }
 }
 
@@ -53,7 +53,8 @@ export async function DELETE(
   try {
     await deleteProduct(parseInt(params.id, 10));
     return NextResponse.json({ message: "Product deleted successfully" });
-  } catch (e: any) {
-    return new NextResponse(e.message, { status: 404 });
+  } catch (e: unknown) { // Use unknown instead of any
+    const errorMessage = e instanceof Error ? e.message : "An unknown error occurred";
+    return new NextResponse(errorMessage, { status: 404 });
   }
 }
