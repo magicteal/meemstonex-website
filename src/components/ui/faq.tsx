@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IconPlus, IconMinus } from "@tabler/icons-react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+// removed unused cn import
 
 const faqData = [
   {

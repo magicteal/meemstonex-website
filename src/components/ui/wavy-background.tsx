@@ -9,7 +9,6 @@ export const WavyBackground = ({
   containerClassName,
   colors,
   waveWidth,
-  backgroundFill, // we’ll ignore this now
   blur = 10,
   speed = "fast",
   waveOpacity = 0.5,
@@ -20,7 +19,6 @@ export const WavyBackground = ({
   containerClassName?: string;
   colors?: string[];
   waveWidth?: number;
-  backgroundFill?: string;
   blur?: number;
   speed?: "slow" | "fast";
   waveOpacity?: number;
@@ -81,7 +79,7 @@ export const WavyBackground = ({
     let w = (ctx.canvas.width = window.innerWidth);
     let h = (ctx.canvas.height = window.innerHeight);
     ctx.filter = `blur(${blur}px)`;
-    let nt = 0;
+    const nt = 0;
     const waveColors = colors ?? [
       "#38bdf8",
       "#818cf8",

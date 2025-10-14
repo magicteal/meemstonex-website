@@ -1,5 +1,10 @@
 "use client";
-import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
 import React, { useRef } from "react";
 
 const TextReveal = ({ children }: { children: React.ReactNode }) => {
@@ -9,7 +14,8 @@ const TextReveal = ({ children }: { children: React.ReactNode }) => {
     offset: ["start 0.9", "start 0.25"],
   });
 
-  const words = (children as string).split(" ");
+  const content = typeof children === "string" ? children : String(children);
+  const words = content.split(" ");
   return (
     <p
       ref={container}
@@ -34,7 +40,7 @@ const Word = ({
   range,
 }: {
   children: React.ReactNode;
-  progress: any;
+  progress: MotionValue<number>;
   range: [number, number];
 }) => {
   const opacity = useTransform(progress, range, [0, 1]);
