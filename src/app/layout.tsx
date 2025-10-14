@@ -31,7 +31,7 @@ export default function RootLayout({
           antialiased
           relative
           min-h-screen
-          bg-[url('/images/bg-texture.jpg')]
+          bg-[url('/images/bg-texture-2.jpg')]
           bg-cover
           bg-center
           bg-no-repeat
