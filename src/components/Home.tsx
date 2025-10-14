@@ -4,8 +4,11 @@ import { NavbarDemo } from "@/components/Navbar";
 import ImageTrailCursor from "@/components/ui/image-trail-cursor";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import Showcase from "@/components/ui/showcase";
-import FeaturedProducts from "./FeaturedProducts";
+import FeaturedProducts from "@/components/FeaturedProducts";
 import WhatsAppButton from "@/components/ui/whatsapp-button";
+import TextReveal from "@/components/ui/text-reveal";
+import Faq from "@/components/ui/faq"; // Import the new FAQ component
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const images = [
@@ -19,9 +22,8 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="bg-black relative z-0">
+    <div className="bg-black/50 relative z-0">
       <NavbarDemo />
-
       <WavyBackground ref={heroRef} className="max-w-4xl mx-auto pb-40">
         <ImageTrailCursor
           images={images}
@@ -37,9 +39,23 @@ export default function Home() {
           </p>
         </div>
       </WavyBackground>
-
       <Showcase />
+      {/* 2. Add the new Text Reveal Section */}
+      <section className="py-20 text-white">
+        <div className="container mx-auto px-8">
+          <TextReveal>
+            Specialized in translating brands into unique and immersive digital
+            user experiences. We focus on web design, product interfaces, and
+            visual systems. Lorem ipsum dolor sit amet, consectetur adipiscing
+            elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+            aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+            laboris nisi ut aliquip ex ea commodo consequat.
+          </TextReveal>
+        </div>
+      </section>
       <FeaturedProducts />
+      <Faq /> {/* Add the FAQ component here */}
+      <Footer />
       <WhatsAppButton />
     </div>
   );

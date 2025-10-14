@@ -25,9 +25,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}
+        className={`
+          ${geistSans.variable}
+          ${geistMono.variable}
+          antialiased
+          relative
+          min-h-screen
+          bg-[url('/images/bg-texture.jpg')]
+          bg-cover
+          bg-center
+          bg-no-repeat
+          bg-fixed
+          before:absolute
+          before:inset-0
+          before:bg-black
+          before:opacity-50
+          before:z-0
+        `}
       >
-        {children}
+        {/* Content Wrapper */}
+        <div className="relative z-10 backdrop-brightness-90">{children}</div>
       </body>
     </html>
   );

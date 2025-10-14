@@ -9,7 +9,7 @@ export const WavyBackground = ({
   containerClassName,
   colors,
   waveWidth,
-  backgroundFill,
+  backgroundFill, // we’ll ignore this now
   blur = 10,
   speed = "fast",
   waveOpacity = 0.5,
@@ -49,9 +49,10 @@ export const WavyBackground = ({
       nt: number,
       waveColors: string[]
     ) => {
-      ctx.fillStyle = backgroundFill || "black";
+      // 🔥 Removed black background fill:
+      ctx.clearRect(0, 0, w, h); // clears previous frame but keeps transparency
+
       ctx.globalAlpha = waveOpacity || 0.5;
-      ctx.fillRect(0, 0, w, h);
       const drawWave = (n: number) => {
         nt += getSpeed();
         for (let i = 0; i < n; i++) {
@@ -60,7 +61,7 @@ export const WavyBackground = ({
           ctx.strokeStyle = waveColors[i % waveColors.length];
           for (let x = 0; x < w; x += 5) {
             const y = noise(x / 800, 0.3 * i, nt) * 100;
-            ctx.lineTo(x, y + h * 0.5); // adjust for height, currently at 50% of the container
+            ctx.lineTo(x, y + h * 0.5);
           }
           ctx.stroke();
           ctx.closePath();
@@ -69,7 +70,7 @@ export const WavyBackground = ({
       drawWave(5);
       return requestAnimationFrame(() => render(ctx, w, h, nt, waveColors));
     },
-    [backgroundFill, getSpeed, noise, waveOpacity, waveWidth]
+    [getSpeed, noise, waveOpacity, waveWidth]
   );
 
   const init = useCallback(() => {
@@ -120,7 +121,7 @@ export const WavyBackground = ({
   return (
     <div
       className={cn(
-        "h-screen flex flex-col items-center justify-center",
+        "relative h-screen flex flex-col items-center justify-center overflow-hidden",
         containerClassName
       )}
     >
@@ -129,9 +130,11 @@ export const WavyBackground = ({
         ref={canvasRef}
         id="canvas"
         style={{
+          background: "transparent", // 🟢 ensure transparency
           ...(isSafari ? { filter: `blur(${blur}px)` } : {}),
         }}
       ></canvas>
+
       <div className={cn("relative z-10", className)} {...props}>
         {children}
       </div>
