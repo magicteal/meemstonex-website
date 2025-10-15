@@ -1,5 +1,5 @@
 import React from "react";
-import { FocusCards } from "./ui/focus-cards";
+import CarouselRectangle from "./ui/carousel-rectangle";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
@@ -36,15 +36,25 @@ const FeaturedProducts = () => {
   ];
 
   return (
-    <section className="py-20 text-white">
-      <div className="container mx-auto px-8 my-24">
-        <div className="text-left mb-12 flex flex-row">
-          <h2 className={`${poppins.className} text-7xl md:text-8xl font-bold`}>
+    <section className="py-24 text-white">
+      <div className="container mx-auto px-8 my-28">
+        <div className="text-left mb-12 flex flex-row items-end gap-6">
+          <h2
+            className={`${poppins.className} text-7xl md:text-8xl font-bold drop-shadow-lg`}
+          >
             Featured Products
           </h2>
-          <p className="text-neutral-400 mt-2">(New Collection)</p>
+          <p className={`${poppins.className} text-neutral-400 mt-2 font-bold`}>
+            (New Collection)
+          </p>
         </div>
-        <FocusCards cards={cards} />
+        <div className="relative">
+          <div
+            className="absolute -inset-8 -z-10 rounded-lg"
+            style={{ boxShadow: "0 30px 80px rgba(6,182,160,0.04)" }}
+          />
+          <CarouselRectangle cards={cards.slice(0, 5)} />
+        </div>
       </div>
     </section>
   );

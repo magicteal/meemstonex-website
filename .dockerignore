@@ -7,3 +7,7 @@ README.md
 npm-debug.log
 .vscode
 .env
+public/uploads
+public/images/uploads
+public/videos
+*.log

@@ -1,68 +1,107 @@
+"use client";
 import React from "react";
-import Image from "next/image";
+import { motion } from "framer-motion";
 import SectionHeader from "@/components/ui/section-header";
+import AboutShowcase from "@/components/about/AboutShowcase";
+import MissionVision from "@/components/about/MissionVision";
+import NumbersSection from "@/components/about/NumbersSection";
 
 const AboutPage = () => {
+  // Animation variants
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.8 },
+    },
+  };
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 60 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8 },
+    },
+  };
+
+  const slideInLeft = {
+    hidden: { opacity: 0, x: -60 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8 },
+    },
+  };
+
+  const slideInRight = {
+    hidden: { opacity: 0, x: 60 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8 },
+    },
+  };
+
   return (
-    <div className="text-white reveal-on-scroll">
-      <SectionHeader
-        title="Our"
-        highlight="Story"
-        subtitle="Crafting legacies in stone since our inception."
-      />
+    <div className="text-white">
+      {/* Header - Fade in on load */}
+      <motion.div initial="hidden" animate="visible" variants={fadeIn}>
+        <SectionHeader
+          title="Our"
+          highlight="Story"
+          subtitle="Crafting legacies in stone since our inception."
+        />
+      </motion.div>
 
-      <div className="container mx-auto px-8 py-16">
-        {/* Section 1: Vision */}
-        <div className="grid md:grid-cols-2 gap-16 items-center mb-24 reveal-on-scroll">
-          <div>
-            <h2 className="text-5xl font-bold mb-6 tracking-tighter">
-              A Vision Carved in Stone
-            </h2>
-            <p className="text-neutral-300 leading-relaxed">
-              Founded with the vision to create products that inspire,
-              Meemstonex is dedicated to the art of stonework. We are driven by
-              a passion for perfection and an unwavering commitment to
-              delivering exceptional quality. Our creations are not just
-              objects, but experiences that elevate everyday life.
-            </p>
-          </div>
-          <div className="h-96 relative rounded-lg overflow-hidden">
-            <Image
-              src="/images/one.jpg"
-              alt="Illuminated Counter"
-              fill
-              loading="lazy"
-              className="object-cover"
-            />
-          </div>
-        </div>
+      <main>
+        {/* Showcase - Slide in from left */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={slideInLeft}
+        >
+          <AboutShowcase />
+        </motion.div>
 
-        {/* Section 2: Craftsmanship */}
-        <div className="grid md:grid-cols-2 gap-16 items-center reveal-on-scroll">
-          <div className="h-96 relative rounded-lg overflow-hidden md:order-last">
-            <Image
-              src="/images/two.png"
-              alt="Marble Fountain"
-              fill
-              loading="lazy"
-              className="object-cover"
-            />
-          </div>
-          <div>
-            <h2 className="text-5xl font-bold mb-6 tracking-tighter">
-              Unmatched Craftsmanship
-            </h2>
-            <p className="text-neutral-300 leading-relaxed">
-              Our master artisans combine timeless techniques with modern
-              innovation to shape raw stone into breathtaking forms. Every
-              curve, every polish, and every detail is a testament to our
-              dedication to the craft. We source the finest materials from
-              around the globe to ensure each piece is a masterpiece of
-              durability and beauty.
-            </p>
-          </div>
-        </div>
-      </div>
+        {/* Mission & Vision - Fade in up */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={fadeInUp}
+        >
+          <MissionVision />
+        </motion.div>
+
+        {/* Numbers / Stats - Slide in from right */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={slideInRight}
+        >
+          <NumbersSection />
+        </motion.div>
+
+        {/* Visit Studio CTA - Fade in up */}
+        <motion.div
+          className="max-w-4xl mx-auto px-8 py-12 text-center text-neutral-300"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={fadeInUp}
+        >
+          <h3 className="text-2xl md:text-3xl mb-4">Visit our studio</h3>
+          <p className="mb-6">
+            Schedule a visit to see our materials and workshop in person.
+          </p>
+          <a className="inline-block bg-teal-400 text-black font-semibold px-6 py-3 rounded-md">
+            Schedule a Visit
+          </a>
+        </motion.div>
+      </main>
     </div>
   );
 };

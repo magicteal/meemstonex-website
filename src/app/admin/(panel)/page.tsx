@@ -11,6 +11,8 @@ interface Product {
 }
 
 const AdminPage = () => {
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -28,8 +30,25 @@ const AdminPage = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    // Check auth status first
+    (async () => {
+      try {
+        const res = await fetch("/api/auth/status", { cache: "no-store" });
+        const data = await res.json();
+        setIsAuthenticated(!!data?.authenticated);
+      } catch {
+        setIsAuthenticated(false);
+      } finally {
+        setAuthChecked(true);
+      }
+    })();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchProducts();
+    }
+  }, [isAuthenticated]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -134,6 +153,33 @@ const AdminPage = () => {
       setEditingProduct(null);
     }
   };
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen grid place-items-center text-white">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen grid place-items-center p-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">Admin Area</h2>
+          <p className="text-neutral-300 mb-6">
+            You must log in to manage products.
+          </p>
+          <a
+            href="/admin/login"
+            className="inline-block bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-md transition-colors"
+          >
+            Go to Login
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

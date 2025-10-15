@@ -34,16 +34,18 @@ const ProductsPage = async () => {
         highlight="Products"
         subtitle="Explore our handcrafted collection of stone marvels."
       />
-      <div className="container mx-auto px-8 pb-24">
+      <div className="container mx-auto px-8 pb-32">
         {Object.keys(productsByCategory).length === 0 ? (
           <p className="text-center text-neutral-400">No products found.</p>
         ) : (
           Object.keys(productsByCategory).map((category) => (
-            <div key={category} className="mb-16">
-              <h2 className="text-4xl font-bold text-white mb-8 border-l-4 border-red-500 pl-4">
-                {category}
+            <div key={category} className="mb-24">
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-8 pl-6">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-purple-400 to-indigo-400">
+                  {category}
+                </span>
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                 {productsByCategory[category].map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

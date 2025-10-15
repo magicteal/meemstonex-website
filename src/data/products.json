@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "name": "Test",
+    "category": "Test",
+    "price": "12000",
+    "image": "https://res.cloudinary.com/divrvxpca/image/upload/v1760541817/uploads/1760541812795-Screenshot_2025-10-15_174759.png.png",
+    "id": 1
+  },
+  {
+    "name": "Test 2",
+    "category": "Test-two",
+    "price": "17000",
+    "image": "https://res.cloudinary.com/divrvxpca/image/upload/v1760541959/uploads/1760541956030-Screenshot_2025-10-15_172520.png.png",
+    "id": 2
+  }
+]

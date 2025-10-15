@@ -45,7 +45,7 @@ const Footer: React.FC = () => {
 
         {/* "Get in touch" Section */}
         <div className="text-center mb-12">
-          <h2 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter">
+          <h2 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter drop-shadow-lg">
             Get in touch
           </h2>
         </div>

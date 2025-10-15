@@ -10,24 +10,24 @@ const poppins = Poppins({
 
 const PricingCards: React.FC = () => {
   return (
-    <section className={`${poppins.className} py-20 text-white`}>
+    <section className={`${poppins.className} py-24 text-white`}>
       <div className="container mx-auto px-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-16">
           <h2 className="text-6xl md:text-7xl font-bold tracking-tight">
             Our pricing is transparent,
           </h2>
-          <p className="text-4xl text-neutral-600 mt-2">
+          <p className="text-4xl text-neutral-600 mt-2 max-w-2xl mx-auto">
             just like our process.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left card - dark */}
           <div className="relative bg-neutral-900 border border-neutral-800 p-8 shadow-sm overflow-hidden transition-all duration-400 hover:scale-[1.01] hover:shadow-lg">
             {/* glow */}
             <div
               className="pointer-events-none absolute inset-0 rounded-sm opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              style={{ boxShadow: "0 0 40px rgba(232,59,27,0.18)" }}
+              style={{ boxShadow: "0 0 48px rgba(6,182,160,0.12)" }}
             />
             <div className="flex items-start justify-between">
               <div>
@@ -64,7 +64,7 @@ const PricingCards: React.FC = () => {
           <div className="relative bg-[#e83b1b] p-8 shadow-sm overflow-hidden transition-all duration-400 hover:scale-[1.01] hover:shadow-lg">
             <div
               className="pointer-events-none absolute inset-0 rounded-sm opacity-0 transition-opacity duration-300"
-              style={{ boxShadow: "0 0 48px rgba(0,0,0,0.06)" }}
+              style={{ boxShadow: "0 0 56px rgba(232,59,27,0.14)" }}
             />
             <div className="flex items-start justify-between">
               <div>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import path from "path";
+import cloudinary from "@/lib/cloudinary";
+import { UploadApiOptions } from "cloudinary";
 
 export async function POST(request: Request) {
   try {
@@ -13,18 +13,41 @@ export async function POST(request: Request) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    // Optional: folder and public_id
+    const folder = (data.get("folder") as string) || "uploads";
+    const publicIdBase = `${Date.now()}-${(file.name || "file").replace(/\s/g, "_")}`;
 
-    // Create a unique filename
-    const filename = `${Date.now()}-${file.name.replace(/\s/g, "_")}`;
-    const uploadsPath = path.join(process.cwd(), "public/uploads");
-    const filePath = path.join(uploadsPath, filename);
+    // Upload to Cloudinary using upload_stream to avoid temp files
+    const uploadOptions: UploadApiOptions = {
+      folder,
+      public_id: publicIdBase,
+      resource_type: "image",
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true,
+    };
 
-    // Write the file to the public/uploads directory
-    await writeFile(filePath, buffer);
+    const result = await new Promise<{
+      secure_url: string;
+      public_id: string;
+      width?: number;
+      height?: number;
+      format?: string;
+    }>((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(uploadOptions, (error, res) => {
+        if (error || !res) return reject(error || new Error("Cloudinary upload failed"));
+        resolve({
+          secure_url: res.secure_url,
+          public_id: res.public_id,
+          width: res.width,
+          height: res.height,
+          format: res.format,
+        });
+      });
+      stream.end(buffer);
+    });
 
-    // Return the public URL of the uploaded file
-    const publicUrl = `/uploads/${filename}`;
-    return NextResponse.json({ success: true, url: publicUrl });
+    return NextResponse.json({ success: true, url: result.secure_url, publicId: result.public_id });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(

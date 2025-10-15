@@ -49,7 +49,15 @@ Copy `.env.example` to `.env` and fill in required values:
 cp .env.example .env
 ```
 
-Any variable prefixed with `NEXT_PUBLIC_` is exposed to the browser.
+Add these admin environment variables to configure the admin login credentials:
+
+```bash
+# Admin login for the site admin panel
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=admin123
+```
+
+Warning: Use a strong password and do not commit these credentials to version control. Use your platform's secrets manager for production.
 
 ### Production Build & Start
 ```bash

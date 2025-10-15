@@ -7,6 +7,11 @@ export function middleware(request: NextRequest) {
 
   // If trying to access admin pages without a session, redirect to login
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    // Allow the /admin root page to render even without a session (it will show a login button)
+    if (pathname === "/admin") {
+      return NextResponse.next();
+    }
+    // For other admin subpaths, enforce auth
     if (!sessionCookie || sessionCookie.value !== "loggedin") {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }

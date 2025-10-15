@@ -23,10 +23,14 @@ ENV NODE_ENV=production
 RUN addgroup -S app && adduser -S app -G app
 
 # Copy only needed build artifacts and production deps
-COPY --from=build /app/package.json ./
-COPY --from=build /app/.next/standalone ./
+## Copy the standalone server files (server.js and package.json) into the runtime /app
+COPY --from=build /app/.next/standalone/ ./
+## Copy Next.js static assets
 COPY --from=build /app/.next/static ./.next/static
+## Copy the public folder
 COPY --from=build /app/public ./public
+## Copy production node_modules created during build stage (build had NODE_ENV=production)
+COPY --from=build /app/node_modules ./node_modules
 
 USER app
 EXPOSE 3000
