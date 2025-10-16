@@ -1,5 +1,7 @@
 import React from "react";
-import CarouselRectangle from "./ui/carousel-rectangle";
+import CoverflowCarousel, {
+  CarouselItem,
+} from "@/components/CoverflowCarousel";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
@@ -8,32 +10,24 @@ const poppins = Poppins({
 });
 
 const FeaturedProducts = () => {
-  const cards = [
-    {
-      title: "Elegant Marble Fountain",
-      src: "/images/one.jpg",
-    },
-    {
-      title: "Modern Illuminated Counter",
-      src: "/images/one.jpg",
-    },
-    {
-      title: "Classic Garden Fountain",
-      src: "/images/three.jpeg",
-    },
-    {
-      title: "Fountain at Dusk",
-      src: "/images/four.jpeg",
-    },
-    {
-      title: "Courtyard Water Feature",
-      src: "/images/five.jpg",
-    },
-    {
-      title: "Courtyard Water Feature",
-      src: "/images/five.jpg",
-    },
+  // Show all available product images in /public/images (exclude background textures)
+  const imageFiles = [
+    "one.jpg",
+    "two.png",
+    "three.jpeg",
+    "four.jpeg",
+    "five.jpg",
   ];
+
+  const cards: CarouselItem[] = imageFiles.map((file, idx) => ({
+    id: idx + 1,
+    title: file
+      .replace(/\.[^/.]+$/, "")
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase()),
+    description: "",
+    imageUrl: `/images/${file}`,
+  }));
 
   return (
     <section className="py-24 text-white">
@@ -53,7 +47,7 @@ const FeaturedProducts = () => {
             className="absolute -inset-8 -z-10 rounded-lg"
             style={{ boxShadow: "0 30px 80px rgba(6,182,160,0.04)" }}
           />
-          <CarouselRectangle cards={cards.slice(0, 5)} />
+          <CoverflowCarousel items={cards} />
         </div>
       </div>
     </section>

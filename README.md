@@ -40,7 +40,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ### Prerequisites
 * Node.js 20+
 * npm 10+ (or compatible package manager)
-* (Optional) Docker 24+
 
 ### Environment Variables
 Copy `.env.example` to `.env` and fill in required values:
@@ -67,15 +66,7 @@ npm start
 ```
 This uses Next.js standalone output (see `next.config.ts`).
 
-### Docker
-Build a production image:
-```bash
-docker build -t meemstonex:latest .
-```
-Run the container:
-```bash
-docker run -p 3000:3000 --env-file .env meemstonex:latest
-```
+
 
 ### Updating Dependencies
 ```bash
@@ -90,7 +81,7 @@ You can configure your platform (Kubernetes / Render / Railway) to hit `GET /` f
 Basic security headers are added via `next.config.ts` (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`). Extend as needed with CSP.
 
 ### Build Troubleshooting
-If memory issues occur during build inside Docker, increase Node memory:
+If memory issues occur during build, increase Node memory:
 ```bash
 NODE_OPTIONS="--max_old_space_size=2048" npm run build
 ```
