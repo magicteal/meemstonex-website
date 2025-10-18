@@ -102,6 +102,7 @@ const Navbar = () => {
                   {item}
                 </Link>
               ))}
+              {/*
               <button
                 className={`nav-hover-btn ${
                   isProductsPage ? "text-black" : "text-white"
@@ -111,6 +112,7 @@ const Navbar = () => {
               >
                 Contact Us
               </button>
+              */}
             </div>
 
             <button
