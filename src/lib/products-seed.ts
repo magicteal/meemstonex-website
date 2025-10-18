@@ -5,6 +5,7 @@ export const products = [
     category: "Fountains",
     price: "₹1,20,000",
     image: "/images/two.png",
+    description: "Hand-carved marble fountain with classical motifs, perfect for gardens and courtyards.",
   },
   {
     id: 2,
@@ -12,6 +13,7 @@ export const products = [
     category: "Counters",
     price: "₹85,000",
     image: "/images/one.jpg",
+    description: "Sleek illuminated counter with integrated lighting — ideal for showrooms and receptions.",
   },
   // ... (baaki products)
 ];

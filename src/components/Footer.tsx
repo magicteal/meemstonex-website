@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useLocale } from "@/lib/locale";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
@@ -38,6 +39,11 @@ const Footer: React.FC = () => {
       className={`${poppins.className} bg-transparent text-white px-8 mt-32`}
     >
       <div className="container mx-auto">
+        {/* Language selector above the rule */}
+        <div className="w-full flex justify-end mb-4">
+          <LanguageSwitcher />
+        </div>
+
         {/* Rule above heading */}
         <div className="w-full flex justify-center mb-8">
           <div className="w-32 h-px bg-neutral-700" />
@@ -101,3 +107,38 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
+
+function LanguageSwitcher() {
+  // This component is client-only because Footer already has "use client" at the top.
+  const { locale, setLocale } = useLocale();
+
+  const setLang = (l: "en" | "hi") => {
+    if (l === locale) return;
+    setLocale(l);
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => setLang("en")}
+        className={`px-3 py-1 rounded ${
+          locale === "en"
+            ? "bg-white text-black"
+            : "bg-transparent text-neutral-400 hover:text-white"
+        }`}
+      >
+        EN
+      </button>
+      <button
+        onClick={() => setLang("hi")}
+        className={`px-3 py-1 rounded ${
+          locale === "hi"
+            ? "bg-white text-black"
+            : "bg-transparent text-neutral-400 hover:text-white"
+        }`}
+      >
+        हिन्दी
+      </button>
+    </div>
+  );
+}

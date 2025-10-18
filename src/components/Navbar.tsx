@@ -10,7 +10,7 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "./ui/resizable-navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function NavbarDemo() {
   const navItems = [
@@ -29,8 +29,12 @@ export function NavbarDemo() {
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const activePath =
-    typeof window !== "undefined" ? window.location.pathname : "/";
+  // Start with "/" so server and initial client render match and avoid hydration mismatches.
+  const [activePath, setActivePath] = useState("/");
+
+  useEffect(() => {
+    setActivePath(window.location.pathname);
+  }, []);
 
   return (
     <div className="relative w-full pt-10">

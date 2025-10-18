@@ -1,7 +1,7 @@
 import React from "react";
 import CoverflowCarousel, {
   CarouselItem,
-} from "@/components/CoverflowCarousel";
+} from "@/components/ui/CoverflowCarousel";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({

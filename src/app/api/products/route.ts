@@ -9,13 +9,14 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const newProductData = await request.json();
-    const { name, category, price, image } = newProductData as Partial<Product>;
+    const { name, category, price, image, description } = newProductData as Partial<Product>;
     const createdProduct = await addProduct({
       // Basic whitelist of product fields; ignore any provided id
       name: name ?? "",
       category: category ?? "",
       price: price ?? "",
       image: image ?? "",
+      description: description ?? "",
     });
     return NextResponse.json(createdProduct, { status: 201 });
   } catch (e: unknown) { // Use unknown instead of any
