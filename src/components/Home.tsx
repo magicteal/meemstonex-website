@@ -1,6 +1,10 @@
 "use client";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import HeroMain from "@/components/ui/hero-main";
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
+import { Reveal } from "@/components/ui/reveal";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import CompanySection from "@/components/CompanySection";
 import Showcase from "@/components/ui/showcase";
 import FeaturedProducts from "@/components/FeaturedProducts";
@@ -20,41 +24,7 @@ export default function Home() {
     "/images/five.jpg",
   ];
 
-  // Animation variants for scroll reveal
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 60 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8 },
-    },
-  };
 
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 1 },
-    },
-  };
-
-  const slideInLeft = {
-    hidden: { opacity: 0, x: -60 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.8 },
-    },
-  };
-
-  const slideInRight = {
-    hidden: { opacity: 0, x: 60 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.8 },
-    },
-  };
 
   return (
     // NavbarDemo and Footer have been removed from here
@@ -78,43 +48,32 @@ export default function Home() {
         }}
       />
 
-      {/* Hero Section - Fade in */}
-      <motion.section
-        className="relative z-0 bg-[#0f0e0e]"
-        initial="hidden"
-        animate="visible"
-        variants={fadeIn}
-      >
-        <HeroMain
-          images={images}
-          subtitle="Where magic meets creativity to craft extraordinary digital experiences"
-        />
-      </motion.section>
+      {/* Hero Section - Fade in with animated beams background */}
+      <BackgroundBeamsWithCollision className="relative z-0 bg-[#0f0e0e]">
+        <Reveal direction="fade">
+          <HeroMain
+            images={images}
+            subtitle={<TextGenerateEffect words="Where magic meets creativity to craft extraordinary digital experiences" className="text-lg md:text-2xl text-white" duration={1.2} />}
+          />
+        </Reveal>
+      </BackgroundBeamsWithCollision>
 
       {/* Company Section */}
-      <CompanySection />
+      <Reveal direction="up">
+        <CompanySection />
+      </Reveal>
 
       {/* Showcase Section - Slide in from left */}
-      <motion.section
-        className="relative z-0 bg-[#0f0e0e]"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={slideInLeft}
-      >
+      <Reveal direction="left" className="relative z-0 bg-[#0f0e0e]">
         <Showcase />
-      </motion.section>
+      </Reveal>
 
-      <ExoticGraniteCollection />
+      <Reveal direction="up">
+        <ExoticGraniteCollection />
+      </Reveal>
 
       {/* Text Reveal Section - Fade in up */}
-      <motion.section
-        className="py-20 text-white bg-[#0f0e0e]"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={fadeInUp}
-      >
+      <Reveal direction="up" className="py-20 text-white bg-[#0f0e0e]">
         <div className="container mx-auto px-8">
           <TextReveal>
             Specialized in translating brands into unique and immersive digital
@@ -125,43 +84,27 @@ export default function Home() {
             laboris nisi ut aliquip ex ea commodo consequat.
           </TextReveal>
         </div>
-      </motion.section>
+      </Reveal>
 
       {/* Featured Products Section - Slide in from right */}
-      <motion.section
-        className="bg-[#0f0e0e]"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={slideInRight}
-      >
+      <Reveal direction="right" className="bg-[#0f0e0e]">
         <FeaturedProducts />
-      </motion.section>
+      </Reveal>
 
       {/* Pricing Cards Section - Fade in up */}
-      <motion.section
-        className="bg-[#0f0e0e]"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={fadeInUp}
-      >
+      <Reveal direction="up" className="bg-[#0f0e0e]">
         <PricingCards />
-      </motion.section>
+      </Reveal>
 
       {/* Exotic Granite Collection Section */}
-      <motion.section
-        className="py-20 bg-[#0f0e0e] text-white"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={fadeInUp}
-      >
+      <Reveal direction="up" className="py-20 bg-[#0f0e0e] text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-extrabold tracking-tight mb-4 text-white">
-              Exotic Granite Collection
-            </h2>
+            <Reveal direction="fade">
+              <h2 className="text-4xl font-extrabold tracking-tight mb-4 text-white">
+                Exotic Granite Collection
+              </h2>
+            </Reveal>
             <div className="flex justify-center items-center gap-6 text-sm text-rose-400 mb-6">
               <button className="border-b border-rose-400 pb-1">
                 Granite by Colour
@@ -170,11 +113,13 @@ export default function Home() {
               <button className="text-gray-300">Granite by Spaces</button>
             </div>
 
-            <p className="text-gray-300 max-w-2xl mx-auto mb-12">
-              Bringing nature’s finest hues to your homes with our range of
-              glorious, imported granite. These striking shades are surely going
-              to leave you and your guests awestruck!
-            </p>
+            <Reveal direction="fade">
+              <p className="text-gray-300 max-w-2xl mx-auto mb-12">
+                Bringing nature’s finest hues to your homes with our range of
+                glorious, imported granite. These striking shades are surely going
+                to leave you and your guests awestruck!
+              </p>
+            </Reveal>
           </div>
 
           <div className="relative">
@@ -187,64 +132,71 @@ export default function Home() {
             </button>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
-              <div className="flex flex-col items-center">
-                <img
-                  src="/images/five.jpg"
-                  alt="White Granite"
-                  className="w-full h-[360px] object-cover shadow-md"
-                />
-                <div className="mt-6 text-center text-lg text-gray-200">
-                  White Granite
+              <Reveal direction="left">
+                <div className="flex flex-col items-center">
+                  <Image
+                    src="/images/five.jpg"
+                    alt="White Granite"
+                    width={400}
+                    height={360}
+                    className="w-full h-[360px] object-cover shadow-md"
+                  />
+                  <div className="mt-6 text-center text-lg text-gray-200">
+                    White Granite
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <img
-                  src="/images/four.jpeg"
-                  alt="Yellow Granite"
-                  className="w-full h-[360px] object-cover shadow-md"
-                />
-                <div className="mt-6 text-center text-lg text-gray-200">
-                  Yellow Granite
+              </Reveal>
+              <Reveal direction="up">
+                <div className="flex flex-col items-center">
+                  <Image
+                    src="/images/four.jpeg"
+                    alt="Yellow Granite"
+                    width={400}
+                    height={360}
+                    className="w-full h-[360px] object-cover shadow-md"
+                  />
+                  <div className="mt-6 text-center text-lg text-gray-200">
+                    Yellow Granite
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <img
-                  src="/images/three.jpeg"
-                  alt="Blue Granite"
-                  className="w-full h-[360px] object-cover shadow-md"
-                />
-                <div className="mt-6 text-center text-lg text-gray-200">
-                  Blue Granite
+              </Reveal>
+              <Reveal direction="right">
+                <div className="flex flex-col items-center">
+                  <Image
+                    src="/images/three.jpeg"
+                    alt="Blue Granite"
+                    width={400}
+                    height={360}
+                    className="w-full h-[360px] object-cover shadow-md"
+                  />
+                  <div className="mt-6 text-center text-lg text-gray-200">
+                    Blue Granite
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <img
-                  src="/images/two.png"
-                  alt="Black Granite"
-                  className="w-full h-[360px] object-cover shadow-md"
-                />
-                <div className="mt-6 text-center text-lg text-gray-200">
-                  Black Granite
+              </Reveal>
+              <Reveal direction="down">
+                <div className="flex flex-col items-center">
+                  <Image
+                    src="/images/two.png"
+                    alt="Black Granite"
+                    width={400}
+                    height={360}
+                    className="w-full h-[360px] object-cover shadow-md"
+                  />
+                  <div className="mt-6 text-center text-lg text-gray-200">
+                    Black Granite
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             </div>
           </div>
         </div>
-      </motion.section>
+      </Reveal>
 
-      <motion.section
-        className="bg-[#0f0e0e]"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={fadeIn}
-      >
+      <Reveal direction="fade" className="bg-[#0f0e0e]">
         <Testimonials />
         <Faq />
-      </motion.section>
+      </Reveal>
 
       <WhatsAppButton />
     </div>

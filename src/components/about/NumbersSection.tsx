@@ -2,6 +2,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Poppins } from "next/font/google";
+import { Reveal } from "@/components/ui/reveal";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
 const poppins = Poppins({
   weight: ["400", "700"],

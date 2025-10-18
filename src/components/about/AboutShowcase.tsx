@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import { CometCard } from "@/components/ui/comet-card";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
@@ -20,20 +22,14 @@ const AboutShowcase: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2
+          <TextGenerateEffect
+            words="Showcase"
             className={`${poppins.variable} text-4xl md:text-6xl font-bold text-white`}
-          >
-            Showcase
-          </h2>
+            duration={1}
+          />
         </motion.div>
 
-        <motion.div
-          className="relative"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
+        <CometCard className="relative">
           <video
             className="w-full h-[480px] object-cover rounded-md shadow-lg border border-neutral-800"
             src="/videos/dummyVideo.mp4"
@@ -46,7 +42,7 @@ const AboutShowcase: React.FC = () => {
             Your browser does not support the video tag.
           </video>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-md" />
-        </motion.div>
+        </CometCard>
       </div>
     </div>
   );
