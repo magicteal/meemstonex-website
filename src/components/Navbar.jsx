@@ -73,7 +73,7 @@ const Navbar = () => {
           <div className="flex items-center gap-7">
             <Link href="/" aria-label="Home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/img/logo.png" alt="logo" className="w-10" />
+              {/* <img src="/img/logo.png" alt="logo" className="w-10" /> */}
             </Link>
 
             {/* <Button
