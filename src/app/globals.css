@@ -6,9 +6,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html,
+:root,
+body,
+#__next {
+  overflow-x: hidden;
+}
+
 body {
   width: 100dvw;
-  overflow-x: hidden;
   background-color: #dfdff0;
   font-family: "General Sans", sans-serif;
 }

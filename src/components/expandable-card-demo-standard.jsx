@@ -163,10 +163,14 @@ export default function ExpandableCardDemo({ items = [] }) {
       </AnimatePresence>
       {/* List — widen to full container width */}
       <div className="w-full">
-        {cardsData.map((card) => (
+        {cardsData.map((card, index) => (
           <motion.div
             layoutId={`card-${keyOf(card)}-${id}`}
-            key={`card-${keyOf(card)}-${id}`}
+            key={
+              card?.uid
+                ? `card-${card.uid}`
+                : `card-${keyOf(card)}-${index}-${id}`
+            }
             onClick={() => setActive(card)}
             className="p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
           >
