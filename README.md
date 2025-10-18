@@ -364,5 +364,8 @@ export default RoundedCorners
 Assets used in the project can be found [here](https://drive.google.com/file/d/12hCVnanOAUmM1vzz2dTWZ_uEFGG8xDcT/view?usp=sharing)
 
 > This project uses some assets and fonts from **[Zentry](https://zentry.com/)** purely for educational and demonstration purposes. All rights to these assets and fonts belong to their respective owners. If you plan to use this project commercially or publicly, please replace these assets and fonts with ones you own or have permission to use. This project is not affiliated with or endorsed by **[Zentry](https://zentry.com/)**.
+<<<<<<< HEAD
+=======
 #   g a m e - w e b s i t e  
  
+>>>>>>> fd6bc8da507425b40f4c0c73e9b8b13db4e9859d
