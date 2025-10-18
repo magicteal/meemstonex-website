@@ -3,12 +3,10 @@ import React, { useRef, useEffect } from "react";
 import ImageTrailCursor from "@/components/ui/image-trail-cursor";
 import { cn } from "@/lib/utils";
 
-import type { ReactNode } from "react";
-
 type HeroMainProps = {
   images: string[];
   className?: string;
-  subtitle?: ReactNode;
+  subtitle?: string;
 };
 
 export default function HeroMain({

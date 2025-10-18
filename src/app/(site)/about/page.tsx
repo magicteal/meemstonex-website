@@ -5,7 +5,6 @@ import SectionHeader from "@/components/ui/section-header";
 import AboutShowcase from "@/components/about/AboutShowcase";
 import MissionVision from "@/components/about/MissionVision";
 import NumbersSection from "@/components/about/NumbersSection";
-import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
 
 const AboutPage = () => {
   // Animation variants
@@ -45,35 +44,17 @@ const AboutPage = () => {
   };
 
   return (
-    <>
-      {/* Dotted Glow Background - Fixed to viewport, starts from absolute top */}
-      <DottedGlowBackground
-        className="fixed top-0 left-0 right-0 z-0 pointer-events-none"
-        gap={20}
-        radius={2}
-        color="rgba(100, 100, 100, 0.3)"
-        darkColor="rgba(200, 200, 200, 0.3)"
-        glowColor="rgba(0, 170, 255, 0.85)"
-        darkGlowColor="rgba(0, 200, 255, 0.9)"
-        opacity={0.6}
-        backgroundOpacity={0.1}
-      />
-      
-      <div className="text-white relative z-10">
-        {/* Header - Fade in on load */}
-        <motion.div 
-          initial="hidden" 
-          animate="visible" 
-          variants={fadeIn}
-        >
-          <SectionHeader
-            title="Our"
-            highlight="Story"
-            subtitle="Crafting legacies in stone since our inception."
-          />
-        </motion.div>
+    <div className="text-white">
+      {/* Header - Fade in on load */}
+      <motion.div initial="hidden" animate="visible" variants={fadeIn}>
+        <SectionHeader
+          title="Our"
+          highlight="Story"
+          subtitle="Crafting legacies in stone since our inception."
+        />
+      </motion.div>
 
-      <main className="relative z-10">
+      <main>
         {/* Showcase - Slide in from left */}
         <motion.div
           initial="hidden"
@@ -121,8 +102,7 @@ const AboutPage = () => {
           </a>
         </motion.div>
       </main>
-      </div>
-    </>
+    </div>
   );
 };
 
