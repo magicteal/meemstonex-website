@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ProductCard from "../../components/products/ProductCard";
 import CategorySelect from "../../components/products/CategorySelect";
 import Modal from "../../components/products/Modal";
+import Navbar from "../../components/Navbar";
 import { listProducts } from "../../services/mockApi";
 import ExpandableGrid from "../../components/expandable-card-demo-standard";
 
@@ -86,8 +87,9 @@ export default function ProductsPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10">
+      <Navbar />
       <div className="flex flex-col items-start gap-6">
-        <h1 className="hero-heading text-5xl font-black text-gray-900">
+        <h1 className="hero-heading text-5xl pt-20 font-black text-gray-900">
           Products
         </h1>
         <br />

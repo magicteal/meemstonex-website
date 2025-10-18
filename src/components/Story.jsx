@@ -51,12 +51,12 @@ const Story = () => {
     >
       <div className="flex size-full flex-col items-center py-10 pb-24">
         <p className="font-general text-sm uppercase md:text-[10px]">
-          the multiversal ip world
+          the multiversal world of meemstonex
         </p>
 
         <div className="relative size-full">
           <AnimatedTitle
-            title="The st<b>o</b>ry of <br /> a hidden real<b>m</b>"
+            title="The st<b>o</b>ry of <br /> a hidden wor<b>k</b>"
             sectionId="#story"
             containerClass="mt-5 pointer-events-none mix-blend-difference relative z-10"
           />
@@ -66,7 +66,7 @@ const Story = () => {
               <div className="story-img-content">
                 <img
                   ref={frameRef}
-                  src="/img/entrance.webp"
+                  src="/img/story.jpg"
                   alt="entrance"
                   className="object-contain"
                   onMouseLeave={handleMouseLeave}
@@ -84,14 +84,14 @@ const Story = () => {
         <div className="-mt-20 md:-mt-40 flex w-full justify-center lg:-mt-80 md:me-44 md:justify-end">
           <div className="flex h-full w-fit flex-col items-center md:items-start">
             <p className="mt-3 max-w-sm text-center font-circular-web text-violet-50 md:text-start px-3">
-              Where realms converge, lies Zentry and the boundless pillar.
-              Discover its secrets and shape your fate amidst infinite
-              opportunities.
+              Where earth’s artistry converges, lies Meemstonex Marble — the
+              boundless pillar of creation. Discover its depths and shape your
+              legacy in stone eternal.
             </p>
 
             <Button
               id="realm-button"
-              title="discover prologue"
+              title="discover products"
               containerClass="mt-5"
             />
           </div>

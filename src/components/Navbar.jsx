@@ -5,8 +5,11 @@ import Button from "./Button";
 import { useWindowScroll } from "react-use";
 import gsap from "gsap";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useTranslation } from "../lib/i18n";
+import ContactFormModal from "./ContactFormModal";
 
-const navItems = ["Products"];
+// navItems will be translated inside the component using useTranslation
 
 const Navbar = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -18,6 +21,11 @@ const Navbar = () => {
   const audioElementRef = useRef(null);
 
   const { y: currentScrollY } = useWindowScroll();
+  const pathname = usePathname?.() || "/";
+  const isProductsPage = pathname.startsWith("/products");
+  const t = useTranslation();
+  const navItems = [t("products")];
+  const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
     if (currentScrollY === 0) {
@@ -63,7 +71,10 @@ const Navbar = () => {
       <header className="absolute top-1/2 w-full -translate-y-1/2">
         <nav className="flex size-full items-center justify-between p-4">
           <div className="flex items-center gap-7">
-            {/* <img src="/img/logo.png" alt="logo" className='w-10' /> */}
+            <Link href="/" aria-label="Home">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/img/logo.png" alt="logo" className="w-10" />
+            </Link>
 
             {/* <Button
               id="product-button"
@@ -81,14 +92,25 @@ const Navbar = () => {
             >
               {navItems.map((item, index) => (
                 <Link
-                  className="nav-hover-btn"
+                  className={`nav-hover-btn ${
+                    isProductsPage ? "text-black" : "text-white"
+                  }`}
                   key={index}
-                  href={`/${item.toLocaleLowerCase()}`}
+                  href="/products"
                   aria-label={`Go to ${item}`}
                 >
                   {item}
                 </Link>
               ))}
+              <button
+                className={`nav-hover-btn ${
+                  isProductsPage ? "text-black" : "text-white"
+                }`}
+                onClick={() => setContactOpen(true)}
+                aria-label="Open contact form"
+              >
+                Contact Us
+              </button>
             </div>
 
             <button
@@ -107,7 +129,7 @@ const Navbar = () => {
                   key={bar}
                   className={`indicator-line ${
                     isIndicatorActive ? "active" : ""
-                  }`}
+                  } ${isProductsPage ? "text-black" : "text-white"}`}
                   style={{ animationDelay: `${bar * 0.1}s` }}
                 />
               ))}
@@ -115,6 +137,10 @@ const Navbar = () => {
           </div>
         </nav>
       </header>
+      <ContactFormModal
+        open={contactOpen}
+        onClose={() => setContactOpen(false)}
+      />
     </div>
   );
 };

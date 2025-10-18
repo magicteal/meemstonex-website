@@ -52,7 +52,7 @@ export default function Modal({
       {open && (
         <motion.div
           ref={overlayRef}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm md:backdrop-blur p-4"
           aria-modal="true"
           role="dialog"
           aria-labelledby="modal-title"

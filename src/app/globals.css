@@ -86,6 +86,22 @@ html.dark .nav-hover-btn::after {
   background: #fff;
 }
 
+/* Ensure utility text color utilities override the default nav color
+   when both classes are present. Placed after .nav-hover-btn rules so
+   they take effect in the cascade. */
+.nav-hover-btn.text-black {
+  color: #000;
+}
+.nav-hover-btn.text-black::after {
+  background: #000;
+}
+.nav-hover-btn.text-white {
+  color: #fff;
+}
+.nav-hover-btn.text-white::after {
+  background: #fff;
+}
+
 .floating-nav {
   background: #000;
   border-radius: 0.5rem; /* rounded-lg */
@@ -335,6 +351,14 @@ html.dark .nav-hover-btn::after {
   border-radius: 9999px; /* rounded-full */
   background-color: #ffffff; /* bg-white */
   transition: all 200ms ease-in-out; /* transition-all duration-200 ease-in-out */
+}
+
+/* Route-aware indicator color overrides */
+.indicator-line.text-black {
+  background-color: #000;
+}
+.indicator-line.text-white {
+  background-color: #fff;
 }
 
 .indicator-line.active {
