@@ -1,7 +1,15 @@
 "use client";
 import React, { useRef, useState } from "react";
-import Modal from "./products/Modal";
 import { useToast } from "./products/ToastProvider";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "./ui/dialog";
 
 const initial = { name: "", number: "", city: "", usage: "interior" };
 
@@ -45,92 +53,113 @@ export default function ContactFormModal({ open, onClose }) {
   };
 
   return (
-    <Modal
+    <Dialog
       open={open}
-      onClose={onClose}
-      title="Contact Us"
-      initialFocusRef={nameRef}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose?.();
+      }}
     >
-      <form onSubmit={onSubmit} className="grid gap-4">
-        <div>
-          <label className="mb-1 block text-sm text-gray-700" htmlFor="name">
-            Name
-          </label>
-          <input
-            id="name"
-            name="name"
-            ref={nameRef}
-            type="text"
-            value={form.name}
-            onChange={onChange}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
-            required
-          />
-        </div>
+      <DialogContent
+        showCloseButton
+        onOpenAutoFocus={() => {
+          // Ensure the Name field receives focus when the dialog opens
+          try {
+            nameRef.current?.focus();
+          } catch {}
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>Contact Us</DialogTitle>
+          <DialogDescription>
+            Fill in the form and we’ll get back to you.
+          </DialogDescription>
+        </DialogHeader>
 
-        <div>
-          <label className="mb-1 block text-sm text-gray-700" htmlFor="number">
-            Number
-          </label>
-          <input
-            id="number"
-            name="number"
-            type="tel"
-            value={form.number}
-            onChange={onChange}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
-            required
-          />
-        </div>
+        <form onSubmit={onSubmit} className="grid gap-4">
+          <div>
+            <label className="mb-1 block text-sm text-gray-700" htmlFor="name">
+              Name
+            </label>
+            <input
+              id="name"
+              name="name"
+              ref={nameRef}
+              type="text"
+              value={form.name}
+              onChange={onChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="mb-1 block text-sm text-gray-700" htmlFor="city">
-            City
-          </label>
-          <input
-            id="city"
-            name="city"
-            type="text"
-            value={form.city}
-            onChange={onChange}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
-            required
-          />
-        </div>
+          <div>
+            <label
+              className="mb-1 block text-sm text-gray-700"
+              htmlFor="number"
+            >
+              Number
+            </label>
+            <input
+              id="number"
+              name="number"
+              type="tel"
+              value={form.number}
+              onChange={onChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="mb-1 block text-sm text-gray-700" htmlFor="usage">
-            Usage
-          </label>
-          <select
-            id="usage"
-            name="usage"
-            value={form.usage}
-            onChange={onChange}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
-          >
-            <option value="interior">For Interior</option>
-            <option value="personal">Personal Use</option>
-          </select>
-        </div>
+          <div>
+            <label className="mb-1 block text-sm text-gray-700" htmlFor="city">
+              City
+            </label>
+            <input
+              id="city"
+              name="city"
+              type="text"
+              value={form.city}
+              onChange={onChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              required
+            />
+          </div>
 
-        <div className="mt-2 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-60"
-          >
-            {loading ? "Submitting..." : "Submit"}
-          </button>
-        </div>
-      </form>
-    </Modal>
+          <div>
+            <label className="mb-1 block text-sm text-gray-700" htmlFor="usage">
+              Usage
+            </label>
+            <select
+              id="usage"
+              name="usage"
+              value={form.usage}
+              onChange={onChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+            >
+              <option value="interior">For Interior</option>
+              <option value="personal">Personal Use</option>
+            </select>
+          </div>
+
+          <DialogFooter className="mt-2 flex justify-end gap-3">
+            <DialogClose asChild>
+              <button
+                type="button"
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </DialogClose>
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-60"
+            >
+              {loading ? "Submitting..." : "Submit"}
+            </button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
