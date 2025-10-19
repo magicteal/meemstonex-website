@@ -1,12 +1,29 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
-import ProductCard from "../../components/products/ProductCard";
-import CategorySelect from "../../components/products/CategorySelect";
-import Modal from "../../components/products/Modal";
-import Navbar from "../../components/Navbar";
 import { listProducts } from "../../services/mockApi";
-import ExpandableGrid from "../../components/expandable-card-demo-standard";
+
+const Navbar = dynamic(() => import("../../components/Navbar"), {
+  ssr: false,
+  loading: () => <div className="h-16" />,
+});
+const ProductCard = dynamic(
+  () => import("../../components/products/ProductCard"),
+  { ssr: false, loading: () => <div className="h-40 w-40 bg-gray-100" /> }
+);
+const CategorySelect = dynamic(
+  () => import("../../components/products/CategorySelect"),
+  { ssr: false, loading: () => <div className="h-10 w-48 bg-gray-100" /> }
+);
+const Modal = dynamic(() => import("../../components/products/Modal"), {
+  ssr: false,
+  loading: () => null,
+});
+const ExpandableGrid = dynamic(
+  () => import("../../components/expandable-card-demo-standard"),
+  { ssr: false, loading: () => <div className="h-64" /> }
+);
 
 /**
  * Folder structure suggestion
@@ -89,51 +106,48 @@ export default function ProductsPage() {
     <main className="mx-auto max-w-7xl px-4 py-10">
       <Navbar />
       <div className="flex flex-col items-start gap-6">
-        <h1 className="hero-heading text-5xl pt-20 font-black text-gray-900">
+        <h1 className="hero-heading text-6xl md:text-7xl pt-8 md:pt-20 font-black text-gray-900">
           Products
         </h1>
-        <br />
-        <div className="flex-1">
-          <div className="mt-2 flex items-center gap-3">
-            {/* <select
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              aria-label="Sort products"
-            >
-              <option value="name:asc">Name A→Z</option>
-              <option value="name:desc">Name Z→A</option>
-              <option value="price:asc">Price Low→High</option>
-              <option value="price:desc">Price High→Low</option>
-            </select> */}
-            <div>
+
+        <div className="w-full">
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3 md:items-end md:gap-6">
+            <div className="md:col-span-2">
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 Filter by categories
               </label>
-              <CategorySelect
-                value={categoryFilter}
-                onChange={setCategoryFilter}
-              />
+              <div className="w-full">
+                <CategorySelect
+                  value={categoryFilter}
+                  onChange={setCategoryFilter}
+                />
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-gray-600">Min</label>
-              <input
-                type="number"
-                className="w-24 rounded-lg border px-2 py-1 text-sm"
-                value={priceRange[0]}
-                onChange={(e) =>
-                  setPriceRange([Number(e.target.value), priceRange[1]])
-                }
-              />
-              <label className="text-sm text-gray-600">Max</label>
-              <input
-                type="number"
-                className="w-24 rounded-lg border px-2 py-1 text-sm"
-                value={priceRange[1]}
-                onChange={(e) =>
-                  setPriceRange([priceRange[0], Number(e.target.value)])
-                }
-              />
+
+            <div className="flex gap-2 items-center md:justify-end">
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-600">Min</label>
+                <input
+                  type="number"
+                  className="w-24 rounded-lg border px-2 py-1 text-sm"
+                  value={priceRange[0]}
+                  onChange={(e) =>
+                    setPriceRange([Number(e.target.value), priceRange[1]])
+                  }
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-600">Max</label>
+                <input
+                  type="number"
+                  className="w-24 rounded-lg border px-2 py-1 text-sm"
+                  value={priceRange[1]}
+                  onChange={(e) =>
+                    setPriceRange([priceRange[0], Number(e.target.value)])
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -159,7 +173,7 @@ export default function ProductsPage() {
           });
           return Array.from(map.entries()).map(([cat, prods]) => (
             <div key={cat}>
-              <h2 className="mb-3 text-xl font-semibold text-gray-800">
+              <h2 className="mb-3 text-lg md:text-xl font-semibold text-gray-800">
                 {cat}
               </h2>
               {/* The demo component now handles its own layout and spans full width */}

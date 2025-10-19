@@ -36,8 +36,9 @@ export default function ExpandableCardDemo({ items = [] }) {
   // Map incoming admin products to local card shape; fallback to demo cards
   const cardsData = useMemo(() => {
     if (Array.isArray(items) && items.length) {
-      return items.map((p) => ({
-        uid: p.id,
+      return items.map((p, idx) => ({
+        // ensure uid is unique even if incoming ids collide by appending the index
+        uid: p.id != null ? `${p.id}-${idx}` : `item-${idx}`,
         title: p.name,
         description: `$${Number(p.price ?? 0).toFixed(2)} • ${
           (p.categories || []).join(", ") || "General"
@@ -172,28 +173,31 @@ export default function ExpandableCardDemo({ items = [] }) {
                 : `card-${keyOf(card)}-${index}-${id}`
             }
             onClick={() => setActive(card)}
-            className="p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
+            className="w-full p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
           >
-            <div className="flex gap-4 flex-col md:flex-row ">
-              <motion.div layoutId={`image-${keyOf(card)}-${id}`}>
+            <div className="flex gap-4 flex-col md:flex-row w-full">
+              <motion.div
+                layoutId={`image-${keyOf(card)}-${id}`}
+                className="w-full md:w-auto"
+              >
                 <img
                   width={100}
                   height={100}
                   src={card.src}
                   alt={card.title}
-                  className="h-40 w-40 md:h-14 md:w-14 rounded-lg object-cover object-top"
+                  className="w-full h-48 md:h-14 md:w-14 rounded-lg object-cover object-top mx-auto md:mx-0"
                 />
               </motion.div>
-              <div className="">
+              <div className="flex-1">
                 <motion.h3
                   layoutId={`title-${keyOf(card)}-${id}`}
-                  className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left"
+                  className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left mt-3 md:mt-0"
                 >
                   {card.title}
                 </motion.h3>
                 <motion.p
                   layoutId={`description-${card.description}-${id}`}
-                  className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
+                  className="text-neutral-600 dark:text-neutral-400 text-center md:text-left mt-2 md:mt-0"
                 >
                   {card.description}
                 </motion.p>
@@ -201,7 +205,7 @@ export default function ExpandableCardDemo({ items = [] }) {
             </div>
             <motion.button
               layoutId={`button-${keyOf(card)}-${id}`}
-              className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-green-500 hover:text-white text-black mt-4 md:mt-0"
+              className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-green-500 hover:text-white text-black mt-4 md:mt-0 self-center md:self-auto"
             >
               {card.ctaText}
             </motion.button>

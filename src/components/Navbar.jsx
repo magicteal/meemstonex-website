@@ -26,6 +26,12 @@ const Navbar = () => {
   const t = useTranslation();
   const navItems = [t("products")];
   const [contactOpen, setContactOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // close mobile menu when route changes
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (currentScrollY === 0) {
@@ -102,7 +108,7 @@ const Navbar = () => {
                   {item}
                 </Link>
               ))}
-              {/*
+              {/* desktop contact (kept hidden if needed) */}
               <button
                 className={`nav-hover-btn ${
                   isProductsPage ? "text-black" : "text-white"
@@ -110,10 +116,45 @@ const Navbar = () => {
                 onClick={() => setContactOpen(true)}
                 aria-label="Open contact form"
               >
-                Contact Us
+                Contact
               </button>
-              */}
             </div>
+
+            {/* mobile hamburger */}
+            <button
+              className={`ml-4 md:hidden inline-flex items-center justify-center rounded-md p-2 ${
+                isProductsPage ? "text-black" : "text-white"
+              } hover:bg-gray-100/10`}
+              aria-controls="mobile-menu"
+              aria-expanded={mobileOpen}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMobileOpen((v) => !v)}
+            >
+              <span className="sr-only">Open main menu</span>
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                {mobileOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
 
             <button
               className="ml-10 flex items-center space-x-0.5"
@@ -139,6 +180,49 @@ const Navbar = () => {
           </div>
         </nav>
       </header>
+      {/* mobile menu overlay and panel */}
+      {mobileOpen && (
+        <div>
+          <div
+            className="fixed inset-0 z-40 bg-black/60"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+
+          <nav
+            id="mobile-menu"
+            className="fixed inset-x-4 top-20 z-50 rounded-lg bg-black p-4 shadow-lg md:hidden"
+            role="dialog"
+            aria-modal="true"
+          >
+            <ul className="flex flex-col gap-3">
+              {navItems.map((item, index) => (
+                <li key={index}>
+                  <Link
+                    href="/products"
+                    className="block w-full rounded-md bg-blue-600 px-3 py-3 text-center text-base font-medium text-white"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <button
+                  onClick={() => {
+                    setContactOpen(true);
+                    setMobileOpen(false);
+                  }}
+                  className="w-full rounded-md bg-blue-600 px-3 py-3 text-center text-base font-medium text-white"
+                >
+                  Contact
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      )}
+
       <ContactFormModal
         open={contactOpen}
         onClose={() => setContactOpen(false)}
