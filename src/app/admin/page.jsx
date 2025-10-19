@@ -75,10 +75,6 @@ export default function AdminLoginPage() {
           </button>
         </div>
       </form>
-      <p className="mt-4 text-xs text-gray-500">
-        Admin email and password are set in your `.env.local` (ADMIN_EMAIL /
-        ADMIN_PASSWORD)
-      </p>
     </main>
   );
 }
