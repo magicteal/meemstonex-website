@@ -88,7 +88,15 @@ export default function ProductsEditorPage() {
   };
 
   const onDelete = async (id) => {
-    const deleted = await deleteProduct(id);
+    let deleted;
+    try {
+      deleted = await deleteProduct(id);
+    } catch (e) {
+      // handle error gracefully and show toast
+      push({ title: "Delete failed", description: e.message, type: "error" });
+      return;
+    }
+
     setItems((prev) => prev.filter((p) => p.id !== id));
     let undo = true;
     const idToast = push({
