@@ -3,6 +3,7 @@
 import React, { useEffect, useId, useRef, useState, useMemo } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "@/hooks/use-outside-click";
+import Image from "next/image";
 
 /**
  * ExpandableCardDemo
@@ -40,9 +41,10 @@ export default function ExpandableCardDemo({ items = [] }) {
         // ensure uid is unique even if incoming ids collide by appending the index
         uid: p.id != null ? `${p.id}-${idx}` : `item-${idx}`,
         title: p.name,
-        description: `$${Number(p.price ?? 0).toFixed(2)} • ${
-          (p.categories || []).join(", ") || "General"
-        }`,
+        description: `₹${Number(p.price ?? 0).toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })} • ${(p.categories || []).join(", ") || "General"}`,
         src: p.photo,
         ctaText: "View",
         ctaLink: "#",
@@ -109,12 +111,13 @@ export default function ExpandableCardDemo({ items = [] }) {
               className="w-[92vw] max-w-5xl h-full md:h-fit md:max-h-[90%] flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
             >
               <motion.div layoutId={`image-${keyOf(active)}-${id}`}>
-                <img
-                  width={200}
-                  height={200}
+                <Image
+                  width={1200}
+                  height={800}
                   src={active.src}
                   alt={active.title}
                   className="w-full h-[42vh] sm:h-80 md:h-[420px] sm:rounded-tr-lg sm:rounded-tl-lg object-cover object-top"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
                 />
               </motion.div>
 
@@ -180,12 +183,13 @@ export default function ExpandableCardDemo({ items = [] }) {
                 layoutId={`image-${keyOf(card)}-${id}`}
                 className="w-full md:w-auto"
               >
-                <img
-                  width={100}
-                  height={100}
+                <Image
+                  width={200}
+                  height={200}
                   src={card.src}
                   alt={card.title}
                   className="w-full h-48 md:h-14 md:w-14 rounded-lg object-cover object-top mx-auto md:mx-0"
+                  sizes="(max-width: 768px) 100vw, 56px"
                 />
               </motion.div>
               <div className="flex-1">

@@ -74,6 +74,11 @@ const Navbar = () => {
       ref={navContainerRef}
       className="fixed inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6"
     >
+      {/** Decide nav text color based on route and scroll */}
+      {/** On /products: black at top, white when scrolled; Elsewhere keep current (white) */}
+      {(() => {
+        return null;
+      })()}
       <header className="absolute top-1/2 w-full -translate-y-1/2">
         <nav className="flex size-full items-center justify-between p-4">
           <div className="flex items-center gap-7">
@@ -90,94 +95,99 @@ const Navbar = () => {
             /> */}
           </div>
 
-          <div className="flex h-full items-center">
-            <div
-              className="hidden md:flex md:items-center md:gap-6"
-              role="navigation"
-              aria-label="Primary"
-            >
-              {navItems.map((item, index) => (
-                <Link
-                  className={`nav-hover-btn ${
-                    isProductsPage ? "text-black" : "text-white"
-                  }`}
-                  key={index}
-                  href="/products"
-                  aria-label={`Go to ${item}`}
-                >
-                  {item}
-                </Link>
-              ))}
-              {/* desktop contact (kept hidden if needed) */}
-              <button
-                className={`nav-hover-btn ${
-                  isProductsPage ? "text-black" : "text-white"
-                }`}
-                onClick={() => setContactOpen(true)}
-                aria-label="Open contact form"
-              >
-                Contact
-              </button>
-            </div>
-
-            {/* mobile hamburger */}
-            <button
-              className={`ml-4 md:hidden inline-flex items-center justify-center rounded-md p-2 ${
-                isProductsPage ? "text-black" : "text-white"
-              } hover:bg-gray-100/10`}
-              aria-controls="mobile-menu"
-              aria-expanded={mobileOpen}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              onClick={() => setMobileOpen((v) => !v)}
-            >
-              <span className="sr-only">Open main menu</span>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                {mobileOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-
-            <button
-              className="ml-10 flex items-center space-x-0.5"
-              onClick={toggleAudioIndicator}
-            >
-              <audio
-                ref={audioElementRef}
-                className="hidden"
-                src="/audio/loop.mp3"
-                loop
-              />
-
-              {[1, 2, 3, 4].map((bar) => (
+          {/** compute class once per render */}
+          {(() => {
+            const hasScrolled = currentScrollY > 0;
+            const navTextClass = isProductsPage
+              ? hasScrolled
+                ? "text-white"
+                : "text-black"
+              : "text-black";
+            return (
+              <div className="flex h-full items-center">
                 <div
-                  key={bar}
-                  className={`indicator-line ${
-                    isIndicatorActive ? "active" : ""
-                  } ${isProductsPage ? "text-black" : "text-white"}`}
-                  style={{ animationDelay: `${bar * 0.1}s` }}
-                />
-              ))}
-            </button>
-          </div>
+                  className="hidden md:flex md:items-center md:gap-6"
+                  role="navigation"
+                  aria-label="Primary"
+                >
+                  {navItems.map((item, index) => (
+                    <Link
+                      className={`nav-hover-btn ${navTextClass}`}
+                      key={index}
+                      href="/products"
+                      aria-label={`Go to ${item}`}
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                  {/* desktop contact (kept hidden if needed) */}
+                  <button
+                    className={`nav-hover-btn ${navTextClass}`}
+                    onClick={() => setContactOpen(true)}
+                    aria-label="Open contact form"
+                  >
+                    Contact
+                  </button>
+                </div>
+
+                {/* mobile hamburger */}
+                <button
+                  className={`ml-4 md:hidden inline-flex items-center justify-center rounded-md p-2 ${navTextClass} hover:bg-gray-100/10`}
+                  aria-controls="mobile-menu"
+                  aria-expanded={mobileOpen}
+                  aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                  onClick={() => setMobileOpen((v) => !v)}
+                >
+                  <span className="sr-only">Open main menu</span>
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    {mobileOpen ? (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    ) : (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    )}
+                  </svg>
+                </button>
+
+                <button
+                  className="ml-10 flex items-center space-x-0.5"
+                  onClick={toggleAudioIndicator}
+                >
+                  <audio
+                    ref={audioElementRef}
+                    className="hidden"
+                    src="/audio/loop.mp3"
+                    loop
+                  />
+
+                  {[1, 2, 3, 4].map((bar) => (
+                    <div
+                      key={bar}
+                      className={`indicator-line ${
+                        isIndicatorActive ? "active" : ""
+                      } ${navTextClass}`}
+                      style={{ animationDelay: `${bar * 0.1}s` }}
+                    />
+                  ))}
+                </button>
+              </div>
+            );
+          })()}
         </nav>
       </header>
       {/* mobile menu overlay and panel */}

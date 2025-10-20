@@ -1,30 +1,33 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 
 const BentoTilt = ({ children, className = "" }) => {
-  const [transformStyle, setTransformStyle] = useState("");
   const itemRef = useRef();
+  const rafRef = useRef(null);
 
   const handleMouseMove = (e) => {
     if (!itemRef.current) return;
 
-    const { left, top, width, height } =
-      itemRef.current.getBoundingClientRect();
-
+    const el = itemRef.current;
+    const { left, top, width, height } = el.getBoundingClientRect();
     const relativeX = (e.clientX - left) / width;
     const relativeY = (e.clientY - top) / height;
-
     const tiltX = (relativeY - 0.5) * 10;
     const tiltY = (relativeX - 0.5) * -10;
 
-    const newTransform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(0.98, 0.98, 0.98)`;
-
-    setTransformStyle(newTransform);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      el.style.transform = `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(0.98, 0.98, 0.98)`;
+      el.style.willChange = "transform";
+    });
   };
 
-  const handleMouseLeave = (e) => {
-    setTransformStyle("");
+  const handleMouseLeave = () => {
+    if (!itemRef.current) return;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    itemRef.current.style.transform = "";
+    itemRef.current.style.willChange = "auto";
   };
 
   return (
@@ -33,21 +36,67 @@ const BentoTilt = ({ children, className = "" }) => {
       ref={itemRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ transform: transformStyle }}
     >
       {children}
     </div>
   );
 };
 
+const LazyVideo = ({ src, className = "", ...rest }) => {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+
+    let observer;
+    const onIntersect = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // Start playback when visible
+          video.play().catch(() => {});
+        } else {
+          // Pause when offscreen
+          video.pause();
+        }
+      });
+    };
+
+    if ("IntersectionObserver" in window) {
+      observer = new IntersectionObserver(onIntersect, {
+        root: null,
+        threshold: 0.25,
+      });
+      observer.observe(video);
+    } else {
+      // Fallback: try to play by default
+      video.play().catch(() => {});
+    }
+
+    return () => {
+      if (observer) observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      src={src}
+      loop
+      muted
+      playsInline
+      preload="metadata"
+      className={className}
+      {...rest}
+    />
+  );
+};
+
 const BentoCard = ({ src, title, description }) => {
   return (
     <div className="relative w-full h-48 md:h-[55vh] overflow-hidden rounded-md">
-      <video
+      <LazyVideo
         src={src}
-        loop
-        muted
-        autoPlay
         className="w-full h-full object-cover object-center"
       />
       <div className="absolute inset-0 z-10 flex flex-col justify-between p-5 text-blue-50">
@@ -116,11 +165,8 @@ const Features = () => {
 
           <BentoTilt className="bento-tilt_2">
             <div className="relative w-full h-48 md:h-[40vh] overflow-hidden rounded-md">
-              <video
+              <LazyVideo
                 src="videos/feature-5.mp4"
-                loop
-                muted
-                autoPlay
                 className="w-full h-full object-cover object-center"
               />
             </div>

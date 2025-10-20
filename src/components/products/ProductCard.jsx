@@ -26,7 +26,11 @@ export default function ProductCard({ product, onView, onQuickAdd }) {
             {product.name}
           </h3>
           <span className="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-sm font-medium text-blue-700">
-            ${product.price.toFixed(2)}
+            ₹
+            {Number(product.price).toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </span>
         </div>
         <div className="flex flex-wrap gap-1">

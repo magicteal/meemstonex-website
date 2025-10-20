@@ -2,7 +2,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
-import { listProducts } from "../../services/mockApi";
+import { listProducts } from "../../services/api";
+import Image from "next/image";
 
 const Navbar = dynamic(() => import("../../components/Navbar"), {
   ssr: false,
@@ -45,7 +46,8 @@ export default function ProductsPage() {
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [categoryFilter, setCategoryFilter] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  // widen default max price so expensive products are not hidden by default
+  const [priceRange, setPriceRange] = useState([0, 100000]);
   const [sort, setSort] = useState("name:asc");
   const [selected, setSelected] = useState(null);
 
@@ -64,7 +66,8 @@ export default function ProductsPage() {
         const nextPage = reset ? 1 : page;
         const res = await listProducts({
           page: nextPage,
-          pageSize: 9,
+          // increase pageSize so newly added items are more likely to appear
+          pageSize: 100,
           filter: { q: debouncedQ, categories: categoryFilter, priceRange },
           sort,
         });
@@ -120,6 +123,7 @@ export default function ProductsPage() {
                 <CategorySelect
                   value={categoryFilter}
                   onChange={setCategoryFilter}
+                  allowCreate={false}
                 />
               </div>
             </div>
@@ -196,15 +200,22 @@ export default function ProductsPage() {
       >
         {selected && (
           <div className="grid gap-4 md:grid-cols-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={selected.photo}
-              alt={selected.name}
-              className="h-64 w-full rounded-lg object-cover"
-            />
+            <div className="relative h-64 w-full">
+              <Image
+                src={selected.photo}
+                alt={selected.name}
+                fill
+                className="rounded-lg object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
             <div>
               <p className="text-lg font-semibold text-blue-700">
-                ${selected.price.toFixed(2)}
+                ₹
+                {Number(selected.price).toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
               <div className="mt-1 flex flex-wrap gap-1">
                 {selected.categories.map((c) => (

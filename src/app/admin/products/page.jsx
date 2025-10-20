@@ -8,8 +8,9 @@ import {
   deleteProduct,
   listProducts,
   updateProduct,
-} from "../../../services/mockApi";
+} from "../../../services/api";
 import { useToast } from "../../../components/products/ToastProvider";
+import Image from "next/image";
 
 export default function ProductsEditorPage() {
   const [items, setItems] = useState([]);
@@ -133,7 +134,7 @@ export default function ProductsEditorPage() {
           onClick={() => setOpenCreate(true)}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
         >
-          New Product (n)
+          New Product
         </button>
       </div>
 
@@ -166,12 +167,15 @@ export default function ProductsEditorPage() {
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                 >
                   <td className="px-3 py-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={p.photo}
-                      alt=""
-                      className="h-12 w-12 rounded-md object-cover"
-                    />
+                    <div className="relative h-12 w-12">
+                      <Image
+                        src={p.photo}
+                        alt={p.name}
+                        fill
+                        className="rounded-md object-cover"
+                        sizes="48px"
+                      />
+                    </div>
                   </td>
                   <td className="px-3 py-2 font-medium text-gray-900">
                     {p.name}
@@ -188,7 +192,13 @@ export default function ProductsEditorPage() {
                       ))}
                     </div>
                   </td>
-                  <td className="px-3 py-2">${p.price.toFixed(2)}</td>
+                  <td className="px-3 py-2">
+                    ₹
+                    {Number(p.price).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
                   <td className="px-3 py-2 text-right">
                     <div className="inline-flex gap-2">
                       <button

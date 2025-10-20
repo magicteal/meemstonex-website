@@ -4,6 +4,7 @@ import AnimatedTitle from "./AnimatedTitle";
 import gsap from "gsap";
 import RoundedCorners from "./RoundedCorners";
 import Button from "./Button";
+import Image from "next/image";
 
 const Story = () => {
   const frameRef = useRef(null);
@@ -63,16 +64,22 @@ const Story = () => {
 
           <div className="story-img-container">
             <div className="story-img-mask">
-              <div className="story-img-content">
-                <img
-                  ref={frameRef}
+              <div
+                className="story-img-content"
+                ref={frameRef}
+                onMouseLeave={handleMouseLeave}
+                onMouseUp={handleMouseLeave}
+                onMouseEnter={handleMouseLeave}
+                onMouseMove={handleMouseMove}
+              >
+                <Image
                   src="/img/story.jpg"
                   alt="entrance"
                   className="object-contain"
-                  onMouseLeave={handleMouseLeave}
-                  onMouseUp={handleMouseLeave}
-                  onMouseEnter={handleMouseLeave}
-                  onMouseMove={handleMouseMove}
+                  width={1920}
+                  height={1080}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority={false}
                 />
               </div>
             </div>

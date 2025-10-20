@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 // Lightweight local implementation inspired by Aceternity Expandable Card
 export default function ExpandableCard({ title, subtitle, image, children }) {
@@ -12,7 +13,14 @@ export default function ExpandableCard({ title, subtitle, image, children }) {
         aria-expanded={open}
         className="flex w-full items-center gap-4 p-4 text-left focus:outline-none"
       >
-        <img src={image} alt="" className="h-20 w-28 rounded-md object-cover" />
+        <Image
+          src={image}
+          alt=""
+          width={224}
+          height={160}
+          className="h-20 w-28 rounded-md object-cover"
+          sizes="(max-width: 768px) 112px, 224px"
+        />
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>

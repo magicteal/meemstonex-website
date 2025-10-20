@@ -1,30 +1,39 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { mockUpload } from "../../services/mockApi";
+import { mockUpload } from "../../services/api";
 import CategorySelect from "./CategorySelect";
 
 export default function ProductForm({
-  initial = {},
+  initial,
   onSubmit,
   onCancel,
   submitLabel = "Save",
 }) {
-  const [name, setName] = useState(initial.name || "");
-  const [categories, setCategories] = useState(initial.categories || []);
-  const [price, setPrice] = useState(initial.price?.toString() || "");
-  const [photo, setPhoto] = useState(initial.photo || "");
-  const [description, setDescription] = useState(initial.description || "");
+  const [name, setName] = useState(initial?.name || "");
+  const [categories, setCategories] = useState(initial?.categories || []);
+  const [price, setPrice] = useState(
+    initial?.price != null ? String(initial.price) : ""
+  );
+  const [photo, setPhoto] = useState(initial?.photo || "");
+  const [description, setDescription] = useState(initial?.description || "");
   const [errors, setErrors] = useState({});
   const [uploading, setUploading] = useState(false);
   const nameRef = useRef(null);
 
   useEffect(() => {
+    if (!initial) return; // only sync when editing
     setName(initial.name || "");
     setCategories(initial.categories || []);
     setPrice(initial.price != null ? String(initial.price) : "");
     setPhoto(initial.photo || "");
     setDescription(initial.description || "");
-  }, [initial]);
+  }, [
+    initial?.name,
+    initial?.photo,
+    initial?.description,
+    initial?.price,
+    JSON.stringify(initial?.categories || []),
+  ]);
 
   const validate = () => {
     const errs = {};
@@ -71,6 +80,7 @@ export default function ProductForm({
       price: parseFloat(price),
       photo,
       description: description.trim(),
+      currency: "INR",
     };
     onSubmit?.(payload);
   };
@@ -144,21 +154,9 @@ export default function ProductForm({
             onChange={onFileChange}
             aria-label="Upload photo"
           />
-          <input
-            type="url"
-            placeholder="Or paste image URL"
-            value={photo}
-            onChange={(e) => setPhoto(e.target.value)}
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
-          />
-          <button
-            type="button"
-            onClick={onUrlUpload}
-            disabled={uploading}
-            className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
-            Use URL
-          </button>
+          <span className="text-sm text-gray-500">
+            Only image file uploads are accepted
+          </span>
         </div>
         {errors.photo && (
           <p className="mt-1 text-sm text-red-600">{errors.photo}</p>
