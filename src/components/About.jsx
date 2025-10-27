@@ -35,16 +35,9 @@ const About = () => {
 
           <AnimatedTitle
             title="Disc<b>o</b>ver the world of <br /> W<b>o</b>rld with Meemstonex"
-            containerClass="mt-5 !text-black text-center"
+            containerClass="mt-5 !text-black text-center h-full"
           />
 
-          <div className="about-subtext">
-            <p>The Game of Games begin-your life, now an epic MMORPG</p>
-
-            <p className="text-gray-500">
-              Zentry unites every player from countless games and platforms
-            </p>
-          </div>
         </div>
       </section>
     </div>

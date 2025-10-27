@@ -46,12 +46,20 @@ export default function ProductForm({
   };
 
   const handleFile = async (file) => {
+    // show an immediate local preview for perceived performance
+    const preview = URL.createObjectURL(file);
+    setPhoto(preview);
     setUploading(true);
     try {
       const url = await mockUpload(file);
-      setPhoto(url);
+      // replace preview with final uploaded URL (or keep preview if upload fails)
+      if (url) setPhoto(url);
     } finally {
       setUploading(false);
+      // revoke the object URL when upload finishes
+      try {
+        URL.revokeObjectURL(preview);
+      } catch (e) {}
     }
   };
 
@@ -152,6 +160,7 @@ export default function ProductForm({
             type="file"
             accept="image/*"
             onChange={onFileChange}
+            disabled={uploading}
             aria-label="Upload photo"
           />
           <span className="text-sm text-gray-500">
@@ -199,9 +208,16 @@ export default function ProductForm({
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          disabled={uploading}
+          aria-busy={uploading}
+          className={
+            "rounded-lg px-3 py-2 text-sm font-medium text-white " +
+            (uploading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700")
+          }
         >
-          {submitLabel}
+          {uploading ? "Uploading…" : submitLabel}
         </button>
       </div>
     </form>

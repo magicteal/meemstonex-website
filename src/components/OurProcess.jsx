@@ -56,17 +56,18 @@ const OurProcess = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-1 gap-10 md:grid-cols-5 md:items-start md:justify-items-center"
+          className="flex gap-6 items-start md:items-center justify-start overflow-x-auto px-4 md:px-0 pr-6 md:pr-0 pb-4 snap-x snap-mandatory flex-nowrap"
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
           {steps.map((step, idx) => (
             <React.Fragment key={step.id}>
               <motion.li
                 variants={itemVariants}
-                className="flex flex-col items-center text-center"
+                className="flex flex-col items-center text-center min-w-[14rem] flex-none md:min-w-0 md:flex-1 snap-start"
               >
-                <div className="mb-5 flex h-36 w-36 items-center justify-center rounded-full border border-blue-200/20 bg-white/5 shadow-[0_0_0_1px_rgba(255,255,255,0.03)_inset] backdrop-blur-sm md:h-40 md:w-40">
+                <div className="mb-5 flex  h-20 w-20   items-center justify-center rounded-full border border-blue-200/20 bg-white/5 shadow-[0_0_0_1px_rgba(255,255,255,0.03)_inset] backdrop-blur-sm">
                   <step.Icon
-                    className="h-14 w-14 text-blue-100"
+                    className="h-8 w-8 md:h-10 md:w-10 text-blue-100"
                     strokeWidth={1.5}
                   />
                 </div>
@@ -80,7 +81,7 @@ const OurProcess = () => {
 
               {/* dashed connector for desktop between steps */}
               {idx < steps.length - 1 && (
-                <div className="hidden md:flex md:items-center md:justify-center">
+                <div className="flexitems-center justify-center mt-10 md:mt-0">
                   <svg
                     width="80"
                     height="24"

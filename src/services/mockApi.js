@@ -15,7 +15,20 @@ const STORAGE_KEY = "mock_products_v1";
 const STORAGE_CATS_KEY = "mock_categories_v1";
 
 const randomDelay = () => 200 + Math.floor(Math.random() * 600);
-let errorRate = 0.1; // 10% chance to error; set via setErrorRate
+// Default simulated network error rate. Can be overridden by
+// NEXT_PUBLIC_MOCK_ERROR_RATE at build time. If NEXT_PUBLIC_USE_MOCK=1
+// and no explicit NEXT_PUBLIC_MOCK_ERROR_RATE is provided, default to 0
+// so local development isn't flaky by default.
+const envRate = typeof process !== "undefined" && process.env && process.env.NEXT_PUBLIC_MOCK_ERROR_RATE;
+let errorRate = 0.1; // legacy default
+if (typeof envRate !== "undefined") {
+  const parsed = Number(envRate);
+  if (!Number.isNaN(parsed) && parsed >= 0 && parsed <= 1) errorRate = parsed;
+}
+if (typeof process !== "undefined" && process.env && process.env.NEXT_PUBLIC_USE_MOCK === "1" && typeof envRate === "undefined") {
+  // when mock mode is explicitly enabled, avoid random failures unless user asked for them
+  errorRate = 0;
+}
 
 export function setErrorRate(rate) {
   errorRate = Math.max(0, Math.min(1, rate));
