@@ -19,7 +19,17 @@ if (!global._mongoClientPromise) {
   }
   client = new MongoClient(uri || "", options);
   global._mongoClientPromise = client.connect().catch((err) => {
+    // Provide a more actionable message for common TLS/SSL issues on Windows/dev machines
     console.error("Failed to connect to MongoDB:", err.message);
+    // print full error in dev to help diagnose (not exposing in production logs)
+    if (process.env.NODE_ENV !== "production") {
+      console.error(err);
+      if (/ssl|tls|TLSV1|SSL routines/i.test(err.message || "")) {
+        console.error(
+          "MongoDB TLS/SSL handshake failed. If you're running locally behind a proxy/inspector or using an intercepting TLS proxy, you can set MONGODB_TLS_INSECURE=1 in your .env.local to allow invalid certs for development. DO NOT enable this in production."
+        );
+      }
+    }
     throw err;
   });
 }

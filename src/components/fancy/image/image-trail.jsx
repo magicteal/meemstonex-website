@@ -28,6 +28,10 @@ export default function ImageTrail({
   const lastPos = useRef({ x: null, y: null });
   const lastTimeRef = useRef(0);
   const indexRef = useRef(0);
+  // smoothing targets for a fluid cursor trail
+  const pointerTarget = useRef({ x: null, y: null });
+  const pointerPos = useRef({ x: null, y: null });
+  const rafRef = useRef(null);
   const [spawns, setSpawns] = useState([]);
 
   const pool = useMemo(() => {
@@ -57,50 +61,62 @@ export default function ImageTrail({
     const el = bindRef?.current || containerRef.current;
     if (!el) return;
 
+    // on mouse move we only update target; the raf loop will smooth & spawn
     const handleMove = (e) => {
       const rect = el.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-
-      const { x: lx, y: ly } = lastPos.current;
-      const now = performance.now();
-
-      if (lx == null || ly == null) {
+      pointerTarget.current = { x, y };
+      // initialize pointerPos immediately if first move
+      if (pointerPos.current.x == null) {
+        pointerPos.current = { x, y };
         lastPos.current = { x, y };
-        lastTimeRef.current = now;
-        spawnAt(x, y);
-        return;
-      }
-
-      const dx = x - lx;
-      const dy = y - ly;
-      const dist = Math.hypot(dx, dy);
-
-      if (now - lastTimeRef.current < minIntervalMs) return;
-
-      if (dist > threshold) {
-        const steps = Math.min(Math.floor(dist / threshold), maxBatchPerMove);
-        for (let i = 1; i <= steps; i++) {
-          const t = i / (steps + 1);
-          spawnAt(lx + dx * t, ly + dy * t);
-        }
-      } else if (dist >= threshold * 0.5) {
+        lastTimeRef.current = performance.now();
         spawnAt(x, y);
       }
-
-      lastPos.current = { x, y };
-      lastTimeRef.current = now;
     };
 
     const handleLeave = () => {
-      lastPos.current = { x: null, y: null };
+      pointerTarget.current = { x: null, y: null };
     };
 
     el.addEventListener("mousemove", handleMove);
     el.addEventListener("mouseleave", handleLeave);
+
+    const smooth = 0.18; // lerp factor (0-1), lower is smoother
+    const loop = () => {
+      const target = pointerTarget.current;
+      if (target && pointerPos.current.x != null) {
+        // lerp toward target
+        pointerPos.current.x += (target.x - pointerPos.current.x) * smooth;
+        pointerPos.current.y += (target.y - pointerPos.current.y) * smooth;
+
+        const lx = lastPos.current.x;
+        const ly = lastPos.current.y;
+        const px = pointerPos.current.x;
+        const py = pointerPos.current.y;
+        const now = performance.now();
+        const dx = px - (lx ?? px);
+        const dy = py - (ly ?? py);
+        const dist = Math.hypot(dx, dy);
+
+        if (now - lastTimeRef.current >= minIntervalMs && dist >= threshold * 0.25) {
+          // spawn at the smoothed position
+          spawnAt(px, py);
+          lastPos.current = { x: px, y: py };
+          lastTimeRef.current = now;
+        }
+      }
+
+      rafRef.current = requestAnimationFrame(loop);
+    };
+
+    rafRef.current = requestAnimationFrame(loop);
+
     return () => {
       el.removeEventListener("mousemove", handleMove);
       el.removeEventListener("mouseleave", handleLeave);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [bindRef, threshold, minIntervalMs, maxBatchPerMove, spawnAt]);
 

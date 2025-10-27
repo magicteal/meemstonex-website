@@ -30,13 +30,58 @@ const Hero = () => {
   const handleMiniVideoClick = () => {
     setHasClicked(true);
 
-    // load next video src on-demand when user interacts
-    setCurrentIndex(upcomingVideoIndex);
-    if (nextVideoRef.current && !nextVideoRef.current.src) {
-      nextVideoRef.current.src = getVideoSrc(upcomingVideoIndex);
-      // try to play immediately once source is set
-      nextVideoRef.current.play().catch(() => {});
-    }
+    // Determine which video the mini is currently showing (so we play exactly that one).
+    let chosen;
+    try {
+      const src = miniVideoRef.current && miniVideoRef.current.src;
+      if (src) {
+        const m = src.match(/hero-(\d+)\.mp4$/);
+        if (m) chosen = Number(m[1]);
+      }
+    } catch (e) {}
+    if (!chosen) chosen = (currentIndex % totalVideos) + 1;
+
+    // Determine following indices
+    const newMini = (chosen % totalVideos) + 1;
+    const nextPreview = (newMini % totalVideos) + 1;
+
+    // update state to the chosen video
+    setCurrentIndex(chosen);
+
+    // Update background (main) to the chosen video
+    try {
+      if (backgroundVideoRef.current) {
+        try {
+          backgroundVideoRef.current.preload = "metadata";
+        } catch (e) {}
+        backgroundVideoRef.current.src = getVideoSrc(chosen);
+        backgroundVideoRef.current.load();
+        backgroundVideoRef.current.play().catch(() => {});
+      }
+    } catch (e) {}
+
+    // Update mini to show the following video (so it previews the next choice)
+    try {
+      if (miniVideoRef.current) {
+        try {
+          miniVideoRef.current.preload = "metadata";
+        } catch (e) {}
+        miniVideoRef.current.src = getVideoSrc(newMini);
+        miniVideoRef.current.load();
+        miniVideoRef.current.play().catch(() => {});
+      }
+    } catch (e) {}
+
+    // Preload the preview/expanded video to the nextPreview index
+    try {
+      if (nextVideoRef.current) {
+        try {
+          nextVideoRef.current.preload = "metadata";
+        } catch (e) {}
+        nextVideoRef.current.src = getVideoSrc(nextPreview);
+        nextVideoRef.current.load();
+      }
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -75,14 +120,15 @@ const Hero = () => {
       revertOnUpdate: true,
     }
   );
-
-  // Lazy-load videos when hero comes into view
   useEffect(() => {
     const el = backgroundVideoRef.current;
     if (!el) return;
 
     if (typeof IntersectionObserver === "undefined") {
       // Fallback: load immediately
+      try {
+        el.preload = "metadata";
+      } catch (e) {}
       el.src = getVideoSrc(currentIndex);
       return;
     }
@@ -97,12 +143,20 @@ const Hero = () => {
             setTimeout(() => {
               try {
                 if (miniVideoRef.current && !miniVideoRef.current.src) {
+                  try {
+                    miniVideoRef.current.preload = "metadata";
+                  } catch (e) {}
                   miniVideoRef.current.src = getVideoSrc(
                     (currentIndex % totalVideos) + 1
                   );
                 }
                 if (nextVideoRef.current && !nextVideoRef.current.src) {
-                  nextVideoRef.current.src = getVideoSrc(currentIndex);
+                  try {
+                    nextVideoRef.current.preload = "metadata";
+                  } catch (e) {}
+                  // next video should be the upcoming index (not the current one)
+                  const upcoming = (currentIndex % totalVideos) + 1;
+                  nextVideoRef.current.src = getVideoSrc(upcoming);
                 }
               } catch (e) {}
             }, 500);
@@ -138,7 +192,7 @@ const Hero = () => {
     });
   });
 
-  const getVideoSrc = (index) => `videos/hero-${index}.mp4`;
+  const getVideoSrc = (index) => `/videos/hero-${index}.mp4`;
   return (
     <div className="relative h-dvh w-screen overflow-x-hidden">
       {isLoading && (
@@ -167,7 +221,7 @@ const Hero = () => {
                 loop
                 muted
                 playsInline
-                preload="none"
+                preload="metadata"
                 id="current-video"
                 className="size-64 origin-center scale-150 object-cover object-center"
                 onLoadedData={handleVideoLoad}
@@ -181,7 +235,7 @@ const Hero = () => {
             loop
             muted
             playsInline
-            preload="none"
+            preload="metadata"
             id="next-video"
             className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
             onLoadedData={handleVideoLoad}
@@ -194,7 +248,7 @@ const Hero = () => {
             loop
             muted
             playsInline
-            preload="none"
+            preload="metadata"
             className="absolute left-0 top-0 size-full object-cover object-center"
             onLoadedData={handleVideoLoad}
           />
