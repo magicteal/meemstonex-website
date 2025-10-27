@@ -11,7 +11,13 @@ let clientPromise;
 let indexesPromise;
 
 if (!global._mongoClientPromise) {
-  client = new MongoClient(uri || "");
+  const options = {};
+  if (process.env.MONGODB_TLS_INSECURE === "1") {
+    // Dev-only: allow invalid certs/hostnames to get around local SSL interception issues
+    options.tlsAllowInvalidCertificates = true;
+    options.tlsAllowInvalidHostnames = true;
+  }
+  client = new MongoClient(uri || "", options);
   global._mongoClientPromise = client.connect().catch((err) => {
     console.error("Failed to connect to MongoDB:", err.message);
     throw err;

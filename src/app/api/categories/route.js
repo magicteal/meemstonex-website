@@ -1,28 +1,26 @@
 import { NextResponse } from "next/server";
 import { getCollection } from "../../../lib/mongodb";
 
-// GET /api/categories - distinct categories from products
+// GET /api/categories - return explicit categories only (admin-managed)
 export async function GET() {
   try {
-    const prodCol = await getCollection("products");
     const catCol = await getCollection("categories");
-    const [fromProducts, explicit] = await Promise.all([
-      prodCol.distinct("categories"),
-      catCol.find({}, { projection: { _id: 0, name: 1 } }).toArray(),
-    ]);
-    const names = new Set();
-    for (const n of fromProducts) if (n) names.add(n);
-    for (const c of explicit) if (c?.name) names.add(c.name);
-    const sorted = Array.from(names).sort((a, b) => a.localeCompare(b));
+    const explicit = await catCol
+      .find({}, { projection: { _id: 0, name: 1 } })
+      .toArray();
+    const sorted = (explicit || [])
+      .map((c) => c?.name)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
     return NextResponse.json(sorted);
   } catch (err) {
     console.error("GET /api/categories error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    // Graceful fallback: empty list so UI can still work (admin can add categories)
+    return NextResponse.json([]);
   }
 }
 
 // POST /api/categories { name }
-// This stores category names in a separate collection for explicit management.
 export async function POST(req) {
   try {
     const { name } = await req.json();
@@ -41,7 +39,6 @@ export async function POST(req) {
 }
 
 // PUT /api/categories { oldName, newName }
-// Renames a category and updates all products referencing it
 export async function PUT(req) {
   try {
     const { oldName, newName } = await req.json();
@@ -78,11 +75,26 @@ export async function PUT(req) {
   }
 }
 
-// DELETE /api/categories?name=...
-// Removes a category and pulls it from all products
+// DELETE /api/categories?name=... or /api/categories?all=true to reset all categories
 export async function DELETE(req) {
   try {
     const { searchParams } = new URL(req.url);
+    const all = (searchParams.get("all") || "").toLowerCase();
+    if (all === "true" || all === "1") {
+      const catCol = await getCollection("categories");
+      const catRes = await catCol.deleteMany({});
+      const prodCol = await getCollection("products");
+      const prodRes = await prodCol.updateMany(
+        {},
+        { $set: { categories: [] } }
+      );
+      return NextResponse.json({
+        ok: true,
+        deletedCategories: catRes.deletedCount ?? 0,
+        productsUpdated: prodRes.modifiedCount ?? 0,
+      });
+    }
+
     const name = (searchParams.get("name") || "").trim();
     if (!name)
       return NextResponse.json({ error: "name is required" }, { status: 400 });

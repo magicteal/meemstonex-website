@@ -14,9 +14,25 @@ const About = dynamic(() => import("./About"), {
   ssr: false,
   loading: () => <div className="h-80" />,
 });
+const OurProcess = dynamic(() => import("./OurProcess"), {
+  ssr: false,
+  loading: () => <div className="h-96" />,
+});
+const CoverFlowCarousel = dynamic(() => import("./CoverFlowCarousel"), {
+  ssr: false,
+  loading: () => <div className="h-80" />,
+});
 const Features = dynamic(() => import("./Features"), {
   ssr: false,
   loading: () => <div className="h-96" />,
+});
+const Testimonials = dynamic(() => import("./Testimonials"), {
+  ssr: false,
+  loading: () => <div className="h-96" />,
+});
+const Stats = dynamic(() => import("./Stats"), {
+  ssr: false,
+  loading: () => <div className="h-48" />,
 });
 const Story = dynamic(() => import("./Story"), {
   ssr: false,
@@ -37,7 +53,11 @@ export default function HomeClient() {
       <Navbar />
       <Hero />
       <About />
+      <OurProcess />
+      <CoverFlowCarousel />
       <Features />
+      <Testimonials />
+      <Stats />
       <Story />
       <Contact />
       <Footer />

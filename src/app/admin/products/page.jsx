@@ -8,6 +8,7 @@ import {
   deleteProduct,
   listProducts,
   updateProduct,
+  resetAllCategories,
 } from "../../../services/api";
 import { useToast } from "../../../components/products/ToastProvider";
 import Image from "next/image";
@@ -21,6 +22,7 @@ export default function ProductsEditorPage() {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const { push, remove } = useToast();
   const newBtnRef = useRef(null);
+  const [resettingCats, setResettingCats] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -46,7 +48,9 @@ export default function ProductsEditorPage() {
   // keyboard shortcut: n to open new modal
   useEffect(() => {
     const handler = (e) => {
-      if (e.key.toLowerCase() === "n") setOpenCreate(true);
+      const key = typeof e?.key === "string" ? e.key.toLowerCase() : "";
+      if (key === "n" && !(e.ctrlKey || e.metaKey || e.altKey))
+        setOpenCreate(true);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -127,15 +131,60 @@ export default function ProductsEditorPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-gray-900">Products Editor</h1>
-        <button
-          ref={newBtnRef}
-          onClick={() => setOpenCreate(true)}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
-        >
-          New Product
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            ref={newBtnRef}
+            onClick={() => setOpenCreate(true)}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          >
+            New Product
+          </button>
+          <button
+            disabled={resettingCats}
+            onClick={async () => {
+              if (
+                !confirm(
+                  "This will delete ALL categories and clear them from all products. Continue?"
+                )
+              )
+                return;
+              setResettingCats(true);
+              const toastId = push({
+                title: "Resetting categories…",
+                duration: 0,
+              });
+              try {
+                const res = await resetAllCategories();
+                push({
+                  title: "Categories reset",
+                  description: `${
+                    res.deletedCategories ?? 0
+                  } categories removed, ${
+                    res.productsUpdated ?? 0
+                  } products updated`,
+                  type: "success",
+                });
+                // optional: reload products to reflect cleared categories
+                await load();
+              } catch (e) {
+                push({
+                  title: "Reset failed",
+                  description: e.message,
+                  type: "error",
+                });
+              } finally {
+                remove(toastId);
+                setResettingCats(false);
+              }
+            }}
+            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-600 disabled:opacity-50"
+            title="Delete all categories and clear them from products"
+          >
+            Reset Categories
+          </button>
+        </div>
       </div>
 
       {error && (

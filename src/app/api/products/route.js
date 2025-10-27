@@ -51,7 +51,8 @@ export async function GET(req) {
     return NextResponse.json({ items: mapped, total, page, pageSize });
   } catch (err) {
     console.error("GET /api/products error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    // Graceful fallback to avoid crashing pages if DB is unavailable
+    return NextResponse.json({ items: [], total: 0, page: 1, pageSize: 12 });
   }
 }
 

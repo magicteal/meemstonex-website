@@ -18,6 +18,8 @@ const Hero = () => {
 
   const miniVideoRef = useRef(null);
   const nextVideoRef = useRef(null);
+  const backgroundVideoRef = useRef(null);
+  const observerRef = useRef(null);
 
   const handleVideoLoad = () => {
     setLoadedVideos((prev) => prev + 1);
@@ -28,7 +30,13 @@ const Hero = () => {
   const handleMiniVideoClick = () => {
     setHasClicked(true);
 
+    // load next video src on-demand when user interacts
     setCurrentIndex(upcomingVideoIndex);
+    if (nextVideoRef.current && !nextVideoRef.current.src) {
+      nextVideoRef.current.src = getVideoSrc(upcomingVideoIndex);
+      // try to play immediately once source is set
+      nextVideoRef.current.play().catch(() => {});
+    }
   };
 
   useEffect(() => {
@@ -67,6 +75,49 @@ const Hero = () => {
       revertOnUpdate: true,
     }
   );
+
+  // Lazy-load videos when hero comes into view
+  useEffect(() => {
+    const el = backgroundVideoRef.current;
+    if (!el) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      // Fallback: load immediately
+      el.src = getVideoSrc(currentIndex);
+      return;
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // load background video first
+            if (!el.src) el.src = getVideoSrc(currentIndex);
+            // load the mini/next video sources lazily after a short delay
+            setTimeout(() => {
+              try {
+                if (miniVideoRef.current && !miniVideoRef.current.src) {
+                  miniVideoRef.current.src = getVideoSrc(
+                    (currentIndex % totalVideos) + 1
+                  );
+                }
+                if (nextVideoRef.current && !nextVideoRef.current.src) {
+                  nextVideoRef.current.src = getVideoSrc(currentIndex);
+                }
+              } catch (e) {}
+            }, 500);
+
+            observerRef.current.disconnect();
+          }
+        });
+      },
+      { rootMargin: "200px" }
+    );
+
+    observerRef.current.observe(el);
+
+    return () => observerRef.current && observerRef.current.disconnect();
+  }, [currentIndex]);
 
   useGSAP(() => {
     gsap.set("#video-frame", {
@@ -112,11 +163,11 @@ const Hero = () => {
             >
               <video
                 ref={miniVideoRef}
-                src={getVideoSrc(upcomingVideoIndex)}
+                // src will be assigned lazily by IntersectionObserver
                 loop
                 muted
                 playsInline
-                preload="metadata"
+                preload="none"
                 id="current-video"
                 className="size-64 origin-center scale-150 object-cover object-center"
                 onLoadedData={handleVideoLoad}
@@ -126,25 +177,24 @@ const Hero = () => {
 
           <video
             ref={nextVideoRef}
-            src={getVideoSrc(currentIndex)}
+            // src assigned lazily when hero enters view or on interaction
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="none"
             id="next-video"
             className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
             onLoadedData={handleVideoLoad}
           />
 
           <video
-            src={getVideoSrc(
-              currentIndex === totalVideos - 1 ? 1 : currentIndex
-            )}
+            ref={backgroundVideoRef}
+            // src assigned lazily by IntersectionObserver
             autoPlay
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="none"
             className="absolute left-0 top-0 size-full object-cover object-center"
             onLoadedData={handleVideoLoad}
           />

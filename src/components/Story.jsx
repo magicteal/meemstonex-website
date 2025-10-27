@@ -96,11 +96,13 @@ const Story = () => {
               legacy in stone eternal.
             </p>
 
-            <Button
-              id="realm-button"
-              title="discover products"
-              containerClass="mt-5"
-            />
+            <a href="/products" className="mt-5">
+              <Button
+                id="realm-button"
+                title="discover products"
+                containerClass=""
+              />
+            </a>
           </div>
         </div>
       </div>

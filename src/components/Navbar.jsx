@@ -23,6 +23,7 @@ const Navbar = () => {
   const { y: currentScrollY } = useWindowScroll();
   const pathname = usePathname?.() || "/";
   const isProductsPage = pathname.startsWith("/products");
+  const isHome = pathname === "/" || pathname === "";
   const t = useTranslation();
   const navItems = [t("products")];
   const [contactOpen, setContactOpen] = useState(false);
@@ -98,11 +99,14 @@ const Navbar = () => {
           {/** compute class once per render */}
           {(() => {
             const hasScrolled = currentScrollY > 0;
-            const navTextClass = isProductsPage
-              ? hasScrolled
-                ? "text-white"
-                : "text-black"
-              : "text-black";
+            // On products and home pages: make nav text white when user scrolls
+            // Elsewhere keep the existing (black) text
+            const navTextClass =
+              isProductsPage || isHome
+                ? hasScrolled
+                  ? "text-white"
+                  : "text-black"
+                : "text-black";
             return (
               <div className="flex h-full items-center">
                 <div
