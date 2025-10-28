@@ -56,7 +56,7 @@ export default function HomeClient() {
       <OurProcess />
       <CoverFlowCarousel />
       <Features />
-      <Testimonials />
+      {/* <Testimonials /> */}
       <Stats />
       <Story />
       <Contact />

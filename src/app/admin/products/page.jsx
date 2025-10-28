@@ -142,6 +142,40 @@ export default function ProductsEditorPage() {
             New Product
           </button>
           <button
+            onClick={async () => {
+              const idToast = push({
+                title: "Syncing categories…",
+                duration: 0,
+              });
+              try {
+                const res = await fetch("/api/admin/sync-categories", {
+                  method: "POST",
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data?.error || "Sync failed");
+                push({
+                  title: "Categories synced",
+                  description: `${data.upserted ?? 0} added / ${
+                    data.total ?? 0
+                  } total`,
+                  type: "success",
+                });
+              } catch (e) {
+                push({
+                  title: "Sync failed",
+                  description: e.message,
+                  type: "error",
+                });
+              } finally {
+                remove(idToast);
+              }
+            }}
+            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            title="Upsert the canonical category list into the database"
+          >
+            Sync Categories
+          </button>
+          <button
             disabled={resettingCats}
             onClick={async () => {
               if (

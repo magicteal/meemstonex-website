@@ -88,6 +88,18 @@ export async function POST(req) {
 
     const col = await getCollection("products");
     const res = await col.insertOne(doc);
+    // Ensure categories exist in categories collection
+    if (Array.isArray(doc.categories) && doc.categories.length) {
+      const catCol = await getCollection("categories");
+      for (const name of doc.categories) {
+        if (!name) continue;
+        await catCol.updateOne(
+          { name },
+          { $setOnInsert: { name, createdAt: new Date() } },
+          { upsert: true }
+        );
+      }
+    }
     return NextResponse.json(
       { id: String(res.insertedId), ...doc },
       { status: 201 }
@@ -130,6 +142,18 @@ export async function PUT(req) {
     );
     const doc = res && (res.value ?? res);
     if (!doc) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    // If categories were updated, upsert them into categories collection
+    if (Array.isArray(update.categories) && update.categories.length) {
+      const catCol = await getCollection("categories");
+      for (const name of update.categories) {
+        if (!name) continue;
+        await catCol.updateOne(
+          { name },
+          { $setOnInsert: { name, createdAt: new Date() } },
+          { upsert: true }
+        );
+      }
+    }
     const { _id, ...rest } = doc;
     return NextResponse.json({ id: String(_id), ...rest });
   } catch (err) {
