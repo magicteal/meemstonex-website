@@ -37,7 +37,7 @@ const itemVariants = {
 
 const OurProcess = () => {
   return (
-    <section className="relative w-screen bg-black py-20 text-blue-50">
+    <section className="relative w-full bg-black py-20 text-blue-50">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-14 text-center">
           <p className="font-general text-[10px] uppercase tracking-wider text-blue-200/70">
@@ -56,48 +56,55 @@ const OurProcess = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
-          className="flex gap-6 items-start md:items-center justify-start overflow-x-auto px-4 md:px-0 pr-6 md:pr-0 pb-4 snap-x snap-mandatory flex-nowrap"
-          style={{ WebkitOverflowScrolling: "touch" }}
+          className="flex flex-col md:flex-row gap-6 md:gap-6 items-stretch md:items-center justify-start md:justify-between overflow-visible px-4 md:px-0 pb-2"
         >
           {steps.map((step, idx) => (
             <React.Fragment key={step.id}>
               <motion.li
                 variants={itemVariants}
-                className="flex flex-col items-center text-center min-w-[14rem] flex-none md:min-w-0 md:flex-1 snap-start"
+                className="flex flex-col items-center text-center w-full md:min-w-0 md:flex-1"
               >
                 <div className="mb-5 flex  h-20 w-20   items-center justify-center rounded-full border border-blue-200/20 bg-white/5 shadow-[0_0_0_1px_rgba(255,255,255,0.03)_inset] backdrop-blur-sm">
                   <step.Icon
-                    className="h-8 w-8 md:h-10 md:w-10 text-blue-100"
+                    className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 text-blue-100"
                     strokeWidth={1.5}
                   />
                 </div>
-                <div className="mt-1 text-sm font-semibold text-amber-300/90">
+                <div className="mt-1 text-xs sm:text-sm font-semibold text-amber-300/90">
                   {step.id}
                 </div>
-                <div className="mt-1 max-w-[12rem] text-sm text-blue-100/90">
+                <div className="mt-1 max-w-[12rem] text-xs sm:text-sm md:text-base text-blue-100/90">
                   {step.title}
                 </div>
               </motion.li>
 
-              {/* dashed connector for desktop between steps */}
+              {/* connectors: vertical on mobile, horizontal on md+ */}
               {idx < steps.length - 1 && (
-                <div className="flexitems-center justify-center mt-10 md:mt-0">
-                  <svg
-                    width="80"
-                    height="24"
-                    viewBox="0 0 80 24"
-                    fill="none"
-                    className="text-blue-200/40"
-                  >
-                    <path
-                      d="M2 12 C 20 12, 60 12, 78 12"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeDasharray="4 6"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </div>
+                <>
+                  {/* mobile vertical connector */}
+                  <div className="flex md:hidden w-full justify-center">
+                    <div className="h-8 sm:h-10 w-px border-l border-dashed border-blue-200/40" />
+                  </div>
+
+                  {/* desktop horizontal connector */}
+                  <div className="hidden md:flex items-center justify-center mt-10 md:mt-0">
+                    <svg
+                      width="80"
+                      height="24"
+                      viewBox="0 0 80 24"
+                      fill="none"
+                      className="text-blue-200/40"
+                    >
+                      <path
+                        d="M2 12 C 20 12, 60 12, 78 12"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeDasharray="4 6"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </div>
+                </>
               )}
             </React.Fragment>
           ))}
