@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Local demo items (replace with props/data source if desired)
 const demoItems = [
-  { id: 1, title: "Nature's Gift", imageUrl: "/img/gallery-1.webp" },
-  { id: 2, title: "Pro Crunch", imageUrl: "/img/gallery-2.webp" },
-  { id: 3, title: "Milkshake Hairspa", imageUrl: "/img/gallery-3.webp" },
-  { id: 4, title: "Skin Wellness", imageUrl: "/img/gallery-4.webp" },
-  { id: 5, title: "Collectivo Lux", imageUrl: "/img/gallery-5.webp" },
+  { id: 1, title: "Nature's Gift", imageUrl: "/products/P1.jpg" },
+  { id: 2, title: "Pro Crunch", imageUrl: "/products/P2.jpg" },
+  { id: 3, title: "Milkshake Hairspa", imageUrl: "/products/P3.jpg" },
+  { id: 4, title: "Skin Wellness", imageUrl: "/products/P4.jpg" },
+  { id: 5, title: "Collectivo Lux", imageUrl: "/products/P5.jpg" },
 ];
 
 // Single card with 3D transforms
@@ -52,53 +52,74 @@ const CoverFlowCard = ({ item, isActive, offset, onClick }) => {
 
 // Core carousel
 const CoverFlowCore = ({ items }) => {
-  const [activeIndex, setActiveIndex] = useState(Math.floor(items.length / 2));
+  const n = items.length;
+  const mid = Math.floor(n / 2);
+  const [activeIndex, setActiveIndex] = useState(mid);
+  const [paused, setPaused] = useState(false);
 
-  const handlePrev = () =>
-    setActiveIndex((p) => (p > 0 ? p - 1 : items.length - 1));
-  const handleNext = () =>
-    setActiveIndex((p) => (p < items.length - 1 ? p + 1 : 0));
+  const handlePrev = () => setActiveIndex((p) => (p - 1 + n) % n);
+  const handleNext = () => setActiveIndex((p) => (p + 1) % n);
 
-  // Center the active card (w-64 -> 256px) with 16px gutters (mx-2)
-  const trackTranslation = `calc(50% - ${activeIndex * 272}px - 128px)`; // 128px = half of 256px
+  // Auto-advance every 2.5s; pause on hover
+  useEffect(() => {
+    if (paused || n <= 1) return;
+    const id = setInterval(handleNext, 2500);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused, n]);
+
+  // Rotate items so active stays centered in DOM order (prevents jump on wrap)
+  const ordered = useMemo(() => {
+    if (!n) return [];
+    const start = (activeIndex - mid + n) % n;
+    return new Array(n).fill(0).map((_, i) => items[(start + i) % n]);
+  }, [items, n, activeIndex, mid]);
 
   return (
-    <div className="relative flex w-full items-center justify-center overflow-hidden py-12">
-      <div className="relative h-[450px] w-full max-w-6xl [perspective:1000px]">
-        <div
-          className="flex h-full items-center [transform-style:preserve-3d]"
-          style={{
-            transform: `translateX(${trackTranslation})`,
-            transition: "transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)",
-          }}
-        >
-          {items.map((item, index) => (
-            <div className="mx-2" key={item.id}>
-              <CoverFlowCard
-                item={item}
-                isActive={index === activeIndex}
-                offset={index - activeIndex}
-                onClick={() => setActiveIndex(index)}
-              />
-            </div>
-          ))}
+    <div
+      className="relative flex w-full items-center justify-center overflow-hidden py-12"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="relative h=[450px] w-full max-w-6xl [perspective:1000px]">
+        <div className="flex h-full items-center justify-center [transform-style:preserve-3d]">
+          {ordered.map((item, i) => {
+            const offset = i - mid; // small, centered offsets in [-mid, +mid]
+            const isActive = offset === 0;
+            return (
+              <div className="mx-2" key={item.id}>
+                <CoverFlowCard
+                  item={item}
+                  isActive={isActive}
+                  offset={offset}
+                  onClick={() =>
+                    setActiveIndex((prev) => (prev + offset + n) % n)
+                  }
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <button
-        onClick={handlePrev}
-        className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-2 text-blue-50 backdrop-blur hover:bg-white/30"
-        aria-label="Previous"
-      >
-        <ChevronLeft size={22} />
-      </button>
-      <button
-        onClick={handleNext}
-        className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-2 text-blue-50 backdrop-blur hover:bg-white/30"
-        aria-label="Next"
-      >
-        <ChevronRight size={22} />
-      </button>
+      {n > 1 && (
+        <>
+          <button
+            onClick={handlePrev}
+            className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-2 text-blue-50 backdrop-blur hover:bg-white/30"
+            aria-label="Previous"
+          >
+            <ChevronLeft size={22} />
+          </button>
+          <button
+            onClick={handleNext}
+            className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-2 text-blue-50 backdrop-blur hover:bg-white/30"
+            aria-label="Next"
+          >
+            <ChevronRight size={22} />
+          </button>
+        </>
+      )}
     </div>
   );
 };
