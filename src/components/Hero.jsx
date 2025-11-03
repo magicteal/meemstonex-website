@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Button from "./Button";
 import { TiLocationArrow } from "react-icons/ti";
 import { useGSAP } from "@gsap/react";
@@ -13,6 +14,7 @@ const Hero = () => {
   const [hasClicked, setHasClicked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedVideos, setLoadedVideos] = useState(0);
+  const router = useRouter();
 
   const totalVideos = 4;
 
@@ -254,8 +256,8 @@ const Hero = () => {
           />
         </div>
 
-        {/* <h1 className="special-font hero-heading absolute bottom-5 right-5 z-40 text-black">
-          m<b>a</b>rbels
+        {/* <h1 className="special-font hero-heading absolute </div>bottom-5 right-5 z-40 text-black">
+          m<b</div>>a</b>rbels
         </h1> */}
 
         <div className="absolute left-0 top-0 z-40 size-full">
@@ -273,6 +275,7 @@ const Hero = () => {
               title="Explore Products"
               leftIcon={<TiLocationArrow />}
               containerClass="!bg-white flex-center gap-1"
+              onClick={() => router.push("/products")}
             />
           </div>
         </div>

@@ -135,18 +135,14 @@ const Features = () => {
           </p>
         </div>
 
-        <BentoTilt className=" relative mb-7 w-full overflow-hidden rounded-md h-64 md:h-[65vh]">
-          <BentoCard
-            src="videos/feature-1.mp4"
-            title={"TABLE TOP"}
-            href={`/categories/${slugify("TABLE TOP")}`}
-            label="View TABLE TOP category"
-            description="Where sophistication meets strength — Meemstonex Counters, crafted to define modern elegance in every space"
-          />
-        </BentoTilt>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+        {/* Categories grid: show TABLE TOP alongside others as equal tiles on md+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-7">
           {[
+            {
+              name: "TABLE TOP",
+              video: "videos/feature-1.mp4",
+              desc: "Where sophistication meets strength — Meemstonex Counters, crafted to define modern elegance in every space",
+            },
             {
               name: "Marble temple",
               video: "videos/feature-2.mp4",
@@ -198,12 +194,13 @@ const Features = () => {
               />
             </BentoTilt>
           ))}
+
           {/* More coming soon tile */}
-          <BentoTilt className="bento-tilt md:col-span-2 lg:col-span-3">
+          <BentoTilt className="bento-tilt md:col-span-2">
             <div className="flex h-48 w-full rounded-md bg-violet-300 p-5 md:h-[40vh]">
               <div className="flex w-full flex-col justify-between">
                 <h1 className="bento-title special-font max-w-64 text-black">
-                  M<b>0</b>re co<b>m</b>ing so<b>o</b>n
+                  M<b>o</b>re co<b>m</b>ing so<b>o</b>n
                 </h1>
                 <TiLocationArrow className="m-5 scale-[3] self-end text-black/80" />
               </div>
