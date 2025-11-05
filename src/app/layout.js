@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "../components/products/ToastProvider";
+import WhatsAppFloating from "../components/WhatsAppFloating";
 import { LanguageProvider } from "../lib/i18n";
 
 const geistSans = Geist({
@@ -25,7 +26,10 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <LanguageProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            {children}
+            <WhatsAppFloating />
+          </ToastProvider>
         </LanguageProvider>
       </body>
     </html>

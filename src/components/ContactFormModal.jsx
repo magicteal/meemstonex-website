@@ -11,7 +11,7 @@ import {
   DialogClose,
 } from "./ui/dialog";
 
-const initial = { name: "", number: "", city: "", usage: "interior" };
+const initial = { name: "", number: "", city: "", usage: [] };
 
 export default function ContactFormModal({ open, onClose }) {
   const [form, setForm] = useState(initial);
@@ -24,18 +24,38 @@ export default function ContactFormModal({ open, onClose }) {
     setForm((f) => ({ ...f, [name]: value }));
   };
 
+  const onToggleUsage = (value) => {
+    setForm((f) => {
+      const existing = Array.isArray(f.usage) ? f.usage : [];
+      if (existing.includes(value)) {
+        return { ...f, usage: existing.filter((v) => v !== value) };
+      }
+      return { ...f, usage: [...existing, value] };
+    });
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.number || !form.city || !form.usage) {
+    if (
+      !form.name ||
+      !form.number ||
+      !form.city ||
+      !(form.usage && form.usage.length)
+    ) {
       push({ type: "error", title: "Please fill all fields" });
       return;
     }
     setLoading(true);
     try {
+      // Send usage as a comma-separated string for downstream integration
+      const payload = {
+        ...form,
+        usage: Array.isArray(form.usage) ? form.usage.join(", ") : form.usage,
+      };
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("Failed to submit");
       push({ type: "success", title: "Form submitted" });
@@ -126,19 +146,53 @@ export default function ContactFormModal({ open, onClose }) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm text-gray-700" htmlFor="usage">
-              Usage
-            </label>
-            <select
-              id="usage"
-              name="usage"
-              value={form.usage}
-              onChange={onChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
-            >
-              <option value="interior">For Interior</option>
-              <option value="personal">Personal Use</option>
-            </select>
+            <span className="mb-2 block text-sm text-gray-700">Usage</span>
+
+            <div className="space-y-2">
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  name="usage"
+                  value="interior"
+                  checked={
+                    Array.isArray(form.usage) && form.usage.includes("interior")
+                  }
+                  onChange={() => onToggleUsage("interior")}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <div className="text-base font-medium text-gray-900">
+                    For interior design projects
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Homes, offices, and built-in fittings. Tell us about your
+                    space and requirements.
+                  </div>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  name="usage"
+                  value="personal"
+                  checked={
+                    Array.isArray(form.usage) && form.usage.includes("personal")
+                  }
+                  onChange={() => onToggleUsage("personal")}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <div className="text-base font-medium text-gray-900">
+                    For personal use & small items
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Gifts, small decorations, or single-piece orders. Let us
+                    know the intended use.
+                  </div>
+                </div>
+              </label>
+            </div>
           </div>
 
           <DialogFooter className="mt-2 flex justify-end gap-3">

@@ -5,9 +5,9 @@ import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 
 const items = [
-  { value: "950+", label: "Projects" },
-  { value: "350+", label: "Cities" },
-  { value: "25+", label: "Years Experience" },
+  { value: "80+", label: "Projects" },
+  { value: "100+", label: "Cities" },
+  { value: "28+", label: "Years Experience" },
 ];
 
 export default function Stats() {
@@ -16,7 +16,7 @@ export default function Stats() {
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src="/img/about.webp"
+          src="/img/numbersBG.jpg"
           alt="Completed custom projects background"
           fill
           className="object-cover"

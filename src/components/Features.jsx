@@ -140,16 +140,16 @@ const Features = () => {
           {[
             {
               name: "TABLE TOP",
-              video: "videos/feature-1.mp4",
+              video: "videos/C1.mp4",
               desc: "Where sophistication meets strength — Meemstonex Counters, crafted to define modern elegance in every space",
             },
             {
               name: "Marble temple",
-              video: "videos/feature-2.mp4",
+              video: "videos/C2.mp4",
               desc: "Meemstonex Mandirs sacred spaces sculpted in pure marble, embodying devotion, peace, and eternal grace",
             },
             {
-              name: "MARBLE MASJID WORK",
+              name: "MARBLE MOSQUE WORK",
               video: "videos/feature-1.mp4",
               desc: "Sacred mosque elements crafted in premium marble with uncompromising quality.",
             },

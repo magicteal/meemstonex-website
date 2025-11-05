@@ -1,10 +1,9 @@
 export const exampleImages = [
-  { url: "/img/gallery-1.webp" },
-  { url: "/img/gallery-2.webp" },
-  { url: "/img/gallery-3.webp" },
-  { url: "/img/gallery-4.webp" },
-  { url: "/img/gallery-5.webp" },
-  { url: "/img/entrance.webp" },
-  { url: "/img/stones.webp" },
-  { url: "/img/about.webp" },
+  { url: "/products/P1.jpg" },
+  { url: "/products/P2.jpg" },
+  { url: "/products/P3.jpg" },
+  { url: "/products/P4.jpg" },
+  { url: "/products/P5.jpg" },
+  { url: "/products/P6.jpg" },
+  { url: "/products/P7.jpg" },
 ];
