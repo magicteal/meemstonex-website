@@ -32,8 +32,8 @@ const Panorama3DRing = () => {
     gsap.set(ring, { rotationY: 180, cursor: "grab" });
     gsap.set(images, {
       rotateY: (i) => i * -(360 / demoItems.length),
-      transformOrigin: "50% 50% 500px",
-      z: -500,
+      transformOrigin: "50% 50% 700px",
+      z: -700,
       backfaceVisibility: "hidden",
     });
 
@@ -101,12 +101,12 @@ const Panorama3DRing = () => {
   }, []);
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-black overflow-hidden">
-      <div className="relative perspective-[2000px] w-[300px] h-[400px]">
+    <div className="w-full h-screen flex items-center justify-center  bg-black overflow-hidden">
+      <div className="relative perspective-[2000px] w-[450px] h-[550px] ">
         {/* The transparent ring container */}
         <div
           ref={ringRef}
-          className="w-full h-full relative preserve-3d pointer-events-none"
+          className="w-full h-full  relative preserve-3d pointer-events-none"
           style={{ background: "transparent", border: "none", outline: "none", boxShadow: "none" }}
         >
           {demoItems.map((item) => (

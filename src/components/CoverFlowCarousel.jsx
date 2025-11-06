@@ -27,8 +27,8 @@ export default function CoverFlowCarousel({ items = demoItems }) {
           </h2>
         </div>
  
-        <Panorama3DSlider />
       </div>
+        <Panorama3DSlider />
     </section>
   );
 }
