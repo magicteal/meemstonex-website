@@ -2,6 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import PanoramaRing from "./PanoramaRing";
+import PanoramaSwiper from "./PanoramaRing";
+import Panorama3DSlider from "./PanoramaRing";
 
 // Local demo items (replace with props/data source if desired)
 const demoItems = [
@@ -129,12 +132,13 @@ export default function CoverFlowCarousel({ items = demoItems }) {
   return (
     <section className="bg-black py-20">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <div className="mb-8 text-center">
+        <div className=" text-center">
           <h2 className="text-2xl font-semibold tracking-widest text-white sm:text-3xl md:text-4xl">
             Our Products
           </h2>
         </div>
-        <CoverFlowCore items={items} />
+        {/* <CoverFlowCore items={items} /> */}
+        <Panorama3DSlider />
       </div>
     </section>
   );
