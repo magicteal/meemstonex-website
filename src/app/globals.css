@@ -6,6 +6,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
+.perspective-\[2000px\] {
+  perspective: 2000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
 html,
 :root,
 body,
@@ -604,3 +612,6 @@ html.dark .nav-hover-btn::after {
     @apply bg-background text-foreground;
   }
 }
+
+
+
