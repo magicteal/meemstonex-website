@@ -96,12 +96,14 @@ const LazyVideo = ({ src, className = "", ...rest }) => {
 
 const BentoCard = ({ src, title, description, href, label }) => {
   return (
-    <div className="relative w-full h-48 md:h-[55vh] overflow-hidden rounded-md">
+    <div className="relative w-full h-48 md:h-[55vh] overflow-hidden rounded-md transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105 z-20 group-hover:z-40">
       <LazyVideo
         src={src}
         className="w-full h-full object-cover object-center"
       />
-      <div className="absolute inset-0 z-10 flex flex-col justify-between p-5 text-blue-50">
+      {/* Black film overlay at 50% opacity */}
+      <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" />
+      <div className="absolute inset-0 z-20 flex flex-col justify-between p-5 text-blue-50">
         <div>
           <h1 className="bento-title special-black">{title}</h1>
           {description && (
@@ -113,7 +115,7 @@ const BentoCard = ({ src, title, description, href, label }) => {
         <Link
           href={href}
           aria-label={label || (typeof title === "string" ? title : "category")}
-          className="absolute inset-0 z-20"
+          className="absolute inset-0 z-30"
         />
       )}
     </div>
@@ -121,6 +123,89 @@ const BentoCard = ({ src, title, description, href, label }) => {
 };
 
 const Features = () => {
+  // define tiles in a variable so we can observe them
+  const tiles = [
+    {
+      name: "TABLE TOP",
+      video: "videos/C1.mp4",
+      desc: "Where sophistication meets strength — Meemstonex Counters, crafted to define modern elegance in every space",
+    },
+    {
+      name: "Marble temple",
+      video: "videos/C2.mp4",
+      desc: "Meemstonex Mandirs sacred spaces sculpted in pure marble, embodying devotion, peace, and eternal grace",
+    },
+    {
+      name: "MARBLE MOSQUE WORK",
+      video: "videos/feature-1.mp4",
+      desc: "Sacred mosque elements crafted in premium marble with uncompromising quality.",
+    },
+    {
+      name: "STONE FOUNTAIN",
+      video: "videos/feature-1.mp4",
+      desc: "Let serenity flow with Meemstonex Fountains, where artistry in stone brings movement, life, and timeless beauty.",
+    },
+    {
+      name: "INLAY WORK",
+      video: "videos/C5.mp4",
+      desc: "Artful stone inlay that blends tradition with precision craftsmanship.",
+    },
+    {
+      name: "WALL PANELS",
+      video: "videos/feature-2.mp4",
+      desc: "Statement wall claddings in marble that elevate interiors with depth and texture.",
+    },
+    {
+      name: "MORAL",
+      video: "videos/feature-5.mp4",
+      desc: "Expressive marble mural work designed to narrate elegance in stone.",
+    },
+    {
+      name: "MARBLE WASH BASIN",
+      video: "videos/feature-1.mp4",
+      desc: "Sleek and refined basins carved from premium marble for timeless bathrooms.",
+    },
+    {
+      name: "HANDICRAFTS PRODUCTS",
+      video: "videos/feature-2.mp4",
+      desc: "Handcrafted marble artefacts that showcase intricate workmanship.",
+    },
+  ];
+
+  const tileRefs = useRef([]);
+  const [visible, setVisible] = useState(() =>
+    new Array(tiles.length).fill(false)
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const idx = tileRefs.current.indexOf(entry.target);
+          if (idx === -1) return;
+          if (entry.isIntersecting) {
+            setVisible((v) => {
+              if (v[idx]) return v;
+              const copy = [...v];
+              copy[idx] = true;
+              return copy;
+            });
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    tileRefs.current.forEach((el) => {
+      if (el) obs.observe(el);
+    });
+
+    return () => obs.disconnect();
+    // tiles length won't change during runtime in this component
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <section className="bg-black pb-20">
       <div className="container mx-auto px-4 md:px-10">
@@ -136,76 +221,54 @@ const Features = () => {
         </div>
 
         {/* Categories grid: show TABLE TOP alongside others as equal tiles on md+ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-7">
-          {[
-            {
-              name: "TABLE TOP",
-              video: "videos/C1.mp4",
-              desc: "Where sophistication meets strength — Meemstonex Counters, crafted to define modern elegance in every space",
-            },
-            {
-              name: "Marble temple",
-              video: "videos/C2.mp4",
-              desc: "Meemstonex Mandirs sacred spaces sculpted in pure marble, embodying devotion, peace, and eternal grace",
-            },
-            {
-              name: "MARBLE MOSQUE WORK",
-              video: "videos/feature-1.mp4",
-              desc: "Sacred mosque elements crafted in premium marble with uncompromising quality.",
-            },
-            {
-              name: "STONE FOUNTAIN",
-              video: "videos/feature-1.mp4",
-              desc: "Let serenity flow with Meemstonex Fountains, where artistry in stone brings movement, life, and timeless beauty.",
-            },
-            {
-              name: "INLAY WORK",
-              video: "videos/feature-5.mp4",
-              desc: "Artful stone inlay that blends tradition with precision craftsmanship.",
-            },
-            {
-              name: "WALL PANELS",
-              video: "videos/feature-2.mp4",
-              desc: "Statement wall claddings in marble that elevate interiors with depth and texture.",
-            },
-            {
-              name: "MORAL",
-              video: "videos/feature-5.mp4",
-              desc: "Expressive marble mural work designed to narrate elegance in stone.",
-            },
-            {
-              name: "MARBLE WASH BASIN",
-              video: "videos/feature-1.mp4",
-              desc: "Sleek and refined basins carved from premium marble for timeless bathrooms.",
-            },
-            {
-              name: "HANDICRAFTS PRODUCTS",
-              video: "videos/feature-2.mp4",
-              desc: "Handcrafted marble artefacts that showcase intricate workmanship.",
-            },
-          ].map((t) => (
-            <BentoTilt key={t.name} className="bento-tilt">
-              <BentoCard
-                src={t.video}
-                title={t.name}
-                href={`/categories/${slugify(t.name)}`}
-                label={`View ${t.name} category`}
-                description={t.desc}
-              />
-            </BentoTilt>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-10">
+          {tiles.map((t, index) => {
+            const isVisible = visible[index];
+            const fromLeft = index % 2 === 0;
+            const baseAnim =
+              "transform transition-transform duration-700 ease-out opacity-0";
+            const enterAnim = isVisible
+              ? "opacity-100 translate-x-0"
+              : fromLeft
+              ? "-translate-x-12"
+              : "translate-x-12";
+            return (
+              <div
+                key={t.name}
+                ref={(el) => (tileRefs.current[index] = el)}
+                className={`group ${baseAnim} ${enterAnim}`}
+              >
+                <BentoTilt className={`bento-tilt`}>
+                  <BentoCard
+                    src={t.video}
+                    title={t.name}
+                    href={`/categories/${slugify(t.name)}`}
+                    label={`View ${t.name} category`}
+                    description={t.desc}
+                  />
+                </BentoTilt>
+              </div>
+            );
+          })}
 
           {/* More coming soon tile */}
-          <BentoTilt className="bento-tilt md:col-span-2">
-            <div className="flex h-48 w-full rounded-md bg-violet-300 p-5 md:h-[40vh]">
-              <div className="flex w-full flex-col justify-between">
-                <h1 className="bento-title special-font max-w-64 text-black">
-                  M<b>o</b>re co<b>m</b>ing so<b>o</b>n
-                </h1>
-                <TiLocationArrow className="m-5 scale-[3] self-end text-black/80" />
+          <div className="group bento-tilt md:col-span-2">
+            <BentoTilt>
+              <div className="relative flex h-40 w-full rounded-md bg-violet-300 p-5 md:h-[30vh] overflow-hidden transition-transform duration-300 transform-gpu group-hover:scale-105">
+                {/* Black film overlay */}
+                <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" />
+                <div className="flex w-full flex-col justify-between z-20">
+                  <h1 className="bento-title special-font max-w-64 text-white">
+                    M<b>o</b>re co<b>m</b>ing so<b>o</b>n
+                  </h1>
+                  <TiLocationArrow
+                    size={42}
+                    className="mt-4 self-end text-white/80"
+                  />
+                </div>
               </div>
-            </div>
-          </BentoTilt>
+            </BentoTilt>
+          </div>
         </div>
 
         {/* Categories tiles above link to /categories/[slug] pages */}
