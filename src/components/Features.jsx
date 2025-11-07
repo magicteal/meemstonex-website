@@ -136,13 +136,13 @@ const Features = () => {
       desc: "Meemstonex Mandirs sacred spaces sculpted in pure marble, embodying devotion, peace, and eternal grace",
     },
     {
-      name: "MARBLE MOSQUE WORK",
-      video: "videos/feature-1.mp4",
+      name: "MOSQUE WORK",
+      video: "videos/C3.mp4",
       desc: "Sacred mosque elements crafted in premium marble with uncompromising quality.",
     },
     {
       name: "STONE FOUNTAIN",
-      video: "videos/feature-1.mp4",
+      video: "videos/C4.mp4",
       desc: "Let serenity flow with Meemstonex Fountains, where artistry in stone brings movement, life, and timeless beauty.",
     },
     {
@@ -152,22 +152,22 @@ const Features = () => {
     },
     {
       name: "WALL PANELS",
-      video: "videos/feature-2.mp4",
+      video: "videos/C6.mp4",
       desc: "Statement wall claddings in marble that elevate interiors with depth and texture.",
     },
+    // {
+    //   name: "MORAL",
+    //   video: "videos/C7.mp4",
+    //   desc: "Expressive marble mural work designed to narrate elegance in stone.",
+    // },
     {
-      name: "MORAL",
-      video: "videos/feature-5.mp4",
-      desc: "Expressive marble mural work designed to narrate elegance in stone.",
-    },
-    {
-      name: "MARBLE WASH BASIN",
-      video: "videos/feature-1.mp4",
+      name: "WASHBASIN",
+      video: "videos/C8.mp4",
       desc: "Sleek and refined basins carved from premium marble for timeless bathrooms.",
     },
     {
       name: "HANDICRAFTS PRODUCTS",
-      video: "videos/feature-2.mp4",
+      video: "videos/C9.mp4",
       desc: "Handcrafted marble artefacts that showcase intricate workmanship.",
     },
   ];

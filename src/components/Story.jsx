@@ -1,99 +1,40 @@
 "use client";
-import React, { useRef } from "react";
+import React from "react";
 import AnimatedTitle from "./AnimatedTitle";
-import gsap from "gsap";
-import RoundedCorners from "./RoundedCorners";
 import Button from "./Button";
-import Image from "next/image";
 
 const Story = () => {
-  const frameRef = useRef(null);
-
-  const handleMouseLeave = () => {
-    const element = frameRef.current;
-
-    gsap.to(element, {
-      duration: 0.3,
-      rotateX: 0,
-      rotateY: 0,
-      ease: "power1.inOut",
-    });
-  };
-
-  const handleMouseMove = (e) => {
-    const { clientX, clientY } = e;
-    const element = frameRef.current;
-
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
-
-    gsap.to(element, {
-      duration: 0.3,
-      rotateX,
-      rotateY,
-      transformPerspective: 500,
-      ease: "power1.inOut",
-    });
-  };
-
   return (
     <section
       id="story"
       className="min-h-dvh w-screen bg-black text-blue-50 overflow-y-hidden"
     >
-      <div className="flex size-full flex-col items-center py-10 pb-24">
+      <div className="flex size-full flex-col items-center pt-20 md:pt-28 pb-24">
         <p className="font-general text-sm uppercase md:text-[10px]">
           the multiversal world of meemstonex
         </p>
 
         <div className="relative size-full">
           <AnimatedTitle
-            title="The st<b>o</b>ry of <br /> a hidden wor<b>k</b>"
+            title="The st<b>o</b>ry of <br /> generations<b>"
             sectionId="#story"
             containerClass="mt-5 pointer-events-none mix-blend-difference relative z-10"
           />
-
-          <div className="story-img-container">
-            <div className="story-img-mask">
-              <div
-                className="story-img-content"
-                ref={frameRef}
-                onMouseLeave={handleMouseLeave}
-                onMouseUp={handleMouseLeave}
-                onMouseEnter={handleMouseLeave}
-                onMouseMove={handleMouseMove}
-              >
-                <Image
-                  src="/img/story.jpg"
-                  alt="entrance"
-                  className="object-contain"
-                  width={1920}
-                  height={1080}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority={false}
-                />
-              </div>
-            </div>
-
-            <RoundedCorners />
-          </div>
+          {/* Image removed as requested */}
         </div>
 
-        <div className="-mt-20 md:-mt-40 flex w-full justify-center lg:-mt-80 md:me-44 md:justify-end">
-          <div className="flex h-full w-fit flex-col items-center md:items-start">
-            <p className="mt-3 max-w-sm text-center font-circular-web text-violet-50 md:text-start px-3">
-              Where earth’s artistry converges, lies Meemstonex Marble — the
-              boundless pillar of creation. Discover its depths and shape your
-              legacy in stone eternal.
+        <div className="flex w-full justify-center mt-10">
+          <div className="flex h-full w-fit flex-col items-center">
+            <p className="mt-3 max-w-sm text-center font-circular-web text-violet-50 px-3">
+              For three generations, Meemstonex Marble has shaped the poetry of
+              stone where earth’s finest artistry becomes a family’s enduring
+              legacy. From the first chisel strike to today’s modern
+              craftsmanship, our heritage lives in every vein, every polish, and
+              every masterpiece we create. Guided by passion, precision, and
+              pride, we honor nature’s grandeur by transforming raw marble into
+              timeless expressions of beauty and strength. At Meemstonex, we
+              don’t just work with stone we preserve tradition, craft stories,
+              and carve the legacy of generations into every surface we touch
             </p>
 
             <a href="/products" className="mt-5">
