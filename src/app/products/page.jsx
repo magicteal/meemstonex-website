@@ -47,7 +47,9 @@ export default function ProductsPage() {
   const [debouncedQ, setDebouncedQ] = useState("");
   const [categoryFilter, setCategoryFilter] = useState([]);
   // widen default max price so expensive products are not hidden by default
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  // Original default 100000 hid products priced above that (e.g., 195000, 200000)
+  // Increase to 1,000,000 to include high-value items; consider making this dynamic later.
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [sort, setSort] = useState("name:asc");
   const [selected, setSelected] = useState(null);
 
@@ -57,7 +59,7 @@ export default function ProductsPage() {
     return () => clearTimeout(t);
   }, [q]);
 
-  const load = useCallback(
+    const load = useCallback(
     async (reset = false) => {
       if (loading) return;
       setLoading(true);
@@ -72,8 +74,17 @@ export default function ProductsPage() {
           sort,
         });
         setHasMore(res.page * res.pageSize < res.total);
+        // Reset vs append logic; also guard against accidental duplicate IDs
         if (reset) setItems(res.items);
-        else setItems((prev) => [...prev, ...res.items]);
+        else
+          setItems((prev) => {
+            const seen = new Set(prev.map((p) => p.id));
+            const merged = [...prev];
+            res.items.forEach((p) => {
+              if (!seen.has(p.id)) merged.push(p);
+            });
+            return merged;
+          });
         setPage(nextPage + 1);
       } catch (e) {
         setError(e.message);
@@ -134,10 +145,12 @@ export default function ProductsPage() {
                 <input
                   type="number"
                   className="w-24 rounded-lg border px-2 py-1 text-sm"
-                  value={priceRange[0]}
-                  onChange={(e) =>
-                    setPriceRange([Number(e.target.value), priceRange[1]])
-                  }
+                  value={priceRange[0] ?? ""}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const val = raw === "" ? undefined : Number(raw);
+                    setPriceRange([val, priceRange[1]]);
+                  }}
                 />
               </div>
 
@@ -146,10 +159,12 @@ export default function ProductsPage() {
                 <input
                   type="number"
                   className="w-24 rounded-lg border px-2 py-1 text-sm"
-                  value={priceRange[1]}
-                  onChange={(e) =>
-                    setPriceRange([priceRange[0], Number(e.target.value)])
-                  }
+                  value={priceRange[1] ?? ""}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const val = raw === "" ? undefined : Number(raw);
+                    setPriceRange([priceRange[0], val]);
+                  }}
                 />
               </div>
             </div>
@@ -164,16 +179,23 @@ export default function ProductsPage() {
       )}
 
       <section className="mt-6 space-y-8">
-        {/* Group by category: show heading then a grid of ExpandableCards */}
+        {/* Group by category: show heading then a grid of ExpandableCards
+            NOTE: a product may belong to multiple categories. Add each product
+            to every category group it belongs to so it appears under all
+            relevant headings. */}
         {(() => {
           const map = new Map();
           items.forEach((it) => {
-            it.categories.length ? it.categories[0] : "Uncategorized";
-            const key = it.categories.length
-              ? it.categories[0]
-              : "Uncategorized";
-            if (!map.has(key)) map.set(key, []);
-            map.get(key).push(it);
+            const cats = Array.isArray(it.categories) && it.categories.length
+              ? it.categories
+              : ["Uncategorized"];
+            cats.forEach((c) => {
+              const key = c || "Uncategorized";
+              if (!map.has(key)) map.set(key, []);
+              // avoid adding the same product twice to a category
+              const list = map.get(key);
+              if (!list.some((p) => p.id === it.id)) list.push(it);
+            });
           });
           return Array.from(map.entries()).map(([cat, prods]) => (
             <div key={cat}>
