@@ -1,15 +1,15 @@
 // Canonical category list and slug helpers used across the app
 
 export const rawCategories = [
-  "Marble temple",
-  "MARBLE MASJID WORK",
-  "STONE FOUNTAIN",
-  "INLAY WORK",
-  "WALL PANELS",
-  "MORAL",
-  "MARBLE WASH BASIN",
-  "TABLE TOP",
-  "HANDICRAFTS PRODUCTS",
+  "Marble Temple",
+  "Marble Masjid Work",
+  "Stone Fountain",
+  "Inlay Work",
+  "Wall Panels",
+  "Moral",
+  "Marble Wash Basin",
+  "Table Top",
+  "Handicrafts Products",
 ];
 
 export function slugify(name) {

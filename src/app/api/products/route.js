@@ -65,12 +65,23 @@ export async function POST(req) {
       categories = [],
       price,
       photo,
+      photos,
       description = "",
       currency,
+      featured = false,
     } = body;
-    if (!name || typeof price !== "number" || price < 0 || !photo) {
+    
+    // Support both photos array and legacy photo field
+    let photoArray = [];
+    if (Array.isArray(photos) && photos.length) {
+      photoArray = photos.filter(Boolean).slice(0, 3);
+    } else if (photo) {
+      photoArray = [String(photo)];
+    }
+    
+    if (!name || typeof price !== "number" || price < 0 || photoArray.length === 0) {
       return NextResponse.json(
-        { error: "Invalid payload: name, price (>=0), photo are required" },
+        { error: "Invalid payload: name, price (>=0), at least one photo required" },
         { status: 400 }
       );
     }
@@ -79,9 +90,11 @@ export async function POST(req) {
       name: String(name),
       categories: Array.isArray(categories) ? categories : [],
       price: Number(price),
-      photo: String(photo),
+      photos: photoArray,
+      photo: photoArray[0], // backward compatibility
       description: String(description || ""),
       currency: typeof currency === "string" && currency ? currency : "INR",
+      featured: Boolean(featured),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -122,11 +135,28 @@ export async function PUT(req) {
       "categories",
       "price",
       "photo",
+      "photos",
       "description",
       "currency",
+      "featured",
     ];
     const update = {};
     for (const k of allowed) if (k in patch) update[k] = patch[k];
+    
+    // Handle photos array update with backward compatibility
+    if ("photos" in patch) {
+      const photoArray = Array.isArray(patch.photos) 
+        ? patch.photos.filter(Boolean).slice(0, 3) 
+        : [];
+      if (photoArray.length > 0) {
+        update.photos = photoArray;
+        update.photo = photoArray[0];
+      }
+    } else if ("photo" in patch && patch.photo) {
+      update.photos = [patch.photo];
+      update.photo = patch.photo;
+    }
+    
     if (!Object.keys(update).length)
       return NextResponse.json(
         { error: "No valid fields to update" },

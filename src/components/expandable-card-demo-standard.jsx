@@ -12,6 +12,7 @@ import Image from "next/image";
  */
 export default function ExpandableCardDemo({ items = [] }) {
   const [active, setActive] = useState(null);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const ref = useRef(null);
   const id = useId();
 
@@ -24,6 +25,7 @@ export default function ExpandableCardDemo({ items = [] }) {
 
     if (active && typeof active === "object") {
       document.body.style.overflow = "hidden";
+      setCurrentPhotoIndex(0); // reset carousel when opening
     } else {
       document.body.style.overflow = "auto";
     }
@@ -45,7 +47,8 @@ export default function ExpandableCardDemo({ items = [] }) {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })} • ${(p.categories || []).join(", ") || "General"}`,
-        src: p.photo,
+        src: (Array.isArray(p.photos) && p.photos.length) ? p.photos[0] : (p.photo || ""),
+        photos: (Array.isArray(p.photos) && p.photos.length) ? p.photos : (p.photo ? [p.photo] : []),
         ctaText: "View",
         ctaLink: "#",
         content: () => (
@@ -108,65 +111,107 @@ export default function ExpandableCardDemo({ items = [] }) {
             <motion.div
               layoutId={`card-${keyOf(active)}-${id}`}
               ref={ref}
-              className="w-[92vw] max-w-5xl h-full md:h-fit md:max-h-[90%] flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
+              className="w-[92vw] max-w-md h-[95vh] md:h-[95vh] flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
             >
-              <motion.div layoutId={`image-${keyOf(active)}-${id}`}>
-                <Image
-                  width={1200}
-                  height={800}
-                  src={active.src}
-                  alt={active.title}
-                  className="w-full h-[42vh] sm:h-80 md:h-[420px] sm:rounded-tr-lg sm:rounded-tl-lg object-cover object-top"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
-                />
-              </motion.div>
+              <div className="relative">
+                <motion.div layoutId={`image-${keyOf(active)}-${id}`} className="relative">
+                  <Image
+                    width={800}
+                    height={1200}
+                    src={active.photos && active.photos.length > 0 && active.photos[currentPhotoIndex] ? active.photos[currentPhotoIndex] : active.src}
+                    alt={active.title}
+                    className="w-full h-[70vh] sm:h-[70vh] md:h-[75vh] sm:rounded-tr-lg sm:rounded-tl-lg object-contain bg-neutral-100"
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
+                  />
+                  {active.photos && active.photos.length > 1 && (
+                    <>
+                      <div className="absolute inset-0 flex items-center justify-between px-4">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentPhotoIndex(prev => prev > 0 ? prev - 1 : active.photos.length - 1);
+                          }}
+                          className="bg-black/50 hover:bg-black/70 text-white text-2xl rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm z-20 transition-colors"
+                          aria-label="Previous photo"
+                          type="button"
+                        >
+                          ‹
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentPhotoIndex(prev => prev < active.photos.length - 1 ? prev + 1 : 0);
+                          }}
+                          className="bg-black/50 hover:bg-black/70 text-white text-2xl rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm z-20 transition-colors"
+                          aria-label="Next photo"
+                          type="button"
+                        >
+                          ›
+                        </button>
+                      </div>
+                      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
+                        {active.photos.map((_, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCurrentPhotoIndex(idx);
+                            }}
+                            className={`w-2 h-2 rounded-full transition-colors ${
+                              idx === currentPhotoIndex ? 'bg-white' : 'bg-white/50'
+                            }`}
+                            aria-label={`Go to photo ${idx + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              </div>
 
-              <div>
-                <div className="flex justify-between items-start p-4">
-                  <div className="">
-                    <motion.h3
-                      layoutId={`title-${keyOf(active)}-${id}`}
-                      className="font-bold text-neutral-700 dark:text-neutral-200"
-                    >
-                      {active.title}
-                    </motion.h3>
-                    <motion.p
-                      layoutId={`description-${active.description}-${id}`}
-                      className="text-neutral-600 dark:text-neutral-400"
-                    >
-                      {active.description}
-                    </motion.p>
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex flex-col gap-3 p-4 flex-shrink-0">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <motion.h3
+                        layoutId={`title-${keyOf(active)}-${id}`}
+                        className="font-bold text-neutral-700 dark:text-neutral-200 text-xl"
+                      >
+                        {active.title}
+                      </motion.h3>
+                      <motion.p
+                        layoutId={`description-${active.description}-${id}`}
+                        className="text-neutral-600 dark:text-neutral-400 mt-1"
+                      >
+                        {active.description}
+                      </motion.p>
+                    </div>
                   </div>
 
                   <motion.a
                     layoutId={`button-${keyOf(active)}-${id}`}
                     href={active.ctaLink}
                     target="_blank"
-                    className="px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
+                    className="w-full text-center px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white hover:bg-green-600 transition-colors"
                   >
                     {active.ctaText}
                   </motion.a>
                 </div>
-                <div className="pt-4 relative px-4">
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
-                  >
+                <div className="px-4 pb-4 flex-1 overflow-y-auto">
+                  <div className="text-neutral-700 dark:text-neutral-300 text-base leading-relaxed">
                     {typeof active.content === "function"
                       ? active.content()
                       : active.content}
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             </motion.div>
           </div>
         ) : null}
       </AnimatePresence>
-      {/* List — widen to full container width */}
-      <div className="w-full">
+      {/* Grid Layout */}
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {cardsData.map((card, index) => (
           <motion.div
             layoutId={`card-${keyOf(card)}-${id}`}
@@ -176,43 +221,41 @@ export default function ExpandableCardDemo({ items = [] }) {
                 : `card-${keyOf(card)}-${index}-${id}`
             }
             onClick={() => setActive(card)}
-            className="w-full p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
+            className="group cursor-pointer bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100"
           >
-            <div className="flex gap-4 flex-col md:flex-row w-full">
-              <motion.div
-                layoutId={`image-${keyOf(card)}-${id}`}
-                className="w-full md:w-auto"
-              >
-                <Image
-                  width={200}
-                  height={200}
-                  src={card.src}
-                  alt={card.title}
-                  className="w-full h-48 md:h-14 md:w-14 rounded-lg object-cover object-top mx-auto md:mx-0"
-                  sizes="(max-width: 768px) 100vw, 56px"
-                />
-              </motion.div>
-              <div className="flex-1">
-                <motion.h3
-                  layoutId={`title-${keyOf(card)}-${id}`}
-                  className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left mt-3 md:mt-0"
-                >
-                  {card.title}
-                </motion.h3>
-                <motion.p
-                  layoutId={`description-${card.description}-${id}`}
-                  className="text-neutral-600 dark:text-neutral-400 text-center md:text-left mt-2 md:mt-0"
-                >
-                  {card.description}
-                </motion.p>
-              </div>
-            </div>
-            <motion.button
-              layoutId={`button-${keyOf(card)}-${id}`}
-              className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-green-500 hover:text-white text-black mt-4 md:mt-0 self-center md:self-auto"
+            <motion.div
+              layoutId={`image-${keyOf(card)}-${id}`}
+              className="relative w-full h-48 overflow-hidden"
             >
-              {card.ctaText}
-            </motion.button>
+              <Image
+                width={400}
+                height={300}
+                src={card.src}
+                alt={card.title}
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              />
+            </motion.div>
+            <div className="p-4">
+              <motion.h3
+                layoutId={`title-${keyOf(card)}-${id}`}
+                className="font-semibold text-neutral-800 dark:text-neutral-200 text-lg mb-2 line-clamp-1"
+              >
+                {card.title}
+              </motion.h3>
+              <motion.p
+                layoutId={`description-${card.description}-${id}`}
+                className="text-neutral-600 dark:text-neutral-400 text-sm mb-3 line-clamp-2"
+              >
+                {card.description}
+              </motion.p>
+              <motion.button
+                layoutId={`button-${keyOf(card)}-${id}`}
+                className="w-full px-4 py-2 text-sm rounded-lg font-semibold bg-gray-100 hover:bg-green-500 hover:text-white text-black transition-colors"
+              >
+                {card.ctaText}
+              </motion.button>
+            </div>
           </motion.div>
         ))}
       </div>

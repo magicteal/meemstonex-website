@@ -224,7 +224,7 @@ export default function ProductsPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="relative h-64 w-full">
               <Image
-                src={selected.photo}
+                src={(Array.isArray(selected.photos) && selected.photos.length) ? selected.photos[0] : (selected.photo || "")}
                 alt={selected.name}
                 fill
                 className="rounded-lg object-cover"

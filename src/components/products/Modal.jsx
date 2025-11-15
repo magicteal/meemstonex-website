@@ -64,7 +64,7 @@ export default function Modal({
           }}
         >
           <motion.div
-            className="w-full max-w-2xl rounded-xl bg-white shadow-xl outline-none"
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-xl outline-none"
             initial={{ y: 20, scale: 0.98, opacity: 0 }}
             animate={{
               y: 0,
@@ -74,7 +74,7 @@ export default function Modal({
             }}
             exit={{ y: 20, scale: 0.98, opacity: 0 }}
           >
-            <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+            <div className="sticky top-0 bg-white z-10 flex items-center justify-between border-b border-gray-200 px-4 py-3">
               <h2
                 id="modal-title"
                 className="text-lg font-semibold text-gray-900"

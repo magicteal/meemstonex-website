@@ -135,9 +135,15 @@ function seedProducts() {
     name,
     categories: categories[i],
     price: prices[i],
+    photos: [
+      samplePhotos[i % samplePhotos.length],
+      samplePhotos[(i + 1) % samplePhotos.length],
+      samplePhotos[(i + 2) % samplePhotos.length],
+    ],
     photo: samplePhotos[i % samplePhotos.length],
     description:
       "High-quality product designed for everyday use. Durable materials, modern aesthetic, and great performance.",
+    featured: false,
   }));
 }
 
@@ -196,12 +202,26 @@ export async function getProduct(id) {
 
 export async function createProduct(product) {
   const id = uuidv4();
-  const newItem = { id, ...product };
+  // Ensure photos array exists and photo field for backward compatibility
+  const photos = Array.isArray(product.photos) && product.photos.length
+    ? product.photos.filter(Boolean).slice(0, 3)
+    : product.photo
+    ? [product.photo]
+    : [];
+  const newItem = { 
+    id, 
+    featured: false, 
+    ...product,
+    photos,
+    photo: photos[0] || product.photo,
+  };
   DB.items.unshift(newItem);
   // track categories
-  newItem.categories.forEach((c) => {
-    if (!DB.categories.includes(c)) DB.categories.push(c);
-  });
+  if (Array.isArray(newItem.categories)) {
+    newItem.categories.forEach((c) => {
+      if (!DB.categories.includes(c)) DB.categories.push(c);
+    });
+  }
   saveState(DB.items, DB.categories);
   return withLatency({ ...newItem });
 }
@@ -209,7 +229,23 @@ export async function createProduct(product) {
 export async function updateProduct(id, patch) {
   const idx = DB.items.findIndex((p) => p.id === id);
   if (idx === -1) throw new Error("Product not found");
-  const updated = { ...DB.items[idx], ...patch };
+  
+  // Handle photos array update
+  const updates = { ...patch };
+  if ("photos" in patch) {
+    const photoArray = Array.isArray(patch.photos)
+      ? patch.photos.filter(Boolean).slice(0, 3)
+      : [];
+    if (photoArray.length > 0) {
+      updates.photos = photoArray;
+      updates.photo = photoArray[0];
+    }
+  } else if ("photo" in patch && patch.photo) {
+    updates.photos = [patch.photo];
+    updates.photo = patch.photo;
+  }
+  
+  const updated = { ...DB.items[idx], ...updates };
   DB.items[idx] = updated;
   // update categories
   if (patch.categories) {

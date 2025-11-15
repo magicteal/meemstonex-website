@@ -252,7 +252,7 @@ export default function ProductsEditorPage() {
                   <td className="px-3 py-2">
                     <div className="relative h-12 w-12">
                       <Image
-                        src={p.photo}
+                        src={(Array.isArray(p.photos) && p.photos.length) ? p.photos[0] : (p.photo || "")}
                         alt={p.name}
                         fill
                         className="rounded-md object-cover"

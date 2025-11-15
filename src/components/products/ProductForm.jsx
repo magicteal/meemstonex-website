@@ -14,10 +14,21 @@ export default function ProductForm({
   const [price, setPrice] = useState(
     initial?.price != null ? String(initial.price) : ""
   );
-  const [photo, setPhoto] = useState(initial?.photo || "");
+  const [photos, setPhotos] = useState(() => {
+    if (Array.isArray(initial?.photos) && initial.photos.length) {
+      const p = [...initial.photos];
+      while (p.length < 3) p.push("");
+      return p.slice(0, 3);
+    }
+    if (initial?.photo) {
+      return [initial.photo, "", ""];
+    }
+    return ["", "", ""];
+  });
   const [description, setDescription] = useState(initial?.description || "");
+  const [featured, setFeatured] = useState(!!initial?.featured);
   const [errors, setErrors] = useState({});
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState([false, false, false]);
   const nameRef = useRef(null);
 
   useEffect(() => {
@@ -25,14 +36,27 @@ export default function ProductForm({
     setName(initial.name || "");
     setCategories(initial.categories || []);
     setPrice(initial.price != null ? String(initial.price) : "");
-    setPhoto(initial.photo || "");
+    
+    const newPhotos = ["", "", ""];
+    if (Array.isArray(initial.photos) && initial.photos.length) {
+      initial.photos.slice(0, 3).forEach((p, i) => {
+        newPhotos[i] = p || "";
+      });
+    } else if (initial.photo) {
+      newPhotos[0] = initial.photo;
+    }
+    setPhotos(newPhotos);
+    
     setDescription(initial.description || "");
+    setFeatured(!!initial.featured);
   }, [
     initial?.name,
     initial?.photo,
+    JSON.stringify(initial?.photos || []),
     initial?.description,
     initial?.price,
     JSON.stringify(initial?.categories || []),
+    initial?.featured,
   ]);
 
   const validate = () => {
@@ -40,22 +64,43 @@ export default function ProductForm({
     if (!name.trim()) errs.name = "Name is required";
     const p = parseFloat(price);
     if (Number.isNaN(p) || p < 0) errs.price = "Enter a valid price";
-    if (!photo) errs.photo = "Photo is required";
+    const hasPhoto = photos.some(p => p && p.trim());
+    if (!hasPhoto) errs.photos = "At least one photo is required";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  const handleFile = async (file) => {
+  const handleFile = async (index, file) => {
     // show an immediate local preview for perceived performance
     const preview = URL.createObjectURL(file);
-    setPhoto(preview);
-    setUploading(true);
+    setPhotos(prev => {
+      const next = [...prev];
+      next[index] = preview;
+      return next;
+    });
+    
+    setUploading(prev => {
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
+    
     try {
       const url = await mockUpload(file);
-      // replace preview with final uploaded URL (or keep preview if upload fails)
-      if (url) setPhoto(url);
+      // replace preview with final uploaded URL
+      if (url) {
+        setPhotos(prev => {
+          const next = [...prev];
+          next[index] = url;
+          return next;
+        });
+      }
     } finally {
-      setUploading(false);
+      setUploading(prev => {
+        const next = [...prev];
+        next[index] = false;
+        return next;
+      });
       // revoke the object URL when upload finishes
       try {
         URL.revokeObjectURL(preview);
@@ -63,20 +108,9 @@ export default function ProductForm({
     }
   };
 
-  const onFileChange = async (e) => {
+  const onFileChange = async (index, e) => {
     const file = e.target.files?.[0];
-    if (file) await handleFile(file);
-  };
-
-  const onUrlUpload = async () => {
-    if (!photo) return;
-    setUploading(true);
-    try {
-      const url = await mockUpload(photo);
-      setPhoto(url);
-    } finally {
-      setUploading(false);
-    }
+    if (file) await handleFile(index, file);
   };
 
   const submit = (e) => {
@@ -86,12 +120,15 @@ export default function ProductForm({
       name: name.trim(),
       categories,
       price: parseFloat(price),
-      photo,
+      photos: photos.filter(p => p && p.trim()),
       description: description.trim(),
       currency: "INR",
+      featured,
     };
     onSubmit?.(payload);
   };
+
+  const anyUploading = uploading.some(Boolean);
 
   return (
     <form onSubmit={submit} className="space-y-4">
@@ -154,31 +191,53 @@ export default function ProductForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Photo</label>
-        <div className="mt-1 flex items-center gap-2">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onFileChange}
-            disabled={uploading}
-            aria-label="Upload photo"
-          />
-          <span className="text-sm text-gray-500">
-            Only image file uploads are accepted
-          </span>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Photos (up to 3)
+        </label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {[0, 1, 2].map((index) => (
+            <div key={index} className="space-y-1">
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => onFileChange(index, e)}
+                  disabled={uploading[index]}
+                  className="text-xs w-full"
+                  aria-label={`Upload photo ${index + 1}`}
+                />
+              </div>
+              {photos[index] && (
+                <div className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photos[index]}
+                    alt={`Preview ${index + 1}`}
+                    className="h-20 w-full rounded-md object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhotos(prev => {
+                        const next = [...prev];
+                        next[index] = "";
+                        return next;
+                      });
+                    }}
+                    className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              {uploading[index] && (
+                <p className="text-xs text-gray-500">Uploading...</p>
+              )}
+            </div>
+          ))}
         </div>
-        {errors.photo && (
-          <p className="mt-1 text-sm text-red-600">{errors.photo}</p>
-        )}
-        {photo && (
-          <div className="mt-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={photo}
-              alt="Preview"
-              className="h-32 w-32 rounded-md object-cover"
-            />
-          </div>
+        {errors.photos && (
+          <p className="mt-1 text-sm text-red-600">{errors.photos}</p>
         )}
       </div>
 
@@ -193,9 +252,22 @@ export default function ProductForm({
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          rows={4}
+          rows={3}
           className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
         />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          id="featured"
+          type="checkbox"
+          checked={featured}
+          onChange={(e) => setFeatured(e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+        />
+        <label htmlFor="featured" className="text-sm text-gray-800">
+          Featured (show on homepage)
+        </label>
       </div>
 
       <div className="flex items-center justify-end gap-2 pt-2">
@@ -208,16 +280,16 @@ export default function ProductForm({
         </button>
         <button
           type="submit"
-          disabled={uploading}
-          aria-busy={uploading}
+          disabled={anyUploading}
+          aria-busy={anyUploading}
           className={
             "rounded-lg px-3 py-2 text-sm font-medium text-white " +
-            (uploading
+            (anyUploading
               ? "bg-blue-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700")
           }
         >
-          {uploading ? "Uploading…" : submitLabel}
+          {anyUploading ? "Uploading…" : submitLabel}
         </button>
       </div>
     </form>
