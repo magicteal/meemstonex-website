@@ -9,7 +9,7 @@ It includes:
 - A public product catalog with category filters, grouped display, and product detail modal.
 - Category listing and category-specific browsing pages.
 - An admin login and product management panel (create/edit/delete with toast feedback).
-- MongoDB-backed APIs for products and categories.
+- MongoDB-backed APIs for products and categories
 
 ---
 
