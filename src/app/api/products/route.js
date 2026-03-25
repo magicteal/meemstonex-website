@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { getCollection } from "../../../lib/mongodb";
 
 // GET /api/products
-// Supports query params: page, pageSize, q, categories (csv), minPrice, maxPrice, sort (name:asc|price:desc)
+// Supports query params: page, pageSize, q, categories (csv), featured, sort (name:asc)
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -11,18 +11,11 @@ export async function GET(req) {
     const pageSize = parseInt(searchParams.get("pageSize") || "12", 10);
     const q = (searchParams.get("q") || "").trim();
     const categoriesCsv = (searchParams.get("categories") || "").trim();
-    const minPrice = parseFloat(searchParams.get("minPrice") || "0");
-    const maxPrice = parseFloat(searchParams.get("maxPrice") || "1000000");
+    const featuredParam = (searchParams.get("featured") || "").trim();
     const sortParam = searchParams.get("sort") || "name:asc";
 
     const filter = {};
     if (q) filter.name = { $regex: q, $options: "i" };
-    if (!Number.isNaN(minPrice) || !Number.isNaN(maxPrice)) {
-      filter.price = {};
-      if (!Number.isNaN(minPrice)) filter.price.$gte = minPrice;
-      if (!Number.isNaN(maxPrice)) filter.price.$lte = maxPrice;
-      if (Object.keys(filter.price).length === 0) delete filter.price;
-    }
     if (categoriesCsv) {
       const cats = categoriesCsv
         .split(",")
@@ -30,6 +23,8 @@ export async function GET(req) {
         .filter(Boolean);
       if (cats.length) filter.categories = { $all: cats };
     }
+    if (featuredParam === "true") filter.featured = true;
+    if (featuredParam === "false") filter.featured = false;
 
     const [sortKey, sortDir] = sortParam.split(":");
     const sort = { [sortKey]: sortDir === "desc" ? -1 : 1 };
@@ -63,7 +58,11 @@ export async function POST(req) {
     const {
       name,
       categories = [],
-      price,
+      size_feet,
+      size_inches,
+      material,
+      customization,
+      service,
       photo,
       photos,
       description = "",
@@ -74,14 +73,16 @@ export async function POST(req) {
     // Support both photos array and legacy photo field
     let photoArray = [];
     if (Array.isArray(photos) && photos.length) {
-      photoArray = photos.filter(Boolean).slice(0, 3);
+      photoArray = photos
+        .filter((photo) => typeof photo === "string" && photo.trim())
+        .map((photo) => photo.trim());
     } else if (photo) {
-      photoArray = [String(photo)];
+      photoArray = [String(photo).trim()].filter(Boolean);
     }
     
-    if (!name || typeof price !== "number" || price < 0 || photoArray.length === 0) {
+    if (!name || photoArray.length === 0) {
       return NextResponse.json(
-        { error: "Invalid payload: name, price (>=0), at least one photo required" },
+        { error: "Invalid payload: name and at least one photo required" },
         { status: 400 }
       );
     }
@@ -89,7 +90,14 @@ export async function POST(req) {
     const doc = {
       name: String(name),
       categories: Array.isArray(categories) ? categories : [],
-      price: Number(price),
+      size_feet:
+        typeof size_feet === "string" ? size_feet.trim() : "",
+      size_inches:
+        typeof size_inches === "string" ? size_inches.trim() : "",
+      material: typeof material === "string" ? material.trim() : "",
+      customization:
+        typeof customization === "string" ? customization.trim() : "",
+      service: typeof service === "string" ? service.trim() : "",
       photos: photoArray,
       photo: photoArray[0], // backward compatibility
       description: String(description || ""),
@@ -133,7 +141,11 @@ export async function PUT(req) {
     const allowed = [
       "name",
       "categories",
-      "price",
+      "size_feet",
+      "size_inches",
+      "material",
+      "customization",
+      "service",
       "photo",
       "photos",
       "description",
@@ -146,15 +158,20 @@ export async function PUT(req) {
     // Handle photos array update with backward compatibility
     if ("photos" in patch) {
       const photoArray = Array.isArray(patch.photos) 
-        ? patch.photos.filter(Boolean).slice(0, 3) 
+        ? patch.photos
+            .filter((photo) => typeof photo === "string" && photo.trim())
+            .map((photo) => photo.trim())
         : [];
       if (photoArray.length > 0) {
         update.photos = photoArray;
         update.photo = photoArray[0];
       }
     } else if ("photo" in patch && patch.photo) {
-      update.photos = [patch.photo];
-      update.photo = patch.photo;
+      const onePhoto = String(patch.photo).trim();
+      if (onePhoto) {
+        update.photos = [onePhoto];
+        update.photo = onePhoto;
+      }
     }
     
     if (!Object.keys(update).length)

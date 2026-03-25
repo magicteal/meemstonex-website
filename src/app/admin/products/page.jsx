@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Modal from "../../../components/products/Modal";
 import ProductForm from "../../../components/products/ProductForm";
@@ -231,16 +231,16 @@ export default function ProductsEditorPage() {
         <table className="min-w-full text-left text-sm">
           <thead className="bg-gray-50 text-gray-600">
             <tr>
+              <th className="px-3 py-2 w-20">Sr. No.</th>
               <th className="px-3 py-2">Photo</th>
               <th className="px-3 py-2">Name</th>
               <th className="px-3 py-2">Categories</th>
-              <th className="px-3 py-2">Price</th>
               <th className="px-3 py-2 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             <AnimatePresence initial={false}>
-              {items.map((p) => (
+              {items.map((p, index) => (
                 <motion.tr
                   key={p.id}
                   className="border-t"
@@ -249,6 +249,7 @@ export default function ProductsEditorPage() {
                   exit={{ opacity: 0, y: 4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                 >
+                  <td className="px-3 py-2 text-gray-700">{index + 1}</td>
                   <td className="px-3 py-2">
                     <div className="relative h-12 w-12">
                       <Image
@@ -274,13 +275,6 @@ export default function ProductsEditorPage() {
                         </span>
                       ))}
                     </div>
-                  </td>
-                  <td className="px-3 py-2">
-                    ₹
-                    {Number(p.price).toLocaleString("en-IN", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
                   </td>
                   <td className="px-3 py-2 text-right">
                     <div className="inline-flex gap-2">
@@ -366,21 +360,6 @@ export default function ProductsEditorPage() {
           </div>
         )}
       </Modal>
-
-      {/* Tests (pseudo) */}
-      {/*
-      describe('Products editor', () => {
-        it('creates a product', async () => {
-          // open modal, fill form, submit, expect new row appears
-        });
-        it('validates edit form', async () => {
-          // open edit, clear name, expect error message and disabled submit
-        });
-        it('delete + undo', async () => {
-          // delete row, toast shows, click Undo, row reappears
-        });
-      });
-      */}
     </main>
   );
 }

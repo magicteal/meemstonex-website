@@ -40,20 +40,63 @@ export default function ExpandableCardDemo({ items = [] }) {
   const cardsData = useMemo(() => {
     if (Array.isArray(items) && items.length) {
       return items.map((p, idx) => ({
+        
         // ensure uid is unique even if incoming ids collide by appending the index
         uid: p.id != null ? `${p.id}-${idx}` : `item-${idx}`,
         title: p.name,
-        description: `₹${Number(p.price ?? 0).toLocaleString("en-IN", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })} • ${(p.categories || []).join(", ") || "General"}`,
-        src: (Array.isArray(p.photos) && p.photos.length) ? p.photos[0] : (p.photo || ""),
-        photos: (Array.isArray(p.photos) && p.photos.length) ? p.photos : (p.photo ? [p.photo] : []),
+        description: (p.categories || []).join(", ") || "General",
+        customOptionText:
+          typeof p.customization === "string" && p.customization.trim()
+            ? p.customization.trim().toUpperCase() === "AVAILABLE"
+              ? "Available"
+              : "Not Available"
+            : "Not Available",
+        sizeText:
+          (p.size_feet || "").trim() || (p.size_inches || "").trim()
+            ? `${(p.size_feet || "").trim() || "N/A"}${
+                (p.size_inches || "").trim()
+                  ? ` / ${(p.size_inches || "").trim()}`
+                  : ""
+              }`
+            : "N/A",
+        src: (
+          Array.isArray(p.photos)
+            ? p.photos.find((photo) => typeof photo === "string" && photo.trim())
+            : typeof p.photo === "string" && p.photo.trim()
+            ? p.photo.trim()
+            : null
+        ) || null,
+        photos: Array.isArray(p.photos)
+          ? p.photos
+              .filter((photo) => typeof photo === "string" && photo.trim())
+              .map((photo) => photo.trim())
+          : typeof p.photo === "string" && p.photo.trim()
+          ? [p.photo.trim()]
+          : [],
         ctaText: "View",
         ctaLink: "#",
         content: () => (
           <div>
             <p className="text-sm md:text-base">{p.description}</p>
+            <div className="mt-3 space-y-1 text-sm text-neutral-700">
+              <p>
+                <span className="font-medium">Sizing (Feet and inches): </span>
+                {(p.size_feet || "N/A") +
+                  (p.size_inches ? ` / ${p.size_inches}` : "")}
+              </p>
+              <p>
+                <span className="font-medium">Material 100% NATURAL MARBLE: </span>
+                {p.material || "N/A"}
+              </p>
+              <p>
+                <span className="font-medium">CUSTOMISE OPTION: </span>
+                {p.customization || "N/A"}
+              </p>
+              <p>
+                <span className="font-medium">FACILITY END TO END SERVICES: </span>
+                {p.service || "N/A"}
+              </p>
+            </div>
             <div className="mt-3 flex flex-wrap gap-1 text-xs">
               {(p.categories || []).map((c) => (
                 <span
@@ -87,7 +130,7 @@ export default function ExpandableCardDemo({ items = [] }) {
       </AnimatePresence>
       <AnimatePresence>
         {active && typeof active === "object" ? (
-          <div className="fixed inset-0 grid place-items-center z-[100]">
+          <div className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto p-2">
             <motion.button
               key={`button-${active.title}-${id}`}
               layout
@@ -111,7 +154,7 @@ export default function ExpandableCardDemo({ items = [] }) {
             <motion.div
               layoutId={`card-${keyOf(active)}-${id}`}
               ref={ref}
-              className="w-[92vw] max-w-md h-[95vh] md:h-[95vh] flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
+              className="w-[92vw] max-w-md max-h-[95vh] flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-y-auto overscroll-contain"
             >
               <div className="relative">
                 <motion.div layoutId={`image-${keyOf(active)}-${id}`} className="relative">
@@ -170,7 +213,7 @@ export default function ExpandableCardDemo({ items = [] }) {
                 </motion.div>
               </div>
 
-              <div className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex flex-col">
                 <div className="flex flex-col gap-3 p-4 flex-shrink-0">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -180,12 +223,6 @@ export default function ExpandableCardDemo({ items = [] }) {
                       >
                         {active.title}
                       </motion.h3>
-                      <motion.p
-                        layoutId={`description-${active.description}-${id}`}
-                        className="text-neutral-600 dark:text-neutral-400 mt-1"
-                      >
-                        {active.description}
-                      </motion.p>
                     </div>
                   </div>
 
@@ -198,7 +235,7 @@ export default function ExpandableCardDemo({ items = [] }) {
                     {active.ctaText}
                   </motion.a>
                 </div>
-                <div className="px-4 pb-4 flex-1 overflow-y-auto">
+                <div className="px-4 pb-4">
                   <div className="text-neutral-700 dark:text-neutral-300 text-base leading-relaxed">
                     {typeof active.content === "function"
                       ? active.content()
@@ -227,14 +264,18 @@ export default function ExpandableCardDemo({ items = [] }) {
               layoutId={`image-${keyOf(card)}-${id}`}
               className="relative w-full h-48 overflow-hidden"
             >
-              <Image
-                width={400}
-                height={300}
-                src={card.src}
-                alt={card.title}
-                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              />
+              {card.src ? (
+                <Image
+                  width={400}
+                  height={300}
+                  src={card.src}
+                  alt={card.title}
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-100" aria-hidden="true" />
+              )}
             </motion.div>
             <div className="p-4">
               <motion.h3
@@ -244,11 +285,17 @@ export default function ExpandableCardDemo({ items = [] }) {
                 {card.title}
               </motion.h3>
               <motion.p
-                layoutId={`description-${card.description}-${id}`}
+                layoutId={`description-${keyOf(card)}-${id}`}
                 className="text-neutral-600 dark:text-neutral-400 text-sm mb-3 line-clamp-2"
               >
-                {card.description}
+                <span className="font-semibold">Custom Option:</span>{" "}
+                {card.customOptionText || "Not Available"}
               </motion.p>
+              {card.sizeText && (
+                <p className="text-neutral-700 dark:text-neutral-300 text-sm mb-3 line-clamp-1">
+                  <span className="font-semibold">Sizing:</span> {card.sizeText}
+                </p>
+              )}
               <motion.button
                 layoutId={`button-${keyOf(card)}-${id}`}
                 className="w-full px-4 py-2 text-sm rounded-lg font-semibold bg-gray-100 hover:bg-green-500 hover:text-white text-black transition-colors"

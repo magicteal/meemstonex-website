@@ -1,37 +1,27 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
-const demoItems = [
-  { id: 1, title: "Nature's Gift", imageUrl: "/products/P1.jpg" },
-  { id: 2, title: "Pro Crunch", imageUrl: "/products/P2.jpg" },
-  { id: 3, title: "Milkshake Hairspa", imageUrl: "/products/P3.jpg" },
-  { id: 4, title: "Skin Wellness", imageUrl: "/products/P4.jpg" },
-  { id: 5, title: "Collectivo Lux", imageUrl: "/products/P5.jpg" },
-  { id: 6, title: "Nature's Gift", imageUrl: "/products/P1.jpg" },
-  { id: 7, title: "Pro Crunch", imageUrl: "/products/P2.jpg" },
-  { id: 8, title: "Milkshake Hairspa", imageUrl: "/products/P3.jpg" },
-  { id: 9, title: "Skin Wellness", imageUrl: "/products/P4.jpg" },
-  { id: 10, title: "Collectivo Lux", imageUrl: "/products/P5.jpg" },
-];
-
-const Panorama3DRing = () => {
+const Panorama3DRing = ({ items = [] }) => {
   const ringRef = useRef(null);
   const xPos = useRef(0);
+  const ringItems = Array.isArray(items) ? items : [];
 
   const getBgPos = (i) => {
     const rotationY = gsap.getProperty(ringRef.current, "rotationY") || 0;
     return (
-      100 - ((rotationY - 180 - i * (360 / demoItems.length)) % 360) / 360 * 500
+      100 - ((rotationY - 180 - i * (360 / ringItems.length)) % 360) / 360 * 500
     ) + "px 0px";
   };
 
   useEffect(() => {
+    if (!ringItems.length) return;
+
     const ring = ringRef.current;
     const images = ring.querySelectorAll(".img");
 
     gsap.set(ring, { rotationY: 180, cursor: "grab" });
     gsap.set(images, {
-      rotateY: (i) => i * -(360 / demoItems.length),
+      rotateY: (i) => i * -(360 / ringItems.length),
       transformOrigin: "50% 50% 700px",
       z: -700,
       backfaceVisibility: "hidden",
@@ -49,17 +39,34 @@ const Panorama3DRing = () => {
       }
     );
 
-    // Hover glow
+    // Hover glow + scale transition
+    const hoverHandlers = [];
     images.forEach((img) => {
-      img.addEventListener("mouseenter", () => {
+      const onMouseEnter = () => {
         gsap.to(images, {
           opacity: (i, t) => (t === img ? 1 : 0.5),
           ease: "power3",
+          duration: 0.25,
         });
-      });
-      img.addEventListener("mouseleave", () => {
-        gsap.to(images, { opacity: 1, ease: "power2.inOut" });
-      });
+        gsap.to(img, {
+          scale: 1.06,
+          duration: 0.25,
+          ease: "power2.out",
+        });
+      };
+
+      const onMouseLeave = () => {
+        gsap.to(images, { opacity: 1, ease: "power2.inOut", duration: 0.25 });
+        gsap.to(img, {
+          scale: 1,
+          duration: 0.25,
+          ease: "power2.out",
+        });
+      };
+
+      img.addEventListener("mouseenter", onMouseEnter);
+      img.addEventListener("mouseleave", onMouseLeave);
+      hoverHandlers.push({ img, onMouseEnter, onMouseLeave });
     });
 
     // Drag control
@@ -93,12 +100,16 @@ const Panorama3DRing = () => {
     window.addEventListener("touchend", dragEnd);
 
     return () => {
+      hoverHandlers.forEach(({ img, onMouseEnter, onMouseLeave }) => {
+        img.removeEventListener("mouseenter", onMouseEnter);
+        img.removeEventListener("mouseleave", onMouseLeave);
+      });
       window.removeEventListener("mousedown", dragStart);
       window.removeEventListener("touchstart", dragStart);
       window.removeEventListener("mouseup", dragEnd);
       window.removeEventListener("touchend", dragEnd);
     };
-  }, []);
+  }, [ringItems.length]);
 
   return (
     <div className="w-full h-screen flex items-center justify-center  bg-black overflow-hidden">
@@ -109,7 +120,7 @@ const Panorama3DRing = () => {
           className="w-full h-full  relative preserve-3d pointer-events-none"
           style={{ background: "transparent", border: "none", outline: "none", boxShadow: "none" }}
         >
-          {demoItems.map((item) => (
+          {ringItems.map((item) => (
             <div
               key={item.id}
               className="img absolute w-full h-full bg-center bg-cover rounded-xl shadow-2xl pointer-events-auto overflow-hidden"
@@ -123,6 +134,11 @@ const Panorama3DRing = () => {
             </div>
           ))}
         </div>
+        {!ringItems.length && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-white/70">
+            No featured products
+          </div>
+        )}
       </div>
     </div>
   );

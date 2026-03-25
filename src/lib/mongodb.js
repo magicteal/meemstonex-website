@@ -42,7 +42,6 @@ async function ensureIndexes(db) {
     await Promise.all([
       db.collection("products").createIndexes([
         { key: { name: 1 }, name: "name_asc" },
-        { key: { price: 1 }, name: "price_asc" },
         { key: { categories: 1 }, name: "categories_asc" },
         { key: { createdAt: -1 }, name: "createdAt_desc" },
       ]),

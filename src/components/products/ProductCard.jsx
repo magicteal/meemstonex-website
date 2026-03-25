@@ -21,17 +21,10 @@ export default function ProductCard({ product, onView, onQuickAdd }) {
         />
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start gap-2">
           <h3 className="line-clamp-1 text-base font-semibold text-gray-900">
             {product.name}
           </h3>
-          <span className="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-sm font-medium text-blue-700">
-            ₹
-            {Number(product.price).toLocaleString("en-IN", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </span>
         </div>
         <div className="flex flex-wrap gap-1">
           {product.categories.slice(0, 3).map((c) => (

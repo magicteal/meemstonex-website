@@ -72,6 +72,13 @@ function saveState(items, categories) {
   ls.setItem(STORAGE_CATS_KEY, JSON.stringify(categories));
 }
 
+function withoutPrice(item) {
+  if (!item || typeof item !== "object") return item;
+  const rest = { ...item };
+  delete rest.price;
+  return rest;
+}
+
 // Seed data
 const seedCategories = [
   "Accessories",
@@ -111,10 +118,6 @@ function seedProducts() {
     "Orbit Mouse",
     "Trek Running Shoes",
   ];
-  const prices = [
-    129.99, 59.0, 79.99, 39.99, 199.0, 24.5, 89.0, 19.5, 25.0, 149.0, 49.99,
-    119.0,
-  ];
   const categories = [
     ["Electronics", "Accessories"],
     ["Apparel"],
@@ -134,7 +137,6 @@ function seedProducts() {
     id: uuidv4(),
     name,
     categories: categories[i],
-    price: prices[i],
     photos: [
       samplePhotos[i % samplePhotos.length],
       samplePhotos[(i + 1) % samplePhotos.length],
@@ -150,7 +152,10 @@ function seedProducts() {
 let DB = { items: seedProducts(), categories: [...seedCategories] };
 const persisted = loadState();
 if (persisted && Array.isArray(persisted.items) && persisted.items.length) {
-  DB = persisted;
+  DB = {
+    items: persisted.items.map(withoutPrice),
+    categories: Array.isArray(persisted.categories) ? persisted.categories : [],
+  };
 }
 
 function applyFilterSort(items, { filter = {}, sort } = {}) {
@@ -159,21 +164,19 @@ function applyFilterSort(items, { filter = {}, sort } = {}) {
     const q = filter.q.toLowerCase();
     results = results.filter((p) => p.name.toLowerCase().includes(q));
   }
+  if (typeof filter.featured === "boolean") {
+    results = results.filter((p) => Boolean(p.featured) === filter.featured);
+  }
   if (filter.categories && filter.categories.length) {
     results = results.filter((p) =>
       filter.categories.every((c) => p.categories.includes(c))
     );
-  }
-  if (filter.priceRange) {
-    const [min, max] = filter.priceRange;
-    results = results.filter((p) => p.price >= min && p.price <= max);
   }
   if (sort) {
     const [key, dir] = sort.split(":");
     results.sort((a, b) => {
       const mult = dir === "desc" ? -1 : 1;
       if (key === "name") return a.name.localeCompare(b.name) * mult;
-      if (key === "price") return (a.price - b.price) * mult;
       return 0;
     });
   }
@@ -190,31 +193,34 @@ export async function listProducts({
   const total = results.length;
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
-  const pageItems = results.slice(start, end);
+  const pageItems = results.slice(start, end).map(withoutPrice);
   return withLatency({ items: pageItems, total, page, pageSize });
 }
 
 export async function getProduct(id) {
   const item = DB.items.find((p) => p.id === id);
   if (!item) throw new Error("Product not found");
-  return withLatency({ ...item });
+  return withLatency(withoutPrice({ ...item }));
 }
 
 export async function createProduct(product) {
+  const { ...safeProduct } = product || {};
   const id = uuidv4();
   // Ensure photos array exists and photo field for backward compatibility
-  const photos = Array.isArray(product.photos) && product.photos.length
-    ? product.photos.filter(Boolean).slice(0, 3)
-    : product.photo
-    ? [product.photo]
+  const photos = Array.isArray(safeProduct.photos) && safeProduct.photos.length
+    ? safeProduct.photos
+        .filter((photo) => typeof photo === "string" && photo.trim())
+        .map((photo) => photo.trim())
+    : safeProduct.photo
+    ? [String(safeProduct.photo).trim()].filter(Boolean)
     : [];
-  const newItem = { 
-    id, 
-    featured: false, 
-    ...product,
+  const newItem = withoutPrice({
+    id,
+    featured: false,
+    ...safeProduct,
     photos,
-    photo: photos[0] || product.photo,
-  };
+    photo: photos[0] || safeProduct.photo,
+  });
   DB.items.unshift(newItem);
   // track categories
   if (Array.isArray(newItem.categories)) {
@@ -223,7 +229,7 @@ export async function createProduct(product) {
     });
   }
   saveState(DB.items, DB.categories);
-  return withLatency({ ...newItem });
+  return withLatency(withoutPrice({ ...newItem }));
 }
 
 export async function updateProduct(id, patch) {
@@ -231,30 +237,36 @@ export async function updateProduct(id, patch) {
   if (idx === -1) throw new Error("Product not found");
   
   // Handle photos array update
-  const updates = { ...patch };
-  if ("photos" in patch) {
-    const photoArray = Array.isArray(patch.photos)
-      ? patch.photos.filter(Boolean).slice(0, 3)
+  const { ...safePatch } = patch || {};
+  const updates = { ...safePatch };
+  if ("photos" in safePatch) {
+    const photoArray = Array.isArray(safePatch.photos)
+      ? safePatch.photos
+          .filter((photo) => typeof photo === "string" && photo.trim())
+          .map((photo) => photo.trim())
       : [];
     if (photoArray.length > 0) {
       updates.photos = photoArray;
       updates.photo = photoArray[0];
     }
-  } else if ("photo" in patch && patch.photo) {
-    updates.photos = [patch.photo];
-    updates.photo = patch.photo;
+  } else if ("photo" in safePatch && safePatch.photo) {
+    const onePhoto = String(safePatch.photo).trim();
+    if (onePhoto) {
+      updates.photos = [onePhoto];
+      updates.photo = onePhoto;
+    }
   }
   
-  const updated = { ...DB.items[idx], ...updates };
+  const updated = withoutPrice({ ...DB.items[idx], ...updates });
   DB.items[idx] = updated;
   // update categories
-  if (patch.categories) {
-    patch.categories.forEach((c) => {
+  if (safePatch.categories) {
+    safePatch.categories.forEach((c) => {
       if (!DB.categories.includes(c)) DB.categories.push(c);
     });
   }
   saveState(DB.items, DB.categories);
-  return withLatency({ ...updated });
+  return withLatency(withoutPrice({ ...updated }));
 }
 
 export async function deleteProduct(id) {
@@ -262,7 +274,7 @@ export async function deleteProduct(id) {
   if (idx === -1) throw new Error("Product not found");
   const [removed] = DB.items.splice(idx, 1);
   saveState(DB.items, DB.categories);
-  return withLatency({ ...removed });
+  return withLatency(withoutPrice({ ...removed }));
 }
 
 export async function listCategories() {
@@ -314,7 +326,7 @@ export const mockUpload = async (fileOrUrl) => {
     // fallback to object URL preview
     const objUrl = URL.createObjectURL(fileOrUrl);
     return withLatency(objUrl);
-  } catch (err) {
+  } catch {
     const objUrl = URL.createObjectURL(fileOrUrl);
     return withLatency(objUrl);
   }

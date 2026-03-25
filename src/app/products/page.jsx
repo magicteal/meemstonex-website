@@ -1,7 +1,6 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { AnimatePresence, motion } from "framer-motion";
 import { listProducts } from "../../services/api";
 import Image from "next/image";
 
@@ -9,10 +8,6 @@ const Navbar = dynamic(() => import("../../components/Navbar"), {
   ssr: false,
   loading: () => <div className="h-16" />,
 });
-const ProductCard = dynamic(
-  () => import("../../components/products/ProductCard"),
-  { ssr: false, loading: () => <div className="h-40 w-40 bg-gray-100" /> }
-);
 const CategorySelect = dynamic(
   () => import("../../components/products/CategorySelect"),
   { ssr: false, loading: () => <div className="h-10 w-48 bg-gray-100" /> }
@@ -26,17 +21,6 @@ const ExpandableGrid = dynamic(
   { ssr: false, loading: () => <div className="h-64" /> }
 );
 
-/**
- * Folder structure suggestion
- * - src/services/mockApi.js
- * - src/components/products/{Modal.jsx,ToastProvider.jsx,ProductCard.jsx,ProductForm.jsx,CategorySelect.jsx}
- * - src/app/products/page.jsx (public catalogue)
- * - src/app/admin/products/page.jsx (admin editor)
- *
- * How to run with mock data
- * - Install dependencies and run dev server; mock API seeds localStorage and simulates latency.
- */
-
 export default function ProductsPage() {
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
@@ -46,10 +30,6 @@ export default function ProductsPage() {
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [categoryFilter, setCategoryFilter] = useState([]);
-  // widen default max price so expensive products are not hidden by default
-  // Original default 100000 hid products priced above that (e.g., 195000, 200000)
-  // Increase to 1,000,000 to include high-value items; consider making this dynamic later.
-  const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [sort, setSort] = useState("name:asc");
   const [selected, setSelected] = useState(null);
 
@@ -59,7 +39,7 @@ export default function ProductsPage() {
     return () => clearTimeout(t);
   }, [q]);
 
-    const load = useCallback(
+  const load = useCallback(
     async (reset = false) => {
       if (loading) return;
       setLoading(true);
@@ -70,7 +50,7 @@ export default function ProductsPage() {
           page: nextPage,
           // increase pageSize so newly added items are more likely to appear
           pageSize: 100,
-          filter: { q: debouncedQ, categories: categoryFilter, priceRange },
+          filter: { q: debouncedQ, categories: categoryFilter },
           sort,
         });
         setHasMore(res.page * res.pageSize < res.total);
@@ -92,7 +72,7 @@ export default function ProductsPage() {
         setLoading(false);
       }
     },
-    [page, debouncedQ, categoryFilter, priceRange, sort, loading]
+    [page, debouncedQ, categoryFilter, sort, loading]
   );
 
   // initial and on filter change
@@ -100,9 +80,7 @@ export default function ProductsPage() {
     setPage(1);
     load(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQ, categoryFilter.join(","), priceRange.join(","), sort]);
-
-  const onView = (p) => setSelected(p);
+  }, [debouncedQ, categoryFilter.join(","), sort]);
 
   const sentinelRef = useRef(null);
   useEffect(() => {
@@ -125,8 +103,8 @@ export default function ProductsPage() {
         </h1>
 
         <div className="w-full">
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3 md:items-end md:gap-6">
-            <div className="md:col-span-2">
+          <div className="mt-4 grid grid-cols-1 gap-4">
+            <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 Filter by categories
               </label>
@@ -135,36 +113,6 @@ export default function ProductsPage() {
                   value={categoryFilter}
                   onChange={setCategoryFilter}
                   allowCreate={false}
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2 items-center md:justify-end">
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-600">Min</label>
-                <input
-                  type="number"
-                  className="w-24 rounded-lg border px-2 py-1 text-sm"
-                  value={priceRange[0] ?? ""}
-                  onChange={(e) => {
-                    const raw = e.target.value;
-                    const val = raw === "" ? undefined : Number(raw);
-                    setPriceRange([val, priceRange[1]]);
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-600">Max</label>
-                <input
-                  type="number"
-                  className="w-24 rounded-lg border px-2 py-1 text-sm"
-                  value={priceRange[1] ?? ""}
-                  onChange={(e) => {
-                    const raw = e.target.value;
-                    const val = raw === "" ? undefined : Number(raw);
-                    setPriceRange([priceRange[0], val]);
-                  }}
                 />
               </div>
             </div>
@@ -223,22 +171,32 @@ export default function ProductsPage() {
         {selected && (
           <div className="grid gap-4 md:grid-cols-2">
             <div className="relative h-64 w-full">
-              <Image
-                src={(Array.isArray(selected.photos) && selected.photos.length) ? selected.photos[0] : (selected.photo || "")}
-                alt={selected.name}
-                fill
-                className="rounded-lg object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+              {(() => {
+                const modalSrc = Array.isArray(selected.photos)
+                  ? selected.photos.find(
+                      (photo) => typeof photo === "string" && photo.trim()
+                    )
+                  : typeof selected.photo === "string" && selected.photo.trim()
+                  ? selected.photo.trim()
+                  : null;
+
+                return modalSrc ? (
+                  <Image
+                    src={modalSrc}
+                    alt={selected.name}
+                    fill
+                    className="rounded-lg object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                ) : (
+                  <div
+                    className="h-full w-full rounded-lg bg-gray-100"
+                    aria-hidden="true"
+                  />
+                );
+              })()}
             </div>
             <div>
-              <p className="text-lg font-semibold text-blue-700">
-                ₹
-                {Number(selected.price).toLocaleString("en-IN", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
               <div className="mt-1 flex flex-wrap gap-1">
                 {selected.categories.map((c) => (
                   <span
@@ -250,6 +208,25 @@ export default function ProductsPage() {
                 ))}
               </div>
               <p className="mt-3 text-gray-700">{selected.description}</p>
+              <div className="mt-3 space-y-1 text-sm text-gray-700">
+                <p>
+                  <span className="font-medium">Sizing (Feet and inches): </span>
+                  {(selected.size_feet || "N/A") +
+                    (selected.size_inches ? ` / ${selected.size_inches}` : "")}
+                </p>
+                <p>
+                  <span className="font-medium">Material 100% NATURAL MARBLE: </span>
+                  {selected.material || "N/A"}
+                </p>
+                <p>
+                  <span className="font-medium">CUSTOMISE OPTION: </span>
+                  {selected.customization || "N/A"}
+                </p>
+                <p>
+                  <span className="font-medium">FACILITY END TO END SERVICES: </span>
+                  {selected.service || "N/A"}
+                </p>
+              </div>
             </div>
           </div>
         )}

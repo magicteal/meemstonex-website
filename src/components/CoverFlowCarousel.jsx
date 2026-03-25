@@ -8,13 +8,11 @@ import { slugify } from "../lib/categories";
 // Section wrapper placed after Our Process with proper padding to match theme
 export default function CoverFlowCarousel() {
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
-      setLoading(true);
       setError(null);
       try {
         const res = await listProducts({
@@ -36,8 +34,6 @@ export default function CoverFlowCarousel() {
         setItems(mapped);
       } catch (e) {
         if (mounted) setError(e.message || "Failed to load featured");
-      } finally {
-        if (mounted) setLoading(false);
       }
     }
     load();
@@ -58,7 +54,7 @@ export default function CoverFlowCarousel() {
           )}
         </div>
       </div>
-      {/* Pass items to the panorama ring; it has internal fallback if empty */}
+      {/* Pass only backend featured items to the panorama ring */}
       <Panorama3DSlider items={items} />
     </section>
   );

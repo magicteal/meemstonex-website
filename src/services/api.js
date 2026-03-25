@@ -2,7 +2,6 @@
 // Optional: fall back to in-memory mock API for local/offline dev when NEXT_PUBLIC_USE_MOCK=1
 import {
   listProducts as mockListProducts,
-  getProduct as mockGetProduct,
   createProduct as mockCreateProduct,
   updateProduct as mockUpdateProduct,
   deleteProduct as mockDeleteProduct,
@@ -35,8 +34,10 @@ export async function listProducts({
     sort,
     q: filter.q,
     categories: filter.categories,
-    minPrice: filter.priceRange?.[0],
-    maxPrice: filter.priceRange?.[1],
+    featured:
+      typeof filter.featured === "boolean"
+        ? String(filter.featured)
+        : undefined,
   };
   if (USE_MOCK) return mockListProducts({ page, pageSize, filter, sort });
   try {

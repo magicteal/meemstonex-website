@@ -83,7 +83,7 @@ export default function ImageTrail({
     el.addEventListener("mousemove", handleMove);
     el.addEventListener("mouseleave", handleLeave);
 
-    const smooth = 0.18; // lerp factor (0-1), lower is smoother
+    const smooth = 0.12; // lerp factor (0-1), lower is smoother
     const loop = () => {
       const target = pointerTarget.current;
       if (target && pointerPos.current.x != null) {

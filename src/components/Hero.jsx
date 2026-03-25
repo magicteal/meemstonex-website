@@ -87,7 +87,8 @@ const Hero = () => {
   };
 
   useEffect(() => {
-    if (loadedVideos === totalVideos - 1) {
+    // Hide loading screen as soon as the main background video is ready
+    if (loadedVideos >= 1) {
       setIsLoading(false);
     }
   }, [loadedVideos]);
@@ -129,10 +130,16 @@ const Hero = () => {
     if (typeof IntersectionObserver === "undefined") {
       // Fallback: load immediately
       try {
-        el.preload = "metadata";
+        el.preload = "auto";
       } catch (e) {}
       el.src = getVideoSrc(currentIndex);
       return;
+    }
+
+    // Set src immediately for the background video since it's the hero asset
+    if (!el.src) {
+        el.preload = "auto";
+        el.src = getVideoSrc(currentIndex);
     }
 
     observerRef.current = new IntersectionObserver(
@@ -245,12 +252,12 @@ const Hero = () => {
 
           <video
             ref={backgroundVideoRef}
-            // src assigned lazily by IntersectionObserver
+            // Background video loads immediately with auto preload for best LCP
             autoPlay
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             className="absolute left-0 top-0 size-full object-cover object-center"
             onLoadedData={handleVideoLoad}
           />

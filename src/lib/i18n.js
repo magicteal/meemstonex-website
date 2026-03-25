@@ -23,14 +23,14 @@ export const LanguageProvider = ({ children }) => {
     try {
       if (typeof window !== "undefined")
         return localStorage.getItem("lang") || "en";
-    } catch (e) {}
+    } catch {}
     return "en";
   });
 
   useEffect(() => {
     try {
       localStorage.setItem("lang", lang);
-    } catch (e) {}
+    } catch {}
   }, [lang]);
 
   const t = (key) => {

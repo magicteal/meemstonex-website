@@ -11,41 +11,51 @@ export default function ProductForm({
 }) {
   const [name, setName] = useState(initial?.name || "");
   const [categories, setCategories] = useState(initial?.categories || []);
-  const [price, setPrice] = useState(
-    initial?.price != null ? String(initial.price) : ""
+  const [sizeFeet, setSizeFeet] = useState(initial?.size_feet || "");
+  const [sizeInches, setSizeInches] = useState(initial?.size_inches || "");
+  const [material, setMaterial] = useState(initial?.material || "");
+  const [customization, setCustomization] = useState(
+    initial?.customization || ""
   );
+  const [service, setService] = useState(initial?.service || "");
   const [photos, setPhotos] = useState(() => {
     if (Array.isArray(initial?.photos) && initial.photos.length) {
-      const p = [...initial.photos];
-      while (p.length < 3) p.push("");
-      return p.slice(0, 3);
+      return initial.photos.filter((p) => typeof p === "string");
     }
     if (initial?.photo) {
-      return [initial.photo, "", ""];
+      return [initial.photo];
     }
-    return ["", "", ""];
+    return [""];
   });
   const [description, setDescription] = useState(initial?.description || "");
   const [featured, setFeatured] = useState(!!initial?.featured);
   const [errors, setErrors] = useState({});
-  const [uploading, setUploading] = useState([false, false, false]);
+  const [uploading, setUploading] = useState(() =>
+    new Array(Math.max(photos.length, 1)).fill(false)
+  );
   const nameRef = useRef(null);
 
   useEffect(() => {
     if (!initial) return; // only sync when editing
     setName(initial.name || "");
     setCategories(initial.categories || []);
-    setPrice(initial.price != null ? String(initial.price) : "");
+    setSizeFeet(initial.size_feet || "");
+    setSizeInches(initial.size_inches || "");
+    setMaterial(initial.material || "");
+    setCustomization(initial.customization || "");
+    setService(initial.service || "");
     
-    const newPhotos = ["", "", ""];
+    const newPhotos = [];
     if (Array.isArray(initial.photos) && initial.photos.length) {
-      initial.photos.slice(0, 3).forEach((p, i) => {
-        newPhotos[i] = p || "";
+      initial.photos.forEach((p) => {
+        newPhotos.push(p || "");
       });
     } else if (initial.photo) {
-      newPhotos[0] = initial.photo;
+      newPhotos.push(initial.photo);
     }
+    if (!newPhotos.length) newPhotos.push("");
     setPhotos(newPhotos);
+    setUploading(new Array(newPhotos.length).fill(false));
     
     setDescription(initial.description || "");
     setFeatured(!!initial.featured);
@@ -54,7 +64,11 @@ export default function ProductForm({
     initial?.photo,
     JSON.stringify(initial?.photos || []),
     initial?.description,
-    initial?.price,
+    initial?.size_feet,
+    initial?.size_inches,
+    initial?.material,
+    initial?.customization,
+    initial?.service,
     JSON.stringify(initial?.categories || []),
     initial?.featured,
   ]);
@@ -62,8 +76,6 @@ export default function ProductForm({
   const validate = () => {
     const errs = {};
     if (!name.trim()) errs.name = "Name is required";
-    const p = parseFloat(price);
-    if (Number.isNaN(p) || p < 0) errs.price = "Enter a valid price";
     const hasPhoto = photos.some(p => p && p.trim());
     if (!hasPhoto) errs.photos = "At least one photo is required";
     setErrors(errs);
@@ -79,8 +91,9 @@ export default function ProductForm({
       return next;
     });
     
-    setUploading(prev => {
+    setUploading((prev) => {
       const next = [...prev];
+      while (next.length <= index) next.push(false);
       next[index] = true;
       return next;
     });
@@ -96,7 +109,7 @@ export default function ProductForm({
         });
       }
     } finally {
-      setUploading(prev => {
+      setUploading((prev) => {
         const next = [...prev];
         next[index] = false;
         return next;
@@ -119,7 +132,11 @@ export default function ProductForm({
     const payload = {
       name: name.trim(),
       categories,
-      price: parseFloat(price),
+      size_feet: sizeFeet.trim(),
+      size_inches: sizeInches.trim(),
+      material: material.trim(),
+      customization: customization.trim(),
+      service: service.trim(),
       photos: photos.filter(p => p && p.trim()),
       description: description.trim(),
       currency: "INR",
@@ -129,6 +146,22 @@ export default function ProductForm({
   };
 
   const anyUploading = uploading.some(Boolean);
+
+  const addPhotoSlot = () => {
+    setPhotos((prev) => [...prev, ""]);
+    setUploading((prev) => [...prev, false]);
+  };
+
+  const removePhotoAt = (index) => {
+    setPhotos((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      return next.length ? next : [""];
+    });
+    setUploading((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      return next.length ? next : [false];
+    });
+  };
 
   return (
     <form onSubmit={submit} className="space-y-4">
@@ -167,75 +200,126 @@ export default function ProductForm({
 
       <div>
         <label
-          htmlFor="price"
+          htmlFor="size-feet"
           className="block text-sm font-medium text-gray-700"
         >
-          Price
+          Sizing (Feet and inches)
+        </label>
+        <div className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+          <input
+            id="size-feet"
+            type="text"
+            value={sizeFeet}
+            onChange={(e) => setSizeFeet(e.target.value)}
+            placeholder="Feet"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          />
+          <input
+            id="size-inches"
+            type="text"
+            value={sizeInches}
+            onChange={(e) => setSizeInches(e.target.value)}
+            placeholder="Inches"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="material"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Material 100% NATURAL MARBLE
         </label>
         <input
-          id="price"
-          type="number"
-          step="0.01"
-          min="0"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          id="material"
+          type="text"
+          value={material}
+          onChange={(e) => setMaterial(e.target.value)}
           className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
-          aria-invalid={!!errors.price}
-          aria-describedby={errors.price ? "price-error" : undefined}
         />
-        {errors.price && (
-          <p id="price-error" className="mt-1 text-sm text-red-600">
-            {errors.price}
-          </p>
-        )}
+      </div>
+
+      <div>
+        <label
+          htmlFor="customization"
+          className="block text-sm font-medium text-gray-700"
+        >
+          CUSTOMISE OPTION
+        </label>
+        <input
+          id="customization"
+          type="text"
+          value={customization}
+          onChange={(e) => setCustomization(e.target.value)}
+          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="service"
+          className="block text-sm font-medium text-gray-700"
+        >
+          FACILITY END TO END SERVICES
+        </label>
+        <input
+          id="service"
+          type="text"
+          value={service}
+          onChange={(e) => setService(e.target.value)}
+          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+        />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Photos (up to 3)
+          Photos
         </label>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {[0, 1, 2].map((index) => (
+          {photos.map((photo, index) => (
             <div key={index} className="space-y-1">
               <div className="flex items-center gap-2">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => onFileChange(index, e)}
-                  disabled={uploading[index]}
+                  disabled={!!uploading[index]}
                   className="text-xs w-full"
                   aria-label={`Upload photo ${index + 1}`}
                 />
               </div>
-              {photos[index] && (
+              {photo && (
                 <div className="relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={photos[index]}
+                    src={photo}
                     alt={`Preview ${index + 1}`}
                     className="h-20 w-full rounded-md object-cover"
                   />
                   <button
                     type="button"
-                    onClick={() => {
-                      setPhotos(prev => {
-                        const next = [...prev];
-                        next[index] = "";
-                        return next;
-                      });
-                    }}
+                    onClick={() => removePhotoAt(index)}
                     className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
                   >
                     ×
                   </button>
                 </div>
               )}
-              {uploading[index] && (
+              {!!uploading[index] && (
                 <p className="text-xs text-gray-500">Uploading...</p>
               )}
             </div>
           ))}
         </div>
+        <button
+          type="button"
+          onClick={addPhotoSlot}
+          className="mt-2 rounded-md border border-gray-300 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
+        >
+          + Add another image
+        </button>
         {errors.photos && (
           <p className="mt-1 text-sm text-red-600">{errors.photos}</p>
         )}
