@@ -9,7 +9,7 @@ const nextConfig = {
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "via.placeholder.com" },
       { protocol: "https", hostname: "placehold.co" },
-      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "theroyalnotch.s3.ap-south-1.amazonaws.com" },
       { protocol: "https", hostname: "assets.aceternity.com" },
     ],
   },

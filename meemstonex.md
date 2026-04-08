@@ -19,8 +19,7 @@ It includes:
 - Runtime: React 19
 - Styling: Tailwind CSS v4 + utility classes in `src/app/globals.css`
 - Animations/UI: Framer Motion, GSAP, Radix Dialog, custom UI components
-- Database: MongoDB (native `mongodb` driver)
-- Image handling: Next Image + optional Cloudinary server-side upload pass-through
+- Image handling: Next Image + optional AWS S3 server-side upload pass-through
 
 ---
 
@@ -101,7 +100,7 @@ meemstonex-website/
 - `POST /api/contact`
   - sends form payload to Google Apps Script URL when configured
 - `POST /api/upload`
-  - optional Cloudinary server-side upload, otherwise returns provided URL
+  - optional AWS S3 server-side upload, otherwise returns provided URL
 - `GET /api/health`
   - lightweight deployment health check endpoint
 
@@ -155,9 +154,10 @@ ADMIN_SESSION_TOKEN=
 
 # Optional integrations
 GOOGLE_APPS_SCRIPT_URL=
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
+AWS_REGION=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_S3_BUCKET=
 
 # Frontend behavior
 NEXT_PUBLIC_USE_MOCK=0
@@ -302,10 +302,10 @@ This design supports both:
 - Product/media files are stored under `public/products`, `public/img`, `public/videos`, etc.
 
 ### Remote images
-- Allowed hostnames are configured in `next.config.mjs` (`images.unsplash.com`, `res.cloudinary.com`, etc.).
+- Allowed hostnames are configured in `next.config.mjs` (`images.unsplash.com`, `theroyalnotch.s3.ap-south-1.amazonaws.com`, etc.).
 
 ### Upload endpoint
-- `/api/upload` uses Cloudinary when credentials exist.
+- `/api/upload` uses AWS S3 when credentials exist.
 - If not configured, it returns the original URL unchanged.
 
 ---

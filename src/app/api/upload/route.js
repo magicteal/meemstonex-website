@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import crypto from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from "uuid";
 
 // POST { url }
 export async function POST(req) {
@@ -8,32 +9,45 @@ export async function POST(req) {
     if (!url)
       return NextResponse.json({ error: "Missing url" }, { status: 400 });
 
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    const apiKey = process.env.CLOUDINARY_API_KEY;
-    const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-    // If Cloudinary credentials are available, attempt an authenticated server-side upload (fetch remote URL into Cloudinary)
-    if (cloudName && apiKey && apiSecret) {
-      const timestamp = Math.floor(Date.now() / 1000);
-      // signature: sha1 of 'timestamp=TIMESTAMP' + api_secret
-      const toSign = `timestamp=${timestamp}${apiSecret}`;
-      const signature = crypto.createHash("sha1").update(toSign).digest("hex");
-
-      const form = new FormData();
-      form.append("file", url);
-      form.append("api_key", apiKey);
-      form.append("timestamp", String(timestamp));
-      form.append("signature", signature);
-
-      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-      const res = await fetch(uploadUrl, { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) return NextResponse.json({ error: data }, { status: 500 });
-      return NextResponse.json({ url: data.secure_url || data.url });
+    if (!url.startsWith("data:")) {
+      return NextResponse.json({ url });
     }
 
-    // Fallback: return the provided URL
-    return NextResponse.json({ url });
+    const s3Client = new S3Client({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+    });
+    
+    const bucket = process.env.AWS_S3_BUCKET;
+
+    // Parse data URL
+    const matches = url.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return NextResponse.json({ error: "Invalid data URL" }, { status: 400 });
+    }
+
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, "base64");
+    
+    const extension = mimeType.split('/')[1] || 'jpg';
+    const key = `meemstonex-uploads/${uuidv4()}.${extension}`;
+
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: buffer,
+      ContentType: mimeType,
+    });
+
+    await s3Client.send(command);
+
+    const s3Url = `https://${bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+    return NextResponse.json({ url: s3Url });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

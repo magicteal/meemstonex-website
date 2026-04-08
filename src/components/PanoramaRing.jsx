@@ -19,11 +19,17 @@ const Panorama3DRing = ({ items = [] }) => {
     const ring = ringRef.current;
     const images = ring.querySelectorAll(".img");
 
+    const itemWidth = typeof window !== 'undefined' && window.innerWidth < 768 ? 280 : 450;
+    const gap = typeof window !== 'undefined' && window.innerWidth < 768 ? 60 : 140;
+    const chord = itemWidth + gap;
+    const angle = (Math.PI * 2) / Math.max(ringItems.length, 1);
+    const radius = Math.max(1200, Math.abs(chord / (2 * Math.sin(angle / 2))));
+
     gsap.set(ring, { rotationY: 180, cursor: "grab" });
     gsap.set(images, {
       rotateY: (i) => i * -(360 / ringItems.length),
-      transformOrigin: "50% 50% 700px",
-      z: -700,
+      transformOrigin: `50% 50% ${radius}px`,
+      z: -radius,
       backfaceVisibility: "hidden",
     });
 
@@ -113,7 +119,7 @@ const Panorama3DRing = ({ items = [] }) => {
 
   return (
     <div className="w-full h-screen flex items-center justify-center  bg-black overflow-hidden">
-      <div className="relative perspective-[2000px] w-[450px] h-[550px] ">
+      <div className="relative perspective-[2000px] w-[280px] md:w-[450px] lg:w-[450px] h-[380px] md:h-[550px] lg:h-[550px]">
         {/* The transparent ring container */}
         <div
           ref={ringRef}

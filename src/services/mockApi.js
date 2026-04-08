@@ -305,7 +305,7 @@ export const mockUpload = async (fileOrUrl) => {
   }
 
   // For File objects in the browser we still create an object URL for preview (no real upload in this demo)
-  // If a File/Blob is provided, read it as a data URL and POST to our upload API which will forward to Cloudinary.
+  // If a File/Blob is provided, read it as a data URL and POST to our upload API which will forward to AWS S3.
   try {
     const readDataUrl = () =>
       new Promise((resolve, reject) => {
