@@ -11,6 +11,7 @@ const nextConfig = {
       { protocol: "https", hostname: "placehold.co" },
       { protocol: "https", hostname: "theroyalnotch.s3.ap-south-1.amazonaws.com" },
       { protocol: "https", hostname: "assets.aceternity.com" },
+      { protocol: "https", hostname: "meemstonex-bucket.s3.ap-south-1.amazonaws.com" },
     ],
   },
 };
