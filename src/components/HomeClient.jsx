@@ -26,10 +26,7 @@ const Features = dynamic(() => import("./Features"), {
   ssr: false,
   loading: () => <div className="h-96" />,
 });
-const Testimonials = dynamic(() => import("./Testimonials"), {
-  ssr: false,
-  loading: () => <div className="h-96" />,
-});
+
 const Stats = dynamic(() => import("./Stats"), {
   ssr: false,
   loading: () => <div className="h-48" />,
@@ -56,7 +53,7 @@ export default function HomeClient() {
       <OurProcess />
       <CoverFlowCarousel />
       <Features />
-      {/* <Testimonials /> */}
+
       <Stats />
       <Story />
       <Contact />

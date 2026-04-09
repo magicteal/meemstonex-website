@@ -29,6 +29,18 @@ export function middleware(req) {
     return NextResponse.next();
   }
 
+  // Protect mutating endpoints (POST, PUT, DELETE) for products, categories, and uploads
+  if (
+    (pathname.startsWith("/api/products") ||
+      pathname.startsWith("/api/categories") ||
+      pathname.startsWith("/api/upload")) &&
+    ["POST", "PUT", "DELETE"].includes(req.method)
+  ) {
+    if (!authed) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
   if (pathname === "/admin") {
     if (authed) {
       return NextResponse.redirect(new URL("/admin/products", req.url));
@@ -44,5 +56,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/:path*"],
 };

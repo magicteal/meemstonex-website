@@ -20,6 +20,10 @@ const ExpandableGrid = dynamic(
   () => import("../../components/expandable-card-demo-standard"),
   { ssr: false, loading: () => <div className="h-64" /> }
 );
+const Footer = dynamic(() => import("../../components/Footer"), {
+  ssr: false,
+  loading: () => <div className="h-24 bg-black" />,
+});
 
 export default function ProductsPage() {
   const [items, setItems] = useState([]);
@@ -95,73 +99,84 @@ export default function ProductsPage() {
   }, [hasMore, loading, load]);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10">
+    <main className="relative min-h-screen bg-black text-blue-50 w-screen overflow-x-hidden">
       <Navbar />
-      <div className="flex flex-col items-start gap-6">
-        <h1 className="hero-heading text-6xl md:text-7xl pt-8 md:pt-20 font-black text-gray-900">
-          Products
+      
+      {/* Cinematic Header Block */}
+      <div className="relative pt-32 pb-16 md:pt-48 md:pb-24 px-4 w-full flex flex-col items-center justify-center border-b border-white/10">
+        <p className="font-general text-[10px] uppercase tracking-widest text-blue-200/50 mb-6">
+          Complete Inventory
+        </p>
+        <h1 className="special-font text-6xl sm:text-8xl md:text-[10rem] font-black text-center text-blue-50 leading-[0.8] tracking-widest uppercase">
+          Pr<b>o</b>ducts
         </h1>
 
-        <div className="w-full">
-          <div className="mt-4 grid grid-cols-1 gap-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
-                Filter by categories
-              </label>
-              <div className="w-full">
-                <CategorySelect
-                  value={categoryFilter}
-                  onChange={setCategoryFilter}
-                  allowCreate={false}
-                />
-              </div>
-            </div>
-          </div>
+        <div className="mt-16 w-full max-w-4xl px-4">
+           <p className="mb-6 text-[10px] font-general uppercase tracking-[0.3em] text-blue-200/40 text-center">
+             Filter by Category
+           </p>
+           <div className="w-full">
+             <CategorySelect
+               value={categoryFilter}
+               onChange={setCategoryFilter}
+               allowCreate={false}
+             />
+           </div>
         </div>
       </div>
 
-      {error && (
-        <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-red-800">
-          {error}
-        </div>
-      )}
+      <div className="mx-auto max-w-7xl px-4 py-20">
+        {error && (
+          <div className="mt-4 rounded-md border border-red-500/30 bg-red-500/10 p-5 text-red-200 text-center font-robert-regular">
+            {error}
+          </div>
+        )}
 
-      <section className="mt-6 space-y-8">
-        {/* Group by category: show heading then a grid of ExpandableCards
-            NOTE: a product may belong to multiple categories. Add each product
-            to every category group it belongs to so it appears under all
-            relevant headings. */}
-        {(() => {
-          const map = new Map();
-          items.forEach((it) => {
-            const cats = Array.isArray(it.categories) && it.categories.length
-              ? it.categories
-              : ["Uncategorized"];
-            cats.forEach((c) => {
-              const key = c || "Uncategorized";
-              if (!map.has(key)) map.set(key, []);
-              // avoid adding the same product twice to a category
-              const list = map.get(key);
-              if (!list.some((p) => p.id === it.id)) list.push(it);
+        <section className="space-y-32">
+          {(() => {
+            const map = new Map();
+            items.forEach((it) => {
+              const cats = Array.isArray(it.categories) && it.categories.length
+                ? it.categories
+                : ["Uncategorized"];
+              cats.forEach((c) => {
+                const key = c || "Uncategorized";
+                if (!map.has(key)) map.set(key, []);
+                // avoid adding the same product twice to a category
+                const list = map.get(key);
+                if (!list.some((p) => p.id === it.id)) list.push(it);
+              });
             });
-          });
-          return Array.from(map.entries()).map(([cat, prods]) => (
-            <div key={cat}>
-              <h2 className="mb-3 text-lg md:text-xl font-semibold text-gray-800">
-                {cat}
-              </h2>
-              {/* The demo component now handles its own layout and spans full width */}
-              <ExpandableGrid items={prods} />
-            </div>
-          ));
-        })()}
-      </section>
+            return Array.from(map.entries()).map(([cat, prods]) => (
+              <div key={cat} className="dark">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-white/10 pb-6 gap-4">
+                   <h2 className="text-4xl md:text-6xl font-black text-blue-50 uppercase tracking-widest special-font">
+                     {cat}
+                   </h2>
+                   <p className="text-blue-50/40 text-[10px] uppercase tracking-[0.2em] font-general">
+                     {prods.length} Creations Found
+                   </p>
+                </div>
+                <ExpandableGrid items={prods} />
+              </div>
+            ));
+          })()}
+        </section>
 
-      <div ref={sentinelRef} className="h-10" />
-      {loading && <p className="mt-2 text-sm text-gray-600">Loading…</p>}
-      {!hasMore && !loading && (
-        <p className="mt-2 text-sm text-gray-600">End of results</p>
-      )}
+        <div ref={sentinelRef} className="h-10" />
+        {loading && (
+          <div className="flex-center w-full py-10">
+            <div className="three-body scale-75">
+              <div className="three-body__dot bg-blue-50"></div>
+              <div className="three-body__dot bg-blue-50"></div>
+              <div className="three-body__dot bg-blue-50"></div>
+            </div>
+          </div>
+        )}
+        {!hasMore && !loading && items.length > 0 && (
+          <p className="mt-16 pb-10 text-center text-xs text-blue-50/40 uppercase tracking-[0.3em] font-general border-t border-white/5 pt-16">End of catalog</p>
+        )}
+      </div>
 
       <Modal
         open={!!selected}
@@ -231,6 +246,7 @@ export default function ProductsPage() {
           </div>
         )}
       </Modal>
+      <Footer />
     </main>
   );
 }

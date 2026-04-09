@@ -154,16 +154,16 @@ export default function ExpandableCardDemo({ items = [] }) {
             <motion.div
               layoutId={`card-${keyOf(active)}-${id}`}
               ref={ref}
-              className="w-[92vw] max-w-md max-h-[95vh] flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-y-auto overscroll-contain"
+              className="w-[92vw] max-w-2xl max-h-[92vh] flex flex-col bg-white dark:bg-black/95 dark:backdrop-blur-xl sm:rounded-3xl overflow-y-auto overscroll-contain shadow-2xl border dark:border-white/10"
             >
               <div className="relative">
                 <motion.div layoutId={`image-${keyOf(active)}-${id}`} className="relative">
                   <Image
-                    width={800}
-                    height={1200}
+                    width={1000}
+                    height={1000}
                     src={active.photos && active.photos.length > 0 && active.photos[currentPhotoIndex] ? active.photos[currentPhotoIndex] : active.src}
                     alt={active.title}
-                    className="w-full h-[70vh] sm:h-[70vh] md:h-[75vh] sm:rounded-tr-lg sm:rounded-tl-lg object-contain bg-neutral-100"
+                    className="w-full h-auto max-h-[70vh] sm:rounded-tr-lg sm:rounded-tl-lg object-contain bg-neutral-100 dark:bg-white/5"
                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
                   />
                   {active.photos && active.photos.length > 1 && (
@@ -174,7 +174,7 @@ export default function ExpandableCardDemo({ items = [] }) {
                             e.stopPropagation();
                             setCurrentPhotoIndex(prev => prev > 0 ? prev - 1 : active.photos.length - 1);
                           }}
-                          className="bg-black/50 hover:bg-black/70 text-white text-2xl rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm z-20 transition-colors"
+                          className="bg-black/50 hover:bg-blue-600 text-white text-2xl rounded-full w-12 h-12 flex items-center justify-center backdrop-blur-sm z-20 transition-all"
                           aria-label="Previous photo"
                           type="button"
                         >
@@ -185,14 +185,14 @@ export default function ExpandableCardDemo({ items = [] }) {
                             e.stopPropagation();
                             setCurrentPhotoIndex(prev => prev < active.photos.length - 1 ? prev + 1 : 0);
                           }}
-                          className="bg-black/50 hover:bg-black/70 text-white text-2xl rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-sm z-20 transition-colors"
+                          className="bg-black/50 hover:bg-blue-600 text-white text-2xl rounded-full w-12 h-12 flex items-center justify-center backdrop-blur-sm z-20 transition-all"
                           aria-label="Next photo"
                           type="button"
                         >
                           ›
                         </button>
                       </div>
-                      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
+                      <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-20">
                         {active.photos.map((_, idx) => (
                           <button
                             key={idx}
@@ -201,8 +201,8 @@ export default function ExpandableCardDemo({ items = [] }) {
                               e.stopPropagation();
                               setCurrentPhotoIndex(idx);
                             }}
-                            className={`w-2 h-2 rounded-full transition-colors ${
-                              idx === currentPhotoIndex ? 'bg-white' : 'bg-white/50'
+                            className={`w-1.5 h-1.5 rounded-full transition-all ${
+                              idx === currentPhotoIndex ? 'bg-blue-500 w-6' : 'bg-white/30'
                             }`}
                             aria-label={`Go to photo ${idx + 1}`}
                           />
@@ -214,15 +214,18 @@ export default function ExpandableCardDemo({ items = [] }) {
               </div>
 
               <div className="flex flex-col">
-                <div className="flex flex-col gap-3 p-4 flex-shrink-0">
+                <div className="flex flex-col gap-4 p-8 flex-shrink-0">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <motion.h3
                         layoutId={`title-${keyOf(active)}-${id}`}
-                        className="font-bold text-neutral-700 dark:text-neutral-200 text-xl"
+                        className="font-black text-neutral-800 dark:text-blue-50 text-3xl md:text-5xl uppercase tracking-tighter special-font mb-2"
                       >
                         {active.title}
                       </motion.h3>
+                      <p className="text-neutral-500 dark:text-blue-50/40 text-xs uppercase tracking-widest font-general">
+                         {active.description}
+                      </p>
                     </div>
                   </div>
 
@@ -230,13 +233,13 @@ export default function ExpandableCardDemo({ items = [] }) {
                     layoutId={`button-${keyOf(active)}-${id}`}
                     href={active.ctaLink}
                     target="_blank"
-                    className="w-full text-center px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white hover:bg-green-600 transition-colors"
+                    className="group/btn w-full text-center px-6 py-4 text-xs tracking-widest uppercase rounded-full font-bold bg-blue-600 text-white hover:bg-blue-50 hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.3)]"
                   >
-                    {active.ctaText}
+                    Inquiry on Whatsapp
                   </motion.a>
                 </div>
-                <div className="px-4 pb-4">
-                  <div className="text-neutral-700 dark:text-neutral-300 text-base leading-relaxed">
+                <div className="px-8 pb-12">
+                  <div className="text-neutral-700 dark:text-blue-50/70 text-base leading-relaxed font-robert-regular border-t border-white/5 pt-8">
                     {typeof active.content === "function"
                       ? active.content()
                       : active.content}
@@ -258,11 +261,11 @@ export default function ExpandableCardDemo({ items = [] }) {
                 : `card-${keyOf(card)}-${index}-${id}`
             }
             onClick={() => setActive(card)}
-            className="group cursor-pointer bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+            className="group cursor-pointer bg-white dark:bg-neutral-900/40 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm dark:shadow-2xl hover:shadow-md dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] transition-all duration-500 border border-gray-100 dark:border-white/10 dark:hover:border-white/20 dark:hover:-translate-y-2 flex flex-col"
           >
             <motion.div
               layoutId={`image-${keyOf(card)}-${id}`}
-              className="relative w-full h-48 overflow-hidden"
+              className="relative w-full h-60 overflow-hidden"
             >
               {card.src ? (
                 <Image
@@ -270,35 +273,38 @@ export default function ExpandableCardDemo({ items = [] }) {
                   height={300}
                   src={card.src}
                   alt={card.title}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-100" aria-hidden="true" />
+                <div className="w-full h-full bg-gray-100 dark:bg-neutral-800/50" aria-hidden="true" />
               )}
+              {/* Subtle inner shadow overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </motion.div>
-            <div className="p-4">
+            <div className="p-6 flex flex-col flex-grow">
               <motion.h3
                 layoutId={`title-${keyOf(card)}-${id}`}
-                className="font-semibold text-neutral-800 dark:text-neutral-200 text-lg mb-2 line-clamp-1"
+                className="font-black text-neutral-800 dark:text-blue-50 text-xl mb-2 line-clamp-1 special-font tracking-wide"
               >
                 {card.title}
               </motion.h3>
-              <motion.p
-                layoutId={`description-${keyOf(card)}-${id}`}
-                className="text-neutral-600 dark:text-neutral-400 text-sm mb-3 line-clamp-2"
-              >
-                <span className="font-semibold">Custom Option:</span>{" "}
-                {card.customOptionText || "Not Available"}
-              </motion.p>
-              {card.sizeText && (
-                <p className="text-neutral-700 dark:text-neutral-300 text-sm mb-3 line-clamp-1">
-                  <span className="font-semibold">Sizing:</span> {card.sizeText}
-                </p>
-              )}
+              <div className="flex-grow">
+                 <motion.p
+                   layoutId={`description-${keyOf(card)}-${id}`}
+                   className="text-neutral-600 dark:text-blue-50/60 text-xs uppercase tracking-widest font-general mb-4 line-clamp-2"
+                 >
+                   {card.description}
+                 </motion.p>
+                 {card.sizeText && (
+                   <p className="text-neutral-700 dark:text-blue-50/80 text-sm mb-4 line-clamp-1 font-robert-regular border-l-2 border-blue-500/50 pl-2">
+                     <span className="opacity-60">Size:</span> {card.sizeText}
+                   </p>
+                 )}
+              </div>
               <motion.button
                 layoutId={`button-${keyOf(card)}-${id}`}
-                className="w-full px-4 py-2 text-sm rounded-lg font-semibold bg-gray-100 hover:bg-green-500 hover:text-white text-black transition-colors"
+                className="w-full mt-auto px-4 py-3 text-xs rounded-full font-bold uppercase tracking-[0.2em] bg-gray-100 dark:bg-transparent border border-transparent dark:border-white/20 hover:bg-blue-600 dark:hover:bg-blue-50 hover:text-white dark:hover:text-black text-black dark:text-blue-50 transition-all duration-300"
               >
                 {card.ctaText}
               </motion.button>

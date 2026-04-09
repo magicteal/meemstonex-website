@@ -12,8 +12,9 @@ import ContactFormModal from "./ContactFormModal";
 // navItems will be translated inside the component using useTranslation
 
 const Navbar = () => {
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [isIndicatorActive, setIsIndicatorActive] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(true);
+  const [isIndicatorActive, setIsIndicatorActive] = useState(true);
+  const hasAutoPlayed = useRef(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isNavVisible, setIsNavVisible] = useState(true);
 
@@ -62,9 +63,37 @@ const Navbar = () => {
     setIsIndicatorActive(!isIndicatorActive);
   };
 
+  // Auto-play on first user interaction (required by browser autoplay policy)
   useEffect(() => {
+    const tryPlay = () => {
+      if (hasAutoPlayed.current) return;
+      hasAutoPlayed.current = true;
+      audioElementRef.current?.play().catch(() => {
+        // Autoplay blocked — leave as is, user can click the button
+      });
+      window.removeEventListener("click", tryPlay);
+      window.removeEventListener("scroll", tryPlay);
+      window.removeEventListener("keydown", tryPlay);
+      window.removeEventListener("touchstart", tryPlay);
+    };
+
+    window.addEventListener("click", tryPlay, { once: true });
+    window.addEventListener("scroll", tryPlay, { once: true });
+    window.addEventListener("keydown", tryPlay, { once: true });
+    window.addEventListener("touchstart", tryPlay, { once: true });
+
+    return () => {
+      window.removeEventListener("click", tryPlay);
+      window.removeEventListener("scroll", tryPlay);
+      window.removeEventListener("keydown", tryPlay);
+      window.removeEventListener("touchstart", tryPlay);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!audioElementRef.current) return;
     if (isAudioPlaying) {
-      audioElementRef.current.play();
+      audioElementRef.current.play().catch(() => {});
     } else {
       audioElementRef.current.pause();
     }
@@ -99,14 +128,15 @@ const Navbar = () => {
           {/** compute class once per render */}
           {(() => {
             const hasScrolled = currentScrollY > 0;
-            // On products and home pages: make nav text white when user scrolls
-            // Elsewhere keep the existing (black) text
-            const navTextClass =
-              isProductsPage || isHome
-                ? hasScrolled
-                  ? "text-white"
-                  : "text-black"
-                : "text-black";
+            const isDarkThemePage = isProductsPage || pathname.startsWith("/categories");
+            // On dark pages: always white/blue-50. On Home: black at top, white when scrolled
+            const navTextClass = isDarkThemePage
+                ? "text-blue-50"
+                : isHome
+                  ? hasScrolled
+                    ? "text-white"
+                    : "text-black"
+                  : "text-black";
             return (
               <div className="flex h-full items-center">
                 <div

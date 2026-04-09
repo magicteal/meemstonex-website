@@ -8,10 +8,9 @@ export async function GET() {
     const explicit = await catCol
       .find({}, { projection: { _id: 0, name: 1 } })
       .toArray();
-    const sorted = (explicit || [])
-      .map((c) => c?.name)
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b));
+    const sorted = Array.from(
+      new Set((explicit || []).map((c) => c?.name).filter(Boolean))
+    ).sort((a, b) => a.localeCompare(b));
     return NextResponse.json(sorted);
   } catch (err) {
     console.error("GET /api/categories error:", err);
@@ -99,7 +98,7 @@ export async function DELETE(req) {
     if (!name)
       return NextResponse.json({ error: "name is required" }, { status: 400 });
     const catCol = await getCollection("categories");
-    await catCol.deleteOne({ name });
+    await catCol.deleteMany({ name });
     const prodCol = await getCollection("products");
     const res = await prodCol.updateMany(
       { categories: name },

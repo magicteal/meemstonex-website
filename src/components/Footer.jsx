@@ -6,7 +6,7 @@ import { useLanguage } from "../lib/i18n";
 const links = [
   { href: "https://instagram.com", label: "Instagram", icon: <FaInstagram /> },
   { href: "https://facebook.com", label: "Facebook", icon: <FaFacebook /> },
-  { href: "https://www.whatsapp.com", label: "WhatsApp", icon: <FaWhatsapp /> },
+  { href: "https://wa.me/919214597877", label: "WhatsApp", icon: <FaWhatsapp /> },
 ];
 
 const Footer = () => {

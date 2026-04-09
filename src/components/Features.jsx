@@ -89,6 +89,17 @@ const LazyVideo = ({ src, className = "", ...rest }) => {
       playsInline
       preload="metadata"
       className={className}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        minWidth: "100%",
+        height: "100%",
+        minHeight: "100%",
+        maxWidth: "none",
+        objectFit: "cover",
+      }}
       {...rest}
     />
   );
@@ -96,10 +107,11 @@ const LazyVideo = ({ src, className = "", ...rest }) => {
 
 const BentoCard = ({ src, title, description, href, label }) => {
   return (
-    <div className="relative w-full h-48 md:h-[55vh] overflow-hidden rounded-md transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105 z-20 group-hover:z-40">
+    <div className="relative w-full h-48 md:h-[55vh] overflow-hidden rounded-md transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105 z-20 group-hover:z-40 bg-black">
       <LazyVideo
         src={src}
-        className="w-full h-full object-cover object-center"
+        className="absolute inset-0 size-full object-cover object-center"
+        style={{ objectFit: "cover" }}
       />
       {/* Black film overlay at 50% opacity */}
       <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" />
@@ -131,17 +143,17 @@ const Features = () => {
       desc: "Where sophistication meets strength — Meemstonex Counters, crafted to define modern elegance in every space",
     },
     {
-      name: "Marble temple",
+      name: "MARBLE TEMPLE",
       video: "videos/C2.mp4",
       desc: "Meemstonex Mandirs sacred spaces sculpted in pure marble, embodying devotion, peace, and eternal grace",
     },
     {
-      name: "MOSQUE WORK",
+      name: "MOSQUE WORKS",
       video: "videos/C3.mp4",
       desc: "Sacred mosque elements crafted in premium marble with uncompromising quality.",
     },
     {
-      name: "STONE FOUNTAIN",
+      name: "FOUNTAINS",
       video: "videos/C4.mp4",
       desc: "Let serenity flow with Meemstonex Fountains, where artistry in stone brings movement, life, and timeless beauty.",
     },
@@ -151,22 +163,17 @@ const Features = () => {
       desc: "Artful stone inlay that blends tradition with precision craftsmanship.",
     },
     {
-      name: "WALL PANELS",
+      name: "STONE WALL PANELS",
       video: "videos/C6.mp4",
       desc: "Statement wall claddings in marble that elevate interiors with depth and texture.",
     },
-    // {
-    //   name: "MORAL",
-    //   video: "videos/C7.mp4",
-    //   desc: "Expressive marble mural work designed to narrate elegance in stone.",
-    // },
     {
-      name: "WASHBASIN",
+      name: "WASH BASIN",
       video: "videos/C8.mp4",
       desc: "Sleek and refined basins carved from premium marble for timeless bathrooms.",
     },
     {
-      name: "HANDICRAFTS PRODUCTS",
+      name: "ART / CRAFT / HANDICRAFT",
       video: "videos/C9.mp4",
       desc: "Handcrafted marble artefacts that showcase intricate workmanship.",
     },

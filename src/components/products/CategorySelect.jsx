@@ -40,18 +40,18 @@ export default function CategorySelect({
   };
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-2">
+    <div className="w-full">
+      <div className="flex flex-wrap justify-center gap-3">
         {options.map((opt) => (
           <button
             key={opt}
             type="button"
             onClick={() => toggle(opt)}
-            className={`rounded-full px-3 py-1 text-sm border ${
+            className={`rounded-full px-5 py-2 text-[10px] uppercase tracking-[0.2em] font-bold border transition-all duration-300 ${
               value.includes(opt)
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-700 border-gray-300"
-            } hover:opacity-90`}
+                ? "bg-blue-50 text-black border-blue-50 shadow-[0_0_15px_rgba(239,246,255,0.5)]"
+                : "bg-blue-50/5 text-blue-50/70 border-white/10 hover:border-blue-50/30 hover:bg-blue-50/10"
+            }`}
             aria-pressed={value.includes(opt)}
           >
             {opt}

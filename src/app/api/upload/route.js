@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
+import sharp from "sharp";
 
 // POST { url }
 export async function POST(req) {
@@ -31,16 +32,23 @@ export async function POST(req) {
 
     const mimeType = matches[1];
     const base64Data = matches[2];
-    const buffer = Buffer.from(base64Data, "base64");
+    const originalBuffer = Buffer.from(base64Data, "base64");
     
-    const extension = mimeType.split('/')[1] || 'jpg';
+    // Compress image heavily using Sharp before uploading to S3
+    const optimizedBuffer = await sharp(originalBuffer)
+      .resize({ width: 1920, withoutEnlargement: true }) // Max 1080p equivalent width
+      .webp({ quality: 75, effort: 6 }) // Convert to efficient WebP
+      .toBuffer();
+    
+    const extension = "webp";
+    const finalMimeType = "image/webp";
     const key = `meemstonex-uploads/${uuidv4()}.${extension}`;
 
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: key,
-      Body: buffer,
-      ContentType: mimeType,
+      Body: optimizedBuffer,
+      ContentType: finalMimeType,
     });
 
     await s3Client.send(command);

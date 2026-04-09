@@ -14,6 +14,10 @@ const ExpandableGrid = dynamic(
   () => import("./expandable-card-demo-standard"),
   { ssr: false, loading: () => <div className="h-64" /> }
 );
+const Footer = dynamic(() => import("./Footer"), {
+  ssr: false,
+  loading: () => <div className="h-24 bg-black" />,
+});
 
 export default function CategoryClient({ slug }) {
   const cat = categoryBySlug(slug);
@@ -48,45 +52,72 @@ export default function CategoryClient({ slug }) {
   }, [cat?.name]);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10">
+    <main className="relative min-h-screen bg-black text-blue-50 w-screen overflow-x-hidden">
       <Navbar />
-      <div className="flex items-center justify-between pt-8 md:pt-20">
-        <h1 className="hero-heading text-4xl md:text-6xl font-black text-gray-900">
-          {cat ? cat.name : "Category"}
-        </h1>
-        <Link
-          href="/products"
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-        >
-          View all products
-        </Link>
-      </div>
-
-      {!cat && (
-        <p className="mt-6 text-gray-700">
-          Unknown category.{" "}
-          <Link href="/" className="underline">
-            Go home
-          </Link>
-          .
+      
+      {/* Cinematic Header Block */}
+      <div className="relative pt-32 pb-16 md:pt-48 md:pb-24 px-4 w-full flex flex-col items-center justify-center border-b border-white/10">
+        <p className="font-general text-[10px] uppercase tracking-widest text-blue-200/50 mb-4">
+          Exclusive Collection
         </p>
-      )}
+        <h1 className="hero-heading special-font text-5xl sm:text-7xl md:text-[8rem] font-black text-center text-blue-50 leading-[0.8]">
+          {cat ? (
+             cat.name.split(" ").map((word, i) => (
+                <span key={i} className="inline-block relative">
+                   {word.slice(0, Math.ceil(word.length/2))}<b>{word.slice(Math.ceil(word.length/2), Math.ceil(word.length/2)+1)}</b>{word.slice(Math.ceil(word.length/2)+1)}&nbsp;
+                </span>
+             ))
+          ) : "Category"}
+        </h1>
 
-      {error && (
-        <div className="mt-6 rounded-md border border-red-200 bg-red-50 p-3 text-red-800">
-          {error}
+        <div className="mt-12">
+          <Link
+            href="/products"
+            className="rounded-full border border-blue-50/20 bg-blue-50/5 px-8 py-4 text-xs tracking-[0.2em] uppercase font-bold text-blue-50 hover:bg-blue-50/10 transition-all duration-300"
+          >
+            View all products
+          </Link>
         </div>
-      )}
-
-      <div className="mt-8">
-        {loading ? (
-          <p className="text-gray-600">Loading…</p>
-        ) : items.length ? (
-          <ExpandableGrid items={items} />
-        ) : (
-          <p className="text-gray-700">No products found in this category.</p>
-        )}
       </div>
+
+      <div className="mx-auto max-w-7xl px-4 py-16 min-h-[40vh]">
+        {!cat && (
+          <p className="text-center text-blue-50/70 py-20 font-robert-regular text-lg">
+            This realm expands beyond known coordinates.{" "}
+            <Link href="/" className="text-blue-400 hover:text-blue-300 transition-colors underline">
+              Return Home
+            </Link>
+          </p>
+        )}
+
+        {error && (
+          <div className="rounded-md border border-red-500/30 bg-red-500/10 p-5 text-red-200 text-center font-robert-regular">
+            {error}
+          </div>
+        )}
+
+        <div className="mt-8 transition-opacity duration-500">
+          {loading ? (
+            <div className="flex-center w-full py-20">
+              <div className="three-body">
+                <div className="three-body__dot bg-blue-50"></div>
+                <div className="three-body__dot bg-blue-50"></div>
+                <div className="three-body__dot bg-blue-50"></div>
+              </div>
+            </div>
+          ) : items.length ? (
+            <div className="dark">
+               {/* Force dark mode for expandable grid mapping within this specific container */}
+               <ExpandableGrid items={items} />
+            </div>
+          ) : (
+            <p className="text-center text-blue-50/60 py-20 font-robert-regular text-lg">
+              No elegant creations currently dwell in this category.
+            </p>
+          )}
+        </div>
+      </div>
+      <Footer />
     </main>
   );
 }
