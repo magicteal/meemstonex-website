@@ -160,7 +160,7 @@ const Navbar = () => {
                     onClick={() => setContactOpen(true)}
                     aria-label="Open contact form"
                   >
-                    Contact
+                    {t("contact")}
                   </button>
                 </div>
 
@@ -259,7 +259,7 @@ const Navbar = () => {
                   }}
                   className="w-full rounded-md bg-blue-600 px-3 py-3 text-center text-base font-medium text-white"
                 >
-                  Contact
+                  {t("contact")}
                 </button>
               </li>
             </ul>

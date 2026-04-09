@@ -5,12 +5,16 @@ const translations = {
   en: {
     products: "Products",
     privacy_policy: "Privacy Policy",
+    contact: "Contact us",
+    footer_copyright: "© Meemstonex 2025, All rights reserved",
     language_english: "English",
     language_hindi: "हिन्दी",
   },
   hi: {
     products: "उत्पाद",
     privacy_policy: "गोपनीयता नीति",
+    contact: "संपर्क करें",
+    footer_copyright: "© 2025 मीमस्टोनेक्स, सर्वाधिकार सुरक्षित",
     language_english: "English",
     language_hindi: "हिन्दी",
   },
@@ -19,7 +23,7 @@ const translations = {
 const LanguageContext = createContext(null);
 
 export const LanguageProvider = ({ children }) => {
-  const [lang, setLang] = useState(() => {
+  const [lang, setLangState] = useState(() => {
     try {
       if (typeof window !== "undefined")
         return localStorage.getItem("lang") || "en";
@@ -27,11 +31,21 @@ export const LanguageProvider = ({ children }) => {
     return "en";
   });
 
-  useEffect(() => {
+  const setLang = (newLang) => {
+    setLangState(newLang);
     try {
-      localStorage.setItem("lang", lang);
+      localStorage.setItem("lang", newLang);
+      // Delete existing cookie first to be safe
+      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      // Set google translation cookie
+      if (newLang === "en") {
+        document.cookie = "googtrans=/en/en; path=/;";
+      } else {
+        document.cookie = "googtrans=/en/hi; path=/;";
+      }
+      window.location.reload();
     } catch {}
-  }, [lang]);
+  };
 
   const t = (key) => {
     return translations[lang] && translations[lang][key]

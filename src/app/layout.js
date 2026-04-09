@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
+import Script from "next/script";
 import "./globals.css";
 import { ToastProvider } from "../components/products/ToastProvider";
 import WhatsAppFloating from "../components/WhatsAppFloating";
@@ -48,9 +49,31 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <style>{`
+          .goog-te-banner-frame { display: none !important; }
+          body { top: 0 !important; }
+          .goog-tooltip { display: none !important; }
+          .goog-tooltip:hover { display: none !important; }
+          .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
+          #goog-gt-tt { display: none !important; }
+        `}</style>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${general.variable} ${circularWeb.variable} ${zentry.variable} ${robertMedium.variable} ${robertRegular.variable} antialiased`}
       >
+        <div id="google_translate_element" style={{ display: "none" }}></div>
+        <Script
+          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          strategy="afterInteractive"
+        />
+        <Script id="google-translate-config" strategy="afterInteractive">
+          {`
+            function googleTranslateElementInit() {
+              new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'en,hi', autoDisplay: false}, 'google_translate_element');
+            }
+          `}
+        </Script>
         <LanguageProvider>
           <ToastProvider>
             {children}
