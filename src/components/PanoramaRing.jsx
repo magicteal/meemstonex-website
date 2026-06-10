@@ -134,8 +134,10 @@ const Panorama3DRing = ({ items = [] }) => {
                 backgroundImage: `url(${item.imageUrl})`,
               }}
             >
-              <div className="absolute bottom-0 w-full text-center text-white text-lg font-semibold bg-black/60 py-2 backdrop-blur-sm">
-                {item.title}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/40 to-transparent p-6 text-center">
+                <div className="text-white text-xl font-black uppercase tracking-widest special-font">
+                  {item.title}
+                </div>
               </div>
             </div>
           ))}

@@ -4,19 +4,48 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 
-const items = [
-  { value: "80+", label: "Projects" },
-  { value: "100+", label: "Cities" },
-  { value: "28+", label: "Years Experience" },
-];
+import { getHomepageSettings } from "../services/api";
 
 export default function Stats() {
+  const [imageUrl, setImageUrl] = useState("/img/numbersBG.jpg");
+  const [subtitle, setSubtitle] = useState("Completed Custom Projects");
+  const [title, setTitle] = useState("COMPLETED CUSTOM PROJECTS");
+  const [items, setItems] = useState([
+    { value: "80+", label: "Projects" },
+    { value: "100+", label: "Cities" },
+    { value: "28+", label: "Years Experience" },
+  ]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadSettings() {
+      try {
+        const data = await getHomepageSettings();
+        if (!mounted) return;
+        if (data?.stats) {
+          if (data.stats.imageUrl) setImageUrl(data.stats.imageUrl);
+          if (data.stats.subtitle) setSubtitle(data.stats.subtitle);
+          if (data.stats.title) setTitle(data.stats.title);
+          if (Array.isArray(data.stats.items) && data.stats.items.length > 0) {
+            setItems(data.stats.items);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load stats settings:", err);
+      }
+    }
+    loadSettings();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <section className="relative w-screen overflow-hidden bg-black py-20">
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src="/img/numbersBG.jpg"
+          src={imageUrl}
           alt="Completed custom projects background"
           fill
           className="object-cover"
@@ -30,10 +59,10 @@ export default function Stats() {
       <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-8">
         <div className="mb-10 text-center">
           <p className="font-general text-[10px] uppercase tracking-wider text-blue-200/70">
-            Completed Custom Projects
+            {subtitle}
           </p>
           <h2 className="mt-3 text-2xl font-semibold tracking-[0.3em] text-white sm:text-3xl md:text-4xl">
-            COMPLETED CUSTOM PROJECTS
+            {title}
           </h2>
         </div>
 

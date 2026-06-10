@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 const translations = {
   en: {
+    home: "Home",
     products: "Products",
     privacy_policy: "Privacy Policy",
     contact: "Contact us",
@@ -11,6 +12,7 @@ const translations = {
     language_hindi: "हिन्दी",
   },
   hi: {
+    home: "होम",
     products: "उत्पाद",
     privacy_policy: "गोपनीयता नीति",
     contact: "संपर्क करें",

@@ -92,54 +92,61 @@ export default function CategoriesEditorPage() {
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h1 className="text-2xl font-bold text-gray-900">Categories Editor</h1>
+    <main className="mx-auto max-w-6xl px-6 py-10 text-white font-general">
+      <div className="flex items-center justify-between gap-4 flex-wrap border-b border-white/10 pb-6 mb-8">
+        <div>
+          <h1 className="text-3xl font-black uppercase tracking-widest special-font text-blue-50">
+            Cat<b>e</b>gories Editor
+          </h1>
+          <p className="text-xs text-neutral-400 mt-1 uppercase tracking-wider font-general">
+            Add, edit, or remove categories dynamically
+          </p>
+        </div>
         <button
           onClick={() => {
             setNewCatName("");
             setOpenCreate(true);
           }}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="rounded-xl bg-white text-black hover:bg-blue-600 hover:text-white transition-all duration-300 px-5 py-2.5 text-xs font-black uppercase tracking-wider cursor-pointer"
         >
           New Category
         </button>
       </div>
 
       {error && (
-        <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-red-800">
+        <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200 text-xs font-robert-regular">
           {error}
         </div>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-lg border">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-gray-50 text-gray-600">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md">
+        <table className="min-w-full text-left text-xs">
+          <thead className="bg-white/5 text-neutral-400 border-b border-white/10 uppercase font-black tracking-wider text-[10px]">
             <tr>
-              <th className="px-3 py-2 w-20">Sr. No.</th>
-              <th className="px-3 py-2">Category Name</th>
-              <th className="px-3 py-2 text-right">Actions</th>
+              <th className="px-5 py-4 w-20">Sr. No.</th>
+              <th className="px-5 py-4">Category Name</th>
+              <th className="px-5 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {categories.map((c, index) => (
-              <tr key={c} className="border-t">
-                <td className="px-3 py-2 text-gray-700">{index + 1}</td>
-                <td className="px-3 py-2 font-medium text-gray-900">{c}</td>
-                <td className="px-3 py-2 text-right">
+              <tr key={c} className="border-b border-white/5 hover:bg-white/5 transition-colors align-middle">
+                <td className="px-5 py-4 font-mono text-neutral-500">{String(index + 1).padStart(2, "0")}</td>
+                <td className="px-5 py-4 font-bold text-white uppercase tracking-wide text-sm">{c}</td>
+                <td className="px-5 py-4 text-right">
                   <div className="inline-flex gap-2">
                     <button
                       onClick={() => {
                         setEditItem(c);
                         setEditName(c);
                       }}
-                      className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+                      className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold uppercase hover:bg-white/10 text-white cursor-pointer transition-all"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => setConfirmDelete(c)}
-                      className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
+                      className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-2 text-xs font-bold uppercase hover:bg-red-500/20 text-red-400 cursor-pointer transition-all"
                     >
                       Delete
                     </button>
@@ -149,9 +156,9 @@ export default function CategoriesEditorPage() {
             ))}
           </tbody>
         </table>
-        {loading && <p className="p-3 text-sm text-gray-600">Loading…</p>}
+        {loading && <p className="p-5 text-sm text-neutral-400 uppercase tracking-widest text-center animate-pulse">Loading categories…</p>}
         {!loading && categories.length === 0 && (
-          <p className="p-3 text-sm text-gray-600">No categories found.</p>
+          <p className="p-8 text-sm text-neutral-500 uppercase tracking-widest text-center font-robert-regular">No categories found.</p>
         )}
       </div>
 
@@ -160,29 +167,29 @@ export default function CategoriesEditorPage() {
         onClose={() => setOpenCreate(false)}
         title="Create Category"
       >
-        <form onSubmit={handleCreate} className="space-y-4">
+        <form onSubmit={handleCreate} className="space-y-6 text-white">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Category Name</label>
+            <label className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2">Category Name</label>
             <input
               type="text"
               value={newCatName}
               onChange={(e) => setNewCatName(e.target.value)}
-              className="mt-1 w-full rounded-md border p-2"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
               required
               autoFocus
             />
           </div>
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
             <button
               type="button"
               onClick={() => setOpenCreate(false)}
-              className="rounded border px-4 py-2"
+              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-xs text-white uppercase tracking-wider font-bold hover:bg-white/10 transition-all cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
+              className="rounded-xl bg-white text-black hover:bg-blue-600 hover:text-white transition-all px-5 py-3 text-xs font-black uppercase tracking-wider cursor-pointer"
             >
               Create
             </button>
@@ -195,31 +202,31 @@ export default function CategoriesEditorPage() {
         onClose={() => setEditItem(null)}
         title="Rename Category"
       >
-        <form onSubmit={handleEdit} className="space-y-4">
+        <form onSubmit={handleEdit} className="space-y-6 text-white">
           <div>
-            <label className="block text-sm font-medium text-gray-700">New Category Name</label>
+            <label className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2">New Category Name</label>
             <input
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="mt-1 w-full rounded-md border p-2"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
               required
               autoFocus
             />
           </div>
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
             <button
               type="button"
               onClick={() => setEditItem(null)}
-              className="rounded border px-4 py-2"
+              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-xs text-white uppercase tracking-wider font-bold hover:bg-white/10 transition-all cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
+              className="rounded-xl bg-white text-black hover:bg-blue-600 hover:text-white transition-all px-5 py-3 text-xs font-black uppercase tracking-wider cursor-pointer"
             >
-              Save
+              Save Changes
             </button>
           </div>
         </form>
@@ -228,23 +235,23 @@ export default function CategoriesEditorPage() {
       <Modal
         open={!!confirmDelete}
         onClose={() => setConfirmDelete(null)}
-        title="Confirm Delete"
+        title="Confirm Deletion"
       >
         {confirmDelete && (
-          <div>
-            <p className="text-sm text-gray-700">
-              Are you sure you want to delete <b>{confirmDelete}</b>? This will also remove the category tag from all products.
+          <div className="text-white space-y-6">
+            <p className="text-sm text-neutral-300 leading-relaxed font-robert-regular">
+              Are you sure you want to permanently delete category <b>{confirmDelete}</b>? This will also clear the category classification from all products referencing it.
             </p>
-            <div className="mt-4 flex justify-end gap-2">
+            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-xs text-white uppercase tracking-wider font-bold hover:bg-white/10 transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                className="rounded-md bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-700"
+                className="rounded-xl bg-red-600 hover:bg-red-700 text-white px-5 py-3 text-xs font-black uppercase tracking-wider transition-all cursor-pointer"
               >
                 Delete
               </button>

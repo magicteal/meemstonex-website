@@ -76,34 +76,36 @@ export default function ExpandableCardDemo({ items = [] }) {
         ctaText: "View",
         ctaLink: "#",
         content: () => (
-          <div>
-            <p className="text-sm md:text-base">{p.description}</p>
-            <div className="mt-3 space-y-1 text-sm text-neutral-700">
-              <p>
-                <span className="font-medium">Sizing (Feet and inches): </span>
-                {(p.size_feet || "N/A") +
-                  (p.size_inches ? ` / ${p.size_inches}` : "")}
-              </p>
-              <p>
-                <span className="font-medium">Material 100% NATURAL MARBLE: </span>
-                {p.material || "N/A"}
-              </p>
-              <p>
-                <span className="font-medium">CUSTOMISE OPTION: </span>
-                {p.customization || "N/A"}
-              </p>
-              <p>
-                <span className="font-medium">FACILITY END TO END SERVICES: </span>
-                {p.service || "N/A"}
-              </p>
+          <div className="space-y-8">
+            <p className="text-white/80 text-lg leading-relaxed font-robert-regular">
+              {p.description}
+            </p>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+              {[
+                { label: "Dimensions", value: `${(p.size_feet || "N/A")} / ${(p.size_inches || "N/A")}` },
+                { label: "Material", value: p.material || "100% Natural Marble" },
+                { label: "Customization", value: p.customization || "Available" },
+                { label: "Services", value: p.service || "End to End Facility" }
+              ].map((spec, i) => (
+                <div key={i} className="group/spec flex flex-col gap-1 border-b border-white/5 pb-4 transition-colors hover:border-blue-500/30">
+                  <span className="text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70">
+                    {spec.label}
+                  </span>
+                  <span className="text-white/90 text-sm font-bold uppercase tracking-wide font-general">
+                    {spec.value}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div className="mt-3 flex flex-wrap gap-1 text-xs">
+
+            <div className="flex flex-wrap gap-2 pt-4">
               {(p.categories || []).map((c) => (
                 <span
                   key={c}
-                  className="rounded-full bg-gray-100 px-2 py-0.5 text-gray-700"
+                  className="rounded-full bg-white/5 border border-white/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white/50 backdrop-blur-sm transition-all hover:bg-blue-600/20 hover:text-white hover:border-blue-500/50"
                 >
-                  {c}
+                  # {c}
                 </span>
               ))}
             </div>
@@ -130,120 +132,111 @@ export default function ExpandableCardDemo({ items = [] }) {
       </AnimatePresence>
       <AnimatePresence>
         {active && typeof active === "object" ? (
-          <div className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto p-2">
-            <motion.button
-              key={`button-${active.title}-${id}`}
-              layout
-              initial={{
-                opacity: 0,
-              }}
-              animate={{
-                opacity: 1,
-              }}
-              exit={{
-                opacity: 0,
-                transition: {
-                  duration: 0.05,
-                },
-              }}
-              className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6"
-              onClick={() => setActive(null)}
-            >
-              <CloseIcon />
-            </motion.button>
+          <div className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto p-4 sm:p-8">
             <motion.div
               layoutId={`card-${keyOf(active)}-${id}`}
               ref={ref}
-              className="w-[92vw] max-w-2xl max-h-[92vh] flex flex-col bg-white dark:bg-black/95 dark:backdrop-blur-xl sm:rounded-3xl overflow-y-auto overscroll-contain shadow-2xl border dark:border-white/10"
+              className="w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row bg-black/80 backdrop-blur-3xl rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/10"
             >
-              <div className="relative">
-                <motion.div layoutId={`image-${keyOf(active)}-${id}`} className="relative">
+              {/* Image Section (Left on md+) */}
+              <div className="relative w-full md:w-1/2 h-64 md:h-auto overflow-hidden bg-neutral-900">
+                <motion.div layoutId={`image-${keyOf(active)}-${id}`} className="h-full w-full">
                   <Image
                     width={1000}
                     height={1000}
                     src={active.photos && active.photos.length > 0 && active.photos[currentPhotoIndex] ? active.photos[currentPhotoIndex] : active.src}
                     alt={active.title}
-                    className="w-full h-auto max-h-[70vh] sm:rounded-tr-lg sm:rounded-tl-lg object-contain bg-neutral-100 dark:bg-white/5"
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
+                    className="w-full h-full object-cover transition-transform duration-1000"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
+                  
+                  {/* Image Navigation */}
                   {active.photos && active.photos.length > 1 && (
-                    <>
-                      <div className="absolute inset-0 flex items-center justify-between px-4">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCurrentPhotoIndex(prev => prev > 0 ? prev - 1 : active.photos.length - 1);
-                          }}
-                          className="bg-black/50 hover:bg-blue-600 text-white text-2xl rounded-full w-12 h-12 flex items-center justify-center backdrop-blur-sm z-20 transition-all"
-                          aria-label="Previous photo"
-                          type="button"
-                        >
-                          ‹
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCurrentPhotoIndex(prev => prev < active.photos.length - 1 ? prev + 1 : 0);
-                          }}
-                          className="bg-black/50 hover:bg-blue-600 text-white text-2xl rounded-full w-12 h-12 flex items-center justify-center backdrop-blur-sm z-20 transition-all"
-                          aria-label="Next photo"
-                          type="button"
-                        >
-                          ›
-                        </button>
-                      </div>
-                      <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-20">
-                        {active.photos.map((_, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCurrentPhotoIndex(idx);
-                            }}
-                            className={`w-1.5 h-1.5 rounded-full transition-all ${
-                              idx === currentPhotoIndex ? 'bg-blue-500 w-6' : 'bg-white/30'
-                            }`}
-                            aria-label={`Go to photo ${idx + 1}`}
-                          />
-                        ))}
-                      </div>
-                    </>
+                    <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentPhotoIndex(prev => prev > 0 ? prev - 1 : active.photos.length - 1);
+                        }}
+                        className="bg-black/40 hover:bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-md transition-all"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentPhotoIndex(prev => prev < active.photos.length - 1 ? prev + 1 : 0);
+                        }}
+                        className="bg-black/40 hover:bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center backdrop-blur-md transition-all"
+                      >
+                        ›
+                      </button>
+                    </div>
                   )}
+
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                    {(active.photos || []).map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`h-1 rounded-full transition-all duration-300 ${
+                          idx === currentPhotoIndex ? 'bg-blue-500 w-6' : 'bg-white/20 w-2'
+                        }`}
+                      />
+                    ))}
+                  </div>
                 </motion.div>
+                
+                {/* Close Button - Floats over image on mobile, stays consistent on md */}
+                <motion.button
+                  key={`button-${active.title}-${id}`}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute top-6 left-6 z-50 flex items-center justify-center bg-black/40 hover:bg-red-500/80 backdrop-blur-xl text-white rounded-full h-10 w-10 transition-colors shadow-lg border border-white/10"
+                  onClick={() => setActive(null)}
+                >
+                  <CloseIcon />
+                </motion.button>
               </div>
 
-              <div className="flex flex-col">
-                <div className="flex flex-col gap-4 p-8 flex-shrink-0">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <motion.h3
-                        layoutId={`title-${keyOf(active)}-${id}`}
-                        className="font-black text-neutral-800 dark:text-blue-50 text-3xl md:text-5xl uppercase tracking-tighter special-font mb-2"
-                      >
-                        {active.title}
-                      </motion.h3>
-                      <p className="text-neutral-500 dark:text-blue-50/40 text-xs uppercase tracking-widest font-general">
-                         {active.description}
-                      </p>
+              {/* Content Section (Right on md+) */}
+              <div className="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar">
+                <div className="flex flex-col gap-6 p-8 md:p-12">
+                  <div className="space-y-4">
+                    <motion.h3
+                      layoutId={`title-${keyOf(active)}-${id}`}
+                      className="font-black text-white text-4xl md:text-6xl uppercase tracking-tighter special-font leading-tight"
+                    >
+                      {active.title}
+                    </motion.h3>
+                    <div className="flex flex-wrap gap-2">
+                       {(active.description || "").split(",").map((tag) => (
+                         <span key={tag} className="text-[10px] uppercase tracking-widest font-black text-blue-400 border border-blue-400/30 px-3 py-1 rounded-full bg-blue-400/5">
+                           {tag.trim()}
+                         </span>
+                       ))}
+                    </div>
+                  </div>
+
+                  <div className="px-8 pb-12">
+                    <div className="text-white/70 text-base leading-relaxed font-robert-regular border-t border-white/10 pt-8">
+                      {typeof active.content === "function"
+                        ? active.content()
+                        : active.content}
                     </div>
                   </div>
 
                   <motion.a
                     layoutId={`button-${keyOf(active)}-${id}`}
-                    href={active.ctaLink}
+                    href={`https://wa.me/+919829012345?text=Hello, I am interested in ${active.title}`}
                     target="_blank"
-                    className="group/btn w-full text-center px-6 py-4 text-xs tracking-widest uppercase rounded-full font-bold bg-blue-600 text-white hover:bg-blue-50 hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.3)]"
+                    className="group/btn w-full flex items-center justify-center gap-3 px-8 py-5 text-[10px] tracking-[0.3em] uppercase rounded-full font-black bg-white text-black hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-[0_20px_40px_rgba(0,0,0,0.3)] mt-4"
                   >
-                    Inquiry on Whatsapp
+                    <span>Inquiry on Whatsapp</span>
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="transition-transform group-hover/btn:translate-x-1">
+                        <path d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+                    </svg>
                   </motion.a>
-                </div>
-                <div className="px-8 pb-12">
-                  <div className="text-neutral-700 dark:text-blue-50/70 text-base leading-relaxed font-robert-regular border-t border-white/5 pt-8">
-                    {typeof active.content === "function"
-                      ? active.content()
-                      : active.content}
-                  </div>
                 </div>
               </div>
             </motion.div>
@@ -261,53 +254,59 @@ export default function ExpandableCardDemo({ items = [] }) {
                 : `card-${keyOf(card)}-${index}-${id}`
             }
             onClick={() => setActive(card)}
-            className="group cursor-pointer bg-white dark:bg-neutral-900/40 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm dark:shadow-2xl hover:shadow-md dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] transition-all duration-500 border border-gray-100 dark:border-white/10 dark:hover:border-white/20 dark:hover:-translate-y-2 flex flex-col"
+            className="group relative cursor-pointer h-[480px] w-full overflow-hidden rounded-3xl bg-neutral-950 shadow-2xl transition-all duration-500 border border-white/5 hover:border-white/20 flex flex-col"
           >
+            {/* Full Image */}
             <motion.div
               layoutId={`image-${keyOf(card)}-${id}`}
-              className="relative w-full h-60 overflow-hidden"
+              className="absolute inset-0 w-full h-full"
             >
               {card.src ? (
                 <Image
-                  width={400}
-                  height={300}
+                  fill
                   src={card.src}
                   alt={card.title}
-                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
+                  className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-1000 ease-out"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-100 dark:bg-neutral-800/50" aria-hidden="true" />
+                <div className="w-full h-full bg-neutral-900" aria-hidden="true" />
               )}
-              {/* Subtle inner shadow overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </motion.div>
-            <div className="p-6 flex flex-col flex-grow">
+
+            {/* Black Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
+
+            {/* Bottom Content Area */}
+            <div className="absolute bottom-0 left-0 right-0 p-8 z-20 flex flex-col">
               <motion.h3
                 layoutId={`title-${keyOf(card)}-${id}`}
-                className="font-black text-neutral-800 dark:text-blue-50 text-xl mb-2 line-clamp-1 special-font tracking-wide"
+                className="font-black text-white text-2xl mb-2 line-clamp-2 special-font uppercase tracking-tighter"
               >
                 {card.title}
               </motion.h3>
-              <div className="flex-grow">
+              
+              <div className="space-y-3">
                  <motion.p
                    layoutId={`description-${keyOf(card)}-${id}`}
-                   className="text-neutral-600 dark:text-blue-50/60 text-xs uppercase tracking-widest font-general mb-4 line-clamp-2"
+                   className="text-white/60 text-[10px] uppercase tracking-[0.2em] font-general line-clamp-2"
                  >
                    {card.description}
                  </motion.p>
+                 
                  {card.sizeText && (
-                   <p className="text-neutral-700 dark:text-blue-50/80 text-sm mb-4 line-clamp-1 font-robert-regular border-l-2 border-blue-500/50 pl-2">
-                     <span className="opacity-60">Size:</span> {card.sizeText}
+                   <p className="text-white/80 text-xs font-robert-regular border-l-2 border-blue-500/80 pl-3">
+                     <span className="opacity-50">Size:</span> {card.sizeText}
                    </p>
                  )}
+
+                 <motion.button
+                   layoutId={`button-${keyOf(card)}-${id}`}
+                   className="w-full mt-4 py-4 text-[10px] rounded-full font-black uppercase tracking-[0.3em] bg-white text-black hover:bg-blue-600 hover:text-white transition-all duration-500"
+                 >
+                   {card.ctaText}
+                 </motion.button>
               </div>
-              <motion.button
-                layoutId={`button-${keyOf(card)}-${id}`}
-                className="w-full mt-auto px-4 py-3 text-xs rounded-full font-bold uppercase tracking-[0.2em] bg-gray-100 dark:bg-transparent border border-transparent dark:border-white/20 hover:bg-blue-600 dark:hover:bg-blue-50 hover:text-white dark:hover:text-black text-black dark:text-blue-50 transition-all duration-300"
-              >
-                {card.ctaText}
-              </motion.button>
             </div>
           </motion.div>
         ))}

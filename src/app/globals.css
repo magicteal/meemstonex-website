@@ -4,6 +4,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  --font-general: var(--font-outfit) !important;
+  --font-circular-web: var(--font-outfit) !important;
+  --font-robert-medium: var(--font-outfit) !important;
+  --font-robert-regular: var(--font-outfit) !important;
+}
+
+@keyframes scrollDot {
+  0%   { transform: translateY(0);    opacity: 1; }
+  60%  { transform: translateY(10px); opacity: 0; }
+  61%  { transform: translateY(0);    opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
 .perspective-\[2000px\] {
   perspective: 2000px;
 }
@@ -15,7 +29,21 @@ html,
 :root,
 body,
 #__next {
-  overflow-x: hidden;
+  /* overflow-x removed */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 body {
@@ -121,24 +149,28 @@ html.dark .nav-hover-btn::after {
 .special-font b {
   font-family: "Zentry";
   font-feature-settings: "ss01" on;
+  font-weight: inherit;
 }
 
 .hero-heading {
   text-transform: uppercase;
   font-family: "zentry", sans-serif;
-  font-weight: 900; /* font-black */
-  font-size: 3rem; /* text-5xl */
-  line-height: 1;
+  font-weight: 200;
+  font-size: clamp(3.2rem, 18vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
 }
 @media (min-width: 640px) {
   .hero-heading {
     right: 2.5rem;
     font-size: 4.5rem;
+    font-weight: 100;
   }
 }
 @media (min-width: 768px) {
   .hero-heading {
     font-size: 8rem;
+    font-weight: 100;
   }
 }
 @media (min-width: 1024px) {

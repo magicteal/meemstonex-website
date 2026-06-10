@@ -7,6 +7,8 @@ import {
   deleteProduct as mockDeleteProduct,
   listCategories as mockListCategories,
   addCategory as mockAddCategory,
+  getHomepageSettings as mockGetHomepageSettings,
+  updateHomepageSettings as mockUpdateHomepageSettings,
 } from "./mockApi";
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -163,4 +165,32 @@ export async function resetAllCategories() {
   });
   if (!res.ok) throw new Error(`Failed to reset categories (${res.status})`);
   return res.json();
+}
+
+export async function getHomepageSettings() {
+  if (USE_MOCK) return mockGetHomepageSettings();
+  try {
+    const res = await fetch(`/api/homepage`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to load settings (${res.status})`);
+    return res.json();
+  } catch (e) {
+    if (!USE_MOCK) throw e;
+    return mockGetHomepageSettings();
+  }
+}
+
+export async function updateHomepageSettings(settings) {
+  if (USE_MOCK) return mockUpdateHomepageSettings(settings);
+  try {
+    const res = await fetch(`/api/admin/homepage`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(settings),
+    });
+    if (!res.ok) throw new Error(`Failed to save settings (${res.status})`);
+    return res.json();
+  } catch (e) {
+    if (!USE_MOCK) throw e;
+    return mockUpdateHomepageSettings(settings);
+  }
 }

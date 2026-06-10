@@ -45,7 +45,6 @@ export default function ProductsEditorPage() {
     load();
   }, []);
 
-  // keyboard shortcut: n to open new modal
   useEffect(() => {
     const handler = (e) => {
       const key = typeof e?.key === "string" ? e.key.toLowerCase() : "";
@@ -97,47 +96,35 @@ export default function ProductsEditorPage() {
     try {
       deleted = await deleteProduct(id);
     } catch (e) {
-      // handle error gracefully and show toast
       push({ title: "Delete failed", description: e.message, type: "error" });
       return;
     }
 
     setItems((prev) => prev.filter((p) => p.id !== id));
-    let undo = true;
-    const idToast = push({
+    push({
       title: "Product deleted",
-      description: "Undo within 5 seconds",
+      description: "Item has been successfully removed",
       type: "success",
-      duration: 5000,
-      action: (
-        <div className="mt-2">
-          <button
-            className="rounded-md bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700"
-            onClick={async () => {
-              undo = false;
-              // re-create deleted item
-              const { id: _id, ...rest } = deleted;
-              const restored = await createProduct(rest);
-              setItems((prev) => [restored, ...prev]);
-            }}
-          >
-            Undo
-          </button>
-        </div>
-      ),
+      duration: 3000,
     });
-    // after 5s, if not undone do nothing (already deleted)
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h1 className="text-2xl font-bold text-gray-900">Products Editor</h1>
-        <div className="flex items-center gap-2">
+    <main className="mx-auto max-w-6xl px-6 py-10 text-white font-general">
+      <div className="flex items-center justify-between gap-4 flex-wrap border-b border-white/10 pb-6 mb-8">
+        <div>
+          <h1 className="text-3xl font-black uppercase tracking-widest special-font text-blue-50">
+            Pr<b>o</b>ducts Editor
+          </h1>
+          <p className="text-xs text-neutral-400 mt-1 uppercase tracking-wider font-general">
+            Manage your premium stone and marble inventory list
+          </p>
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             ref={newBtnRef}
             onClick={() => setOpenCreate(true)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="rounded-xl bg-white text-black hover:bg-blue-600 hover:text-white transition-all duration-300 px-5 py-2.5 text-xs font-black uppercase tracking-wider cursor-pointer"
           >
             New Product
           </button>
@@ -170,7 +157,7 @@ export default function ProductsEditorPage() {
                 remove(idToast);
               }
             }}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition-all px-5 py-2.5 text-xs font-bold uppercase tracking-wider cursor-pointer"
             title="Upsert the canonical category list into the database"
           >
             Sync Categories
@@ -200,7 +187,6 @@ export default function ProductsEditorPage() {
                   } products updated`,
                   type: "success",
                 });
-                // optional: reload products to reflect cleared categories
                 await load();
               } catch (e) {
                 push({
@@ -213,7 +199,7 @@ export default function ProductsEditorPage() {
                 setResettingCats(false);
               }
             }}
-            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-600 disabled:opacity-50"
+            className="rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all px-5 py-2.5 text-xs font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50"
             title="Delete all categories and clear them from products"
           >
             Reset Categories
@@ -222,20 +208,20 @@ export default function ProductsEditorPage() {
       </div>
 
       {error && (
-        <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-red-800">
+        <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200 text-xs font-robert-regular">
           {error}
         </div>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-lg border">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-gray-50 text-gray-600">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md">
+        <table className="min-w-full text-left text-xs">
+          <thead className="bg-white/5 text-neutral-400 border-b border-white/10 uppercase font-black tracking-wider text-[10px]">
             <tr>
-              <th className="px-3 py-2 w-20">Sr. No.</th>
-              <th className="px-3 py-2">Photo</th>
-              <th className="px-3 py-2">Name</th>
-              <th className="px-3 py-2">Categories</th>
-              <th className="px-3 py-2 text-right">Actions</th>
+              <th className="px-5 py-4 w-20">Sr. No.</th>
+              <th className="px-5 py-4">Photo</th>
+              <th className="px-5 py-4">Name</th>
+              <th className="px-5 py-4">Categories</th>
+              <th className="px-5 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -243,50 +229,50 @@ export default function ProductsEditorPage() {
               {items.map((p, index) => (
                 <motion.tr
                   key={p.id}
-                  className="border-t"
+                  className="border-b border-white/5 hover:bg-white/5 transition-colors align-middle"
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                 >
-                  <td className="px-3 py-2 text-gray-700">{index + 1}</td>
-                  <td className="px-3 py-2">
-                    <div className="relative h-12 w-12">
+                  <td className="px-5 py-4 font-mono text-neutral-500">{String(index + 1).padStart(2, "0")}</td>
+                  <td className="px-5 py-4">
+                    <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-white/10 bg-black">
                       <Image
                         src={(Array.isArray(p.photos) && p.photos.length) ? p.photos[0] : (p.photo || "")}
                         alt={p.name}
                         fill
-                        className="rounded-md object-cover"
+                        className="object-cover"
                         sizes="48px"
                       />
                     </div>
                   </td>
-                  <td className="px-3 py-2 font-medium text-gray-900">
+                  <td className="px-5 py-4 font-bold text-white uppercase tracking-wide text-sm">
                     {p.name}
                   </td>
-                  <td className="px-3 py-2 text-gray-700">
-                    <div className="flex flex-wrap gap-1">
+                  <td className="px-5 py-4">
+                    <div className="flex flex-wrap gap-1.5">
                       {p.categories.map((c) => (
                         <span
                           key={c}
-                          className="rounded-full bg-gray-100 px-2 py-0.5 text-xs"
+                          className="rounded-full bg-white/5 border border-white/10 px-2.5 py-1 text-[10px] uppercase font-bold text-neutral-400 tracking-wider"
                         >
                           {c}
                         </span>
                       ))}
                     </div>
                   </td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="px-5 py-4 text-right">
                     <div className="inline-flex gap-2">
                       <button
                         onClick={() => setEditItem(p)}
-                        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold uppercase hover:bg-white/10 text-white cursor-pointer transition-all"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => setConfirmDelete(p)}
-                        className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
+                        className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-2 text-xs font-bold uppercase hover:bg-red-500/20 text-red-400 cursor-pointer transition-all"
                       >
                         Delete
                       </button>
@@ -297,16 +283,16 @@ export default function ProductsEditorPage() {
             </AnimatePresence>
           </tbody>
         </table>
-        {loading && <p className="p-3 text-sm text-gray-600">Loading…</p>}
+        {loading && <p className="p-5 text-sm text-neutral-400 uppercase tracking-widest text-center animate-pulse">Loading items…</p>}
         {!loading && items.length === 0 && (
-          <p className="p-3 text-sm text-gray-600">No products.</p>
+          <p className="p-8 text-sm text-neutral-500 uppercase tracking-widest text-center font-robert-regular">No products in inventory.</p>
         )}
       </div>
 
       <Modal
         open={openCreate}
         onClose={() => setOpenCreate(false)}
-        title="Create Product"
+        title="Create New Creation"
       >
         <ProductForm
           onSubmit={onCreate}
@@ -325,7 +311,7 @@ export default function ProductsEditorPage() {
             initial={editItem}
             onSubmit={(payload) => onUpdate(editItem.id, payload)}
             onCancel={() => setEditItem(null)}
-            submitLabel="Save"
+            submitLabel="Save Changes"
           />
         )}
       </Modal>
@@ -333,17 +319,17 @@ export default function ProductsEditorPage() {
       <Modal
         open={!!confirmDelete}
         onClose={() => setConfirmDelete(null)}
-        title="Confirm Delete"
+        title="Confirm Deletion"
       >
         {confirmDelete && (
-          <div>
-            <p className="text-sm text-gray-700">
-              Are you sure you want to delete <b>{confirmDelete.name}</b>?
+          <div className="text-white space-y-6">
+            <p className="text-sm text-neutral-300 leading-relaxed font-robert-regular">
+              Are you sure you want to permanently delete <b>{confirmDelete.name}</b> from the database? This action is irreversible.
             </p>
-            <div className="mt-4 flex justify-end gap-2">
+            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-xs text-white uppercase tracking-wider font-bold hover:bg-white/10 transition-all cursor-pointer"
               >
                 Cancel
               </button>
@@ -352,7 +338,7 @@ export default function ProductsEditorPage() {
                   await onDelete(confirmDelete.id);
                   setConfirmDelete(null);
                 }}
-                className="rounded-md bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-700"
+                className="rounded-xl bg-red-600 hover:bg-red-700 text-white px-5 py-3 text-xs font-black uppercase tracking-wider transition-all cursor-pointer"
               >
                 Delete
               </button>

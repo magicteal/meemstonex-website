@@ -65,14 +65,14 @@ export default function CategorySelect({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Add new category"
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             aria-label="New category name"
           />
           <button
             type="button"
             onClick={create}
             disabled={loading}
-            className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="rounded-xl bg-white text-black hover:bg-blue-600 hover:text-white transition-all px-4 py-2.5 text-xs font-black uppercase tracking-wider disabled:opacity-50 cursor-pointer"
           >
             Add
           </button>

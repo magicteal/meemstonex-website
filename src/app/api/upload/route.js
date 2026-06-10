@@ -34,20 +34,26 @@ export async function POST(req) {
     const base64Data = matches[2];
     const originalBuffer = Buffer.from(base64Data, "base64");
     
-    // Compress image heavily using Sharp before uploading to S3
-    const optimizedBuffer = await sharp(originalBuffer)
-      .resize({ width: 1920, withoutEnlargement: true }) // Max 1080p equivalent width
-      .webp({ quality: 75, effort: 6 }) // Convert to efficient WebP
-      .toBuffer();
+    let finalBuffer = originalBuffer;
+    let finalMimeType = mimeType;
+    let extension = mimeType.split("/")[1] || "bin";
+
+    if (mimeType.startsWith("image/")) {
+      // Compress image heavily using Sharp before uploading to S3
+      finalBuffer = await sharp(originalBuffer)
+        .resize({ width: 1920, withoutEnlargement: true }) // Max 1080p equivalent width
+        .webp({ quality: 75, effort: 6 }) // Convert to efficient WebP
+        .toBuffer();
+      extension = "webp";
+      finalMimeType = "image/webp";
+    }
     
-    const extension = "webp";
-    const finalMimeType = "image/webp";
     const key = `meemstonex-uploads/${uuidv4()}.${extension}`;
 
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: key,
-      Body: optimizedBuffer,
+      Body: finalBuffer,
       ContentType: finalMimeType,
     });
 

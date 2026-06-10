@@ -52,7 +52,7 @@ export default function Modal({
       {open && (
         <motion.div
           ref={overlayRef}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm md:backdrop-blur p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
           aria-modal="true"
           role="dialog"
           aria-labelledby="modal-title"
@@ -64,7 +64,7 @@ export default function Modal({
           }}
         >
           <motion.div
-            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-xl outline-none"
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2rem] bg-neutral-950 border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] text-white outline-none"
             initial={{ y: 20, scale: 0.98, opacity: 0 }}
             animate={{
               y: 0,
@@ -74,23 +74,23 @@ export default function Modal({
             }}
             exit={{ y: 20, scale: 0.98, opacity: 0 }}
           >
-            <div className="sticky top-0 bg-white z-10 flex items-center justify-between border-b border-gray-200 px-4 py-3">
+            <div className="sticky top-0 bg-neutral-950 z-10 flex items-center justify-between border-b border-white/10 px-6 py-4">
               <h2
                 id="modal-title"
-                className="text-lg font-semibold text-gray-900"
+                className="text-sm font-black uppercase tracking-widest text-blue-50"
               >
                 {title}
               </h2>
               <button
                 ref={closeBtnRef}
                 aria-label="Close"
-                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="rounded-full p-2 text-neutral-400 hover:text-white hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 onClick={onClose}
               >
                 ✕
               </button>
             </div>
-            <div className="p-4">{children}</div>
+            <div className="p-6">{children}</div>
           </motion.div>
         </motion.div>
       )}

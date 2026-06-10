@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
@@ -16,29 +16,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
 const general = localFont({
   src: "./../../public/fonts/general.woff2",
   variable: "--font-general",
+  display: "swap",
 });
 
 const circularWeb = localFont({
   src: "./../../public/fonts/circularweb-book.woff2",
   variable: "--font-circular-web",
+  display: "swap",
 });
 
 const zentry = localFont({
   src: "./../../public/fonts/zentry-regular.woff2",
   variable: "--font-zentry",
+  display: "swap",
 });
 
 const robertMedium = localFont({
   src: "./../../public/fonts/robert-medium.woff2",
   variable: "--font-robert-medium",
+  display: "swap",
 });
 
 const robertRegular = localFont({
   src: "./../../public/fonts/robert-regular.woff2",
   variable: "--font-robert-regular",
+  display: "swap",
 });
 
 export const metadata = {
@@ -60,7 +71,7 @@ export default function RootLayout({ children }) {
         `}</style>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${general.variable} ${circularWeb.variable} ${zentry.variable} ${robertMedium.variable} ${robertRegular.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${general.variable} ${circularWeb.variable} ${zentry.variable} ${robertMedium.variable} ${robertRegular.variable} antialiased`}
       >
         <div id="google_translate_element" style={{ display: "none" }}></div>
         <Script

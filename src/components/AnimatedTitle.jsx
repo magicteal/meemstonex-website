@@ -26,7 +26,7 @@ const AnimatedTitle = ({ title, containerClass }) => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [title]);
 
   return (
     <div className={`animated-title ${containerClass}`} ref={containerRef}>

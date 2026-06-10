@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { slugify } from "../lib/categories";
 import { TiLocationArrow } from "react-icons/ti";
+import { getHomepageSettings } from "../services/api";
 
 const BentoTilt = ({ children, className = "" }) => {
   const itemRef = useRef();
@@ -113,13 +114,12 @@ const BentoCard = ({ src, title, description, href, label }) => {
         className="absolute inset-0 size-full object-cover object-center"
         style={{ objectFit: "cover" }}
       />
-      {/* Black film overlay at 50% opacity */}
-      <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" />
-      <div className="absolute inset-0 z-20 flex flex-col justify-between p-5 text-blue-50">
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-0 z-20 flex flex-col justify-end p-5 text-blue-50">
         <div>
-          <h1 className="bento-title special-black">{title}</h1>
+          <h1 className="bento-title special-font uppercase tracking-wider">{title}</h1>
           {description && (
-            <p className="mt-3 max-w-64 text-xs md:text-base">{description}</p>
+            <p className="mt-2 max-w-64 text-xs md:text-sm opacity-80 font-robert-regular border-l-2 border-blue-500 pl-3">{description}</p>
           )}
         </div>
       </div>
@@ -135,6 +135,29 @@ const BentoCard = ({ src, title, description, href, label }) => {
 };
 
 const Features = () => {
+  const [subtitle, setSubtitle] = useState("Where Everyday Elegance Meets a World of Interconnected Luxury");
+  const [description, setDescription] = useState("Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home");
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadSettings() {
+      try {
+        const data = await getHomepageSettings();
+        if (!mounted) return;
+        if (data?.features) {
+          if (data.features.subtitle) setSubtitle(data.features.subtitle);
+          if (data.features.description) setDescription(data.features.description);
+        }
+      } catch (err) {
+        console.error("Failed to load features settings:", err);
+      }
+    }
+    loadSettings();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   // define tiles in a variable so we can observe them
   const tiles = [
     {
@@ -218,12 +241,10 @@ const Features = () => {
       <div className="container mx-auto px-4 md:px-10">
         <div className="px-5 py-16 md:py-32">
           <p className="font-circular-web text-base md:text-lg text-blue-50">
-            Where Everyday Elegance Meets a World of Interconnected Luxury
+            {subtitle}
           </p>
           <p className="mt-3 max-w-md font-circular-web text-sm md:text-lg text-blue-50 opacity-50">
-            Immerse yourself in a rich and ever-expanding universe where our
-            vibrant array of marble products seamlessly converge, creating an
-            interconnected overlay of refined experiences within your home
+            {description}
           </p>
         </div>
 

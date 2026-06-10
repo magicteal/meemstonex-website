@@ -83,7 +83,6 @@ export default function ProductForm({
   };
 
   const handleFile = async (index, file) => {
-    // show an immediate local preview for perceived performance
     const preview = URL.createObjectURL(file);
     setPhotos(prev => {
       const next = [...prev];
@@ -100,7 +99,6 @@ export default function ProductForm({
     
     try {
       const url = await mockUpload(file);
-      // replace preview with final uploaded URL
       if (url) {
         setPhotos(prev => {
           const next = [...prev];
@@ -114,7 +112,6 @@ export default function ProductForm({
         next[index] = false;
         return next;
       });
-      // revoke the object URL when upload finishes
       try {
         URL.revokeObjectURL(preview);
       } catch (e) {}
@@ -164,13 +161,13 @@ export default function ProductForm({
   };
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} className="space-y-6 text-white">
       <div>
         <label
           htmlFor="name"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2"
         >
-          Name
+          Product Name
         </label>
         <input
           ref={nameRef}
@@ -178,20 +175,20 @@ export default function ProductForm({
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           aria-invalid={!!errors.name}
           aria-describedby={errors.name ? "name-error" : undefined}
         />
         {errors.name && (
-          <p id="name-error" className="mt-1 text-sm text-red-600">
+          <p id="name-error" className="mt-1 text-sm text-red-400">
             {errors.name}
           </p>
         )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Categories
+        <label className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2">
+          Categories Tagging
         </label>
         <div className="mt-1">
           <CategorySelect value={categories} onChange={setCategories} />
@@ -201,26 +198,26 @@ export default function ProductForm({
       <div>
         <label
           htmlFor="size-feet"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2"
         >
-          Sizing (Feet and inches)
+          Sizing (Feet / Inches)
         </label>
-        <div className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-3">
           <input
             id="size-feet"
             type="text"
             value={sizeFeet}
             onChange={(e) => setSizeFeet(e.target.value)}
-            placeholder="Feet"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+            placeholder="Feet (e.g. 5)"
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           />
           <input
             id="size-inches"
             type="text"
             value={sizeInches}
             onChange={(e) => setSizeInches(e.target.value)}
-            placeholder="Inches"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+            placeholder="Inches (e.g. 8)"
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           />
         </div>
       </div>
@@ -228,87 +225,88 @@ export default function ProductForm({
       <div>
         <label
           htmlFor="material"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2"
         >
-          Material 100% NATURAL MARBLE
+          Material Structure (e.g. 100% Natural Marble)
         </label>
         <input
           id="material"
           type="text"
           value={material}
           onChange={(e) => setMaterial(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         />
       </div>
 
       <div>
         <label
           htmlFor="customization"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2"
         >
-          CUSTOMISE OPTION
+          Customisation Capability (e.g. Available)
         </label>
         <input
           id="customization"
           type="text"
           value={customization}
           onChange={(e) => setCustomization(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         />
       </div>
 
       <div>
         <label
           htmlFor="service"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2"
         >
-          FACILITY END TO END SERVICES
+          End-to-End Services (e.g. Facility Delivery & Installation)
         </label>
         <input
           id="service"
           type="text"
           value={service}
           onChange={(e) => setService(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Photos
+        <label className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2">
+          Product Images
         </label>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {photos.map((photo, index) => (
-            <div key={index} className="space-y-1">
+            <div key={index} className="space-y-2 border border-white/5 p-3 rounded-2xl bg-neutral-900/50">
+              <span className="text-[10px] font-bold text-neutral-500 block">Slot {index + 1}</span>
               <div className="flex items-center gap-2">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => onFileChange(index, e)}
                   disabled={!!uploading[index]}
-                  className="text-xs w-full"
+                  className="text-xs text-neutral-400 w-full cursor-pointer file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50/10 file:text-blue-200 hover:file:bg-blue-50/20 file:transition-all"
                   aria-label={`Upload photo ${index + 1}`}
                 />
               </div>
               {photo && (
-                <div className="relative">
+                <div className="relative rounded-lg overflow-hidden aspect-video bg-black">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photo}
                     alt={`Preview ${index + 1}`}
-                    className="h-20 w-full rounded-md object-cover"
+                    className="h-full w-full object-cover"
                   />
                   <button
                     type="button"
                     onClick={() => removePhotoAt(index)}
-                    className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                    className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold transition-all shadow-md cursor-pointer"
                   >
                     ×
                   </button>
                 </div>
               )}
               {!!uploading[index] && (
-                <p className="text-xs text-gray-500">Uploading...</p>
+                <p className="text-xs text-blue-400 animate-pulse">Uploading to S3...</p>
               )}
             </div>
           ))}
@@ -316,49 +314,49 @@ export default function ProductForm({
         <button
           type="button"
           onClick={addPhotoSlot}
-          className="mt-2 rounded-md border border-gray-300 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
+          className="mt-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2 text-xs text-white transition-all uppercase tracking-wider font-bold cursor-pointer"
         >
           + Add another image
         </button>
         {errors.photos && (
-          <p className="mt-1 text-sm text-red-600">{errors.photos}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.photos}</p>
         )}
       </div>
 
       <div>
         <label
           htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2"
         >
-          Description
+          Product Description
         </label>
         <textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         />
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3 bg-white/5 border border-white/5 rounded-2xl p-4">
         <input
           id="featured"
           type="checkbox"
           checked={featured}
           onChange={(e) => setFeatured(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+          className="h-4 w-4 rounded border-white/10 bg-white/5 text-blue-600 focus:ring-blue-500 cursor-pointer"
         />
-        <label htmlFor="featured" className="text-sm text-gray-800">
-          Featured (show on homepage)
+        <label htmlFor="featured" className="text-xs font-bold uppercase tracking-wider text-neutral-300 cursor-pointer">
+          Featured (Showcase in home flow ring)
         </label>
       </div>
 
-      <div className="flex items-center justify-end gap-2 pt-2">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+          className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-xs text-white uppercase tracking-wider font-bold hover:bg-white/10 transition-all cursor-pointer"
         >
           Cancel
         </button>
@@ -367,10 +365,10 @@ export default function ProductForm({
           disabled={anyUploading}
           aria-busy={anyUploading}
           className={
-            "rounded-lg px-3 py-2 text-sm font-medium text-white " +
+            "rounded-xl px-5 py-3 text-xs font-black uppercase tracking-wider transition-all cursor-pointer " +
             (anyUploading
-              ? "bg-blue-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700")
+              ? "bg-neutral-800 text-neutral-500 cursor-not-allowed"
+              : "bg-white text-black hover:bg-blue-600 hover:text-white")
           }
         >
           {anyUploading ? "Uploading…" : submitLabel}

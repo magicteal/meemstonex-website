@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -9,14 +9,7 @@ import {
   CheckCircle2,
   Truck,
 } from "lucide-react";
-
-const steps = [
-  { id: 1, title: "Lets Connect One on One", Icon: Users },
-  { id: 2, title: "Explore our Catalog", Icon: BookOpen },
-  { id: 3, title: "Place The Order", Icon: ShoppingCart },
-  { id: 4, title: "Approval", Icon: CheckCircle2 },
-  { id: 5, title: "Delivery and Installation", Icon: Truck },
-];
+import { getHomepageSettings } from "../services/api";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -36,18 +29,61 @@ const itemVariants = {
 };
 
 const OurProcess = () => {
+  const [subtitle, setSubtitle] = useState("Our Process");
+  const [title, setTitle] = useState("YOUR DREAM TEMPLE IN 5 STEPS");
+  const [description, setDescription] = useState("Looking to design your Dream Temple? Here's how you can get started.");
+  const [stepTitles, setStepTitles] = useState([
+    "Lets Connect One on One",
+    "Explore our Catalog",
+    "Place The Order",
+    "Approval",
+    "Delivery and Installation"
+  ]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadSettings() {
+      try {
+        const data = await getHomepageSettings();
+        if (!mounted) return;
+        if (data?.ourProcess) {
+          if (data.ourProcess.subtitle) setSubtitle(data.ourProcess.subtitle);
+          if (data.ourProcess.title) setTitle(data.ourProcess.title);
+          if (data.ourProcess.description) setDescription(data.ourProcess.description);
+          if (Array.isArray(data.ourProcess.steps) && data.ourProcess.steps.length > 0) {
+            setStepTitles(data.ourProcess.steps);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load ourProcess settings:", err);
+      }
+    }
+    loadSettings();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const steps = [
+    { id: 1, title: stepTitles[0] || "Lets Connect One on One", Icon: Users },
+    { id: 2, title: stepTitles[1] || "Explore our Catalog", Icon: BookOpen },
+    { id: 3, title: stepTitles[2] || "Place The Order", Icon: ShoppingCart },
+    { id: 4, title: stepTitles[3] || "Approval", Icon: CheckCircle2 },
+    { id: 5, title: stepTitles[4] || "Delivery and Installation", Icon: Truck },
+  ];
+
   return (
     <section className="relative w-full bg-black py-20 text-blue-50">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-14 text-center">
           <p className="font-general text-[10px] uppercase tracking-wider text-blue-200/70">
-            Our Process
+            {subtitle}
           </p>
           <h2 className="mt-3 text-2xl font-semibold tracking-widest text-white sm:text-3xl md:text-4xl">
-            YOUR DREAM TEMPLE IN 5 STEPS
+            {title}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-blue-200/80">
-            Looking to design your Dream Temple? Here's how you can get started.
+            {description}
           </p>
         </div>
 

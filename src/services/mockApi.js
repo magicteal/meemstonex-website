@@ -331,3 +331,155 @@ export const mockUpload = async (fileOrUrl) => {
     return withLatency(objUrl);
   }
 };
+
+const HOMEPAGE_SETTINGS_KEY = "mock_homepage_settings_v1";
+
+const defaultSettings = {
+  hero: {
+    heading: "MEEMSTONEX",
+    paragraph: "Enter the world of Meemstonex, where raw natural stones are transformed into timeless architectural masterpieces. Crafting unmatched luxury for three generations, our premium marble collection brings custom precision and breathtaking beauty to your spaces.",
+    buttonTitle: "Explore Products",
+    buttonLink: "/products",
+    videos: [
+      "/videos/hero-1.mp4",
+      "/videos/hero-2.mp4",
+      "/videos/hero-3.mp4",
+      "/videos/hero-4.mp4",
+      "/videos/hero-2.mp4"
+    ]
+  },
+  about: {
+    imageUrl: "/img/sub-hero.png",
+    title: "Disc<b>o</b>ver the world of <br /> W<b>o</b>rld with Meemstonex",
+    subtext: "Welcome to Meemstonex",
+    trailImages: [
+      "/products/P1.jpg",
+      "/products/P2.jpg",
+      "/products/P3.jpg",
+      "/products/P4.jpg",
+      "/products/P5.jpg",
+      "/products/P6.jpg",
+      "/products/P7.jpg"
+    ]
+  },
+  ourProcess: {
+    subtitle: "Our Process",
+    title: "YOUR DREAM TEMPLE IN 5 STEPS",
+    description: "Looking to design your Dream Temple? Here's how you can get started.",
+    steps: [
+      "Lets Connect One on One",
+      "Explore our Catalog",
+      "Place The Order",
+      "Approval",
+      "Delivery and Installation"
+    ]
+  },
+  features: {
+    subtitle: "Where Everyday Elegance Meets a World of Interconnected Luxury",
+    description: "Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home"
+  },
+  stats: {
+    imageUrl: "/img/numbersBG.jpg",
+    subtitle: "Completed Custom Projects",
+    title: "COMPLETED CUSTOM PROJECTS",
+    items: [
+      { value: "80+", label: "Projects" },
+      { value: "100+", label: "Cities" },
+      { value: "28+", label: "Years Experience" }
+    ]
+  },
+  story: {
+    subtitle: "the multiversal world of meemstonex",
+    title: "The st<b>o</b>ry of <br /> generations",
+    description: "For three generations, Meemstonex Marble has shaped the poetry of stone where earth’s finest artistry becomes a family’s enduring legacy. From the first chisel strike to today’s modern craftsmanship, our heritage lives in every vein, every polish, and every masterpiece we create. Guided by passion, precision, and pride, we honor nature’s grandeur by transforming raw marble into timeless expressions of beauty and strength. At Meemstonex, we don’t just work with stone we preserve tradition, craft stories, and carve the legacy of generations into every surface we touch",
+    buttonTitle: "discover products"
+  },
+  contact: {
+    imageUrl: "/img/abdul.jpg",
+    subtitle: "Contact Meemstonex",
+    title: "Let's b<b>u</b>ild the <br /> new e<b>r</b>a of <br /> ma<b>r</b>bles toge<b>t</b>her",
+    buttonTitle: "contact us"
+  }
+};
+
+let mockHomepageSettings = defaultSettings;
+
+function ensureBoldTags(text) {
+  if (!text) return "";
+  
+  // Normalize text for comparison with default keys
+  const normalized = text.replace(/<\/?b>/gi, "").toLowerCase().replace(/\s+/g, " ").trim();
+  
+  const DEFAULT_MAP = {
+    "discover the world of <br /> world with meemstonex": "Disc<b>o</b>ver the world of <br /> W<b>o</b>rld with Meemstonex",
+    "the story of <br /> generations": "The st<b>o</b>ry of <br /> generations",
+    "let's build the <br /> new era of <br /> marbles together": "Let's b<b>u</b>ild the <br /> new e<b>r</b>a of <br /> ma<b>r</b>bles toge<b>t</b>her"
+  };
+  
+  if (DEFAULT_MAP[normalized]) {
+    return DEFAULT_MAP[normalized];
+  }
+  
+  // Otherwise, auto-inject bold tags into words of length >= 3
+  let clean = text.replace(/<\/?b>/gi, "");
+  
+  const words = clean.split(" ");
+  const stopWords = ["the", "of", "and", "in", "to", "with", "a", "an", "for", "on", "at", "by", "is", "it"];
+  
+  const processed = words.map(word => {
+    // If it is an HTML tag or stop word, return as is
+    if (word.includes("<") || word.includes(">") || word.includes("/") || stopWords.includes(word.toLowerCase())) {
+      return word;
+    }
+    
+    // Remove punctuation to calculate correct word length and index
+    let cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?'"]/g, "");
+    if (cleanWord.length < 3) {
+      return word;
+    }
+    
+    // Find middle index of clean word
+    let mid = Math.floor(cleanWord.length / 2);
+    let targetChar = cleanWord[mid];
+    
+    // Find index of target character in original word
+    let idx = word.indexOf(targetChar);
+    if (idx !== -1) {
+      return word.slice(0, idx) + "<b>" + targetChar + "</b>" + word.slice(idx + 1);
+    }
+    return word;
+  });
+  
+  return processed.join(" ");
+}
+
+try {
+  if (typeof window !== "undefined") {
+    const ls = window.localStorage.getItem(HOMEPAGE_SETTINGS_KEY);
+    if (ls) mockHomepageSettings = JSON.parse(ls);
+  }
+} catch (e) {}
+
+export async function getHomepageSettings() {
+  const copy = JSON.parse(JSON.stringify(mockHomepageSettings));
+  if (copy.about && copy.about.title) {
+    copy.about.title = ensureBoldTags(copy.about.title);
+  }
+  if (copy.story && copy.story.title) {
+    copy.story.title = ensureBoldTags(copy.story.title);
+  }
+  if (copy.contact && copy.contact.title) {
+    copy.contact.title = ensureBoldTags(copy.contact.title);
+  }
+  return withLatency(copy);
+}
+
+export async function updateHomepageSettings(settings) {
+  mockHomepageSettings = JSON.parse(JSON.stringify(settings));
+  try {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(HOMEPAGE_SETTINGS_KEY, JSON.stringify(mockHomepageSettings));
+    }
+  } catch (e) {}
+  return withLatency(mockHomepageSettings);
+}
