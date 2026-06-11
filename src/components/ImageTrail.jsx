@@ -247,6 +247,8 @@ class ImageTrailVariant2 extends BaseTrail {
     const img = this.images[this.imgPosition];
 
     gsap.killTweensOf(img.DOM.el);
+    gsap.killTweensOf(img.DOM.inner);
+
     gsap
       .timeline({
         onStart: () => this.onImageActivated(),
@@ -256,15 +258,17 @@ class ImageTrailVariant2 extends BaseTrail {
         img.DOM.el,
         {
           opacity: 1,
-          scale: 0,
+          scale: 0.4,
+          rotation: gsap.utils.random(-15, 15),
           zIndex: this.zIndexVal,
           x: this.cacheMousePos.x - img.rect.width / 2,
           y: this.cacheMousePos.y - img.rect.height / 2,
         },
         {
-          duration: 0.4,
-          ease: "power1",
+          duration: 0.6,
+          ease: "power3.out",
           scale: 1,
+          rotation: gsap.utils.random(-4, 4),
           x: this.mousePos.x - img.rect.width / 2,
           y: this.mousePos.y - img.rect.height / 2,
         },
@@ -272,14 +276,20 @@ class ImageTrailVariant2 extends BaseTrail {
       )
       .fromTo(
         img.DOM.inner,
-        { scale: 2.8, filter: "brightness(250%)" },
-        { duration: 0.4, ease: "power1", scale: 1, filter: "brightness(100%)" },
+        { scale: 1.4, filter: "brightness(130%)" },
+        { duration: 0.6, ease: "power2.out", scale: 1, filter: "brightness(100%)" },
         0
       )
       .to(
         img.DOM.el,
-        { duration: 0.4, ease: "power2", opacity: 0, scale: 0.2 },
-        0.45
+        { 
+          duration: 0.6, 
+          ease: "power2.in", 
+          opacity: 0, 
+          scale: 0.4,
+          rotation: gsap.utils.random(-8, 8)
+        },
+        0.5
       );
   }
 }

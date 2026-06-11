@@ -134,9 +134,53 @@ const BentoCard = ({ src, title, description, href, label }) => {
   );
 };
 
+const DEFAULT_TILES = [
+  {
+    name: "MARBLE TEMPLE",
+    video: "videos/C2.mp4",
+    desc: "Meemstonex Mandirs sacred spaces sculpted in pure marble, embodying devotion, peace, and eternal grace",
+  },
+  {
+    name: "INLAY WORK",
+    video: "videos/C5.mp4",
+    desc: "Artful stone inlay that blends tradition with precision craftsmanship.",
+  },
+  {
+    name: "FOUNTAINS",
+    video: "videos/C4.mp4",
+    desc: "Let serenity flow with Meemstonex Fountains, where artistry in stone brings movement, life, and timeless beauty.",
+  },
+  {
+    name: "STONE WALL PANELS",
+    video: "videos/C6.mp4",
+    desc: "Statement wall claddings in marble that elevate interiors with depth and texture.",
+  },
+  {
+    name: "ART / CRAFT / HANDICRAFT",
+    video: "videos/C9.mp4",
+    desc: "Handcrafted marble artefacts that showcase intricate workmanship.",
+  },
+  {
+    name: "MOSQUE WORKS",
+    video: "videos/C3.mp4",
+    desc: "Sacred mosque elements crafted in premium marble with uncompromising quality.",
+  },
+  {
+    name: "WASH BASIN",
+    video: "videos/C8.mp4",
+    desc: "Sleek and refined basins carved from premium marble for timeless bathrooms.",
+  },
+  {
+    name: "TABLE TOP",
+    video: "videos/C1.mp4",
+    desc: "Where sophistication meets strength — Meemstonex Counters, crafted to define modern elegance in every space",
+  },
+];
+
 const Features = () => {
   const [subtitle, setSubtitle] = useState("Where Everyday Elegance Meets a World of Interconnected Luxury");
   const [description, setDescription] = useState("Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home");
+  const [orderedTiles, setOrderedTiles] = useState(DEFAULT_TILES);
 
   useEffect(() => {
     let mounted = true;
@@ -147,6 +191,17 @@ const Features = () => {
         if (data?.features) {
           if (data.features.subtitle) setSubtitle(data.features.subtitle);
           if (data.features.description) setDescription(data.features.description);
+          if (Array.isArray(data.features.tilesOrder) && data.features.tilesOrder.length > 0) {
+            const order = data.features.tilesOrder;
+            const sorted = [...DEFAULT_TILES].sort((a, b) => {
+              const idxA = order.indexOf(a.name);
+              const idxB = order.indexOf(b.name);
+              const valA = idxA === -1 ? 999 : idxA;
+              const valB = idxB === -1 ? 999 : idxB;
+              return valA - valB;
+            });
+            setOrderedTiles(sorted);
+          }
         }
       } catch (err) {
         console.error("Failed to load features settings:", err);
@@ -158,53 +213,9 @@ const Features = () => {
     };
   }, []);
 
-  // define tiles in a variable so we can observe them
-  const tiles = [
-    {
-      name: "TABLE TOP",
-      video: "videos/C1.mp4",
-      desc: "Where sophistication meets strength — Meemstonex Counters, crafted to define modern elegance in every space",
-    },
-    {
-      name: "MARBLE TEMPLE",
-      video: "videos/C2.mp4",
-      desc: "Meemstonex Mandirs sacred spaces sculpted in pure marble, embodying devotion, peace, and eternal grace",
-    },
-    {
-      name: "MOSQUE WORKS",
-      video: "videos/C3.mp4",
-      desc: "Sacred mosque elements crafted in premium marble with uncompromising quality.",
-    },
-    {
-      name: "FOUNTAINS",
-      video: "videos/C4.mp4",
-      desc: "Let serenity flow with Meemstonex Fountains, where artistry in stone brings movement, life, and timeless beauty.",
-    },
-    {
-      name: "INLAY WORK",
-      video: "videos/C5.mp4",
-      desc: "Artful stone inlay that blends tradition with precision craftsmanship.",
-    },
-    {
-      name: "STONE WALL PANELS",
-      video: "videos/C6.mp4",
-      desc: "Statement wall claddings in marble that elevate interiors with depth and texture.",
-    },
-    {
-      name: "WASH BASIN",
-      video: "videos/C8.mp4",
-      desc: "Sleek and refined basins carved from premium marble for timeless bathrooms.",
-    },
-    {
-      name: "ART / CRAFT / HANDICRAFT",
-      video: "videos/C9.mp4",
-      desc: "Handcrafted marble artefacts that showcase intricate workmanship.",
-    },
-  ];
-
   const tileRefs = useRef([]);
   const [visible, setVisible] = useState(() =>
-    new Array(tiles.length).fill(false)
+    new Array(DEFAULT_TILES.length).fill(false)
   );
 
   useEffect(() => {
@@ -232,9 +243,7 @@ const Features = () => {
     });
 
     return () => obs.disconnect();
-    // tiles length won't change during runtime in this component
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [orderedTiles]);
 
   return (
     <section className="bg-black pb-20">
@@ -250,7 +259,7 @@ const Features = () => {
 
         {/* Categories grid: show TABLE TOP alongside others as equal tiles on md+ */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-10">
-          {tiles.map((t, index) => {
+          {orderedTiles.map((t, index) => {
             const isVisible = visible[index];
             const fromLeft = index % 2 === 0;
             const baseAnim =

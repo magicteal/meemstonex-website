@@ -4,10 +4,10 @@ import { getCollection } from "../../../../lib/mongodb";
 export async function PUT(req) {
   try {
     const body = await req.json();
-    const { hero, about, ourProcess, features, stats, story, contact } = body || {};
+    const { hero, about, ourProcess, features, stats, story, contact, team } = body || {};
 
-    if (!hero && !about && !ourProcess && !features && !stats && !story && !contact) {
-      return NextResponse.json({ error: "Missing settings payload (hero, about, ourProcess, features, stats, story, or contact)" }, { status: 400 });
+    if (!hero && !about && !ourProcess && !features && !stats && !story && !contact && !team) {
+      return NextResponse.json({ error: "Missing settings payload (hero, about, ourProcess, features, stats, story, contact, or team)" }, { status: 400 });
     }
 
     const updateDoc = {
@@ -58,10 +58,13 @@ export async function PUT(req) {
     }
 
     if (features) {
-      const { subtitle, description } = features;
+      const { subtitle, description, tilesOrder } = features;
       updateDoc.features = {
         subtitle: String(subtitle || "").trim(),
-        description: String(description || "").trim()
+        description: String(description || "").trim(),
+        tilesOrder: Array.isArray(tilesOrder)
+          ? tilesOrder.map((t) => String(t || "").trim()).filter(Boolean)
+          : []
       };
     }
 
@@ -97,6 +100,22 @@ export async function PUT(req) {
         subtitle: String(subtitle || "").trim(),
         title: String(title || "").trim(),
         buttonTitle: String(buttonTitle || "").trim()
+      };
+    }
+
+    if (team) {
+      const { visible, subtitle, title, members } = team;
+      updateDoc.team = {
+        visible: typeof visible === "boolean" ? visible : true,
+        subtitle: String(subtitle || "").trim(),
+        title: String(title || "").trim(),
+        members: Array.isArray(members)
+          ? members.map((m) => ({
+              name: String(m?.name || "").trim(),
+              position: String(m?.position || "").trim(),
+              photo: String(m?.photo || "").trim()
+            })).filter(m => m.name || m.position || m.photo)
+          : []
       };
     }
 

@@ -64,25 +64,25 @@ export async function GET() {
         buttonTitle: "Explore Products",
         buttonLink: "/products",
         videos: [
-          "/videos/hero-1.mp4",
-          "/videos/hero-2.mp4",
-          "/videos/hero-3.mp4",
-          "/videos/hero-4.mp4",
-          "/videos/hero-2.mp4"
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-1.mp4",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-2.mp4",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-3.mp4",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-4.mp4",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-2.mp4"
         ]
       },
       about: {
-        imageUrl: "/img/sub-hero.png",
+        imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/sub-hero.webp",
         title: "Disc<b>o</b>ver the world of <br /> W<b>o</b>rld with Meemstonex",
         subtext: "Welcome to Meemstonex",
         trailImages: [
-          "/products/P1.jpg",
-          "/products/P2.jpg",
-          "/products/P3.jpg",
-          "/products/P4.jpg",
-          "/products/P5.jpg",
-          "/products/P6.jpg",
-          "/products/P7.jpg"
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P1.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P2.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P3.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P4.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P5.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P6.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P7.webp"
         ]
       },
       ourProcess: {
@@ -99,10 +99,20 @@ export async function GET() {
       },
       features: {
         subtitle: "Where Everyday Elegance Meets a World of Interconnected Luxury",
-        description: "Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home"
+        description: "Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home",
+        tilesOrder: [
+          "MARBLE TEMPLE",
+          "INLAY WORK",
+          "FOUNTAINS",
+          "STONE WALL PANELS",
+          "ART / CRAFT / HANDICRAFT",
+          "MOSQUE WORKS",
+          "WASH BASIN",
+          "TABLE TOP"
+        ]
       },
       stats: {
-        imageUrl: "/img/numbersBG.jpg",
+        imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/numbersBG.webp",
         subtitle: "Completed Custom Projects",
         title: "COMPLETED CUSTOM PROJECTS",
         items: [
@@ -118,10 +128,22 @@ export async function GET() {
         buttonTitle: "discover products"
       },
       contact: {
-        imageUrl: "/img/abdul.jpg",
+        imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/abdul.webp",
         subtitle: "Contact Meemstonex",
         title: "Let's b<b>u</b>ild the <br /> new e<b>r</b>a of <br /> ma<b>r</b>bles toge<b>t</b>her",
         buttonTitle: "contact us"
+      },
+      team: {
+        visible: true,
+        subtitle: "The Minds Behind the Craft",
+        title: "MEET THE TEAM",
+        members: [
+          {
+            name: "Abdul",
+            position: "Founder & Master Carver",
+            photo: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/abdul.webp"
+          }
+        ]
       }
     };
 
@@ -158,6 +180,10 @@ export async function GET() {
       contact: {
         ...defaults.contact,
         ...(doc.contact || {})
+      },
+      team: {
+        ...defaults.team,
+        ...(doc.team || {})
       }
     };
 
@@ -169,6 +195,9 @@ export async function GET() {
     }
     if (merged.contact && merged.contact.title) {
       merged.contact.title = ensureBoldTags(merged.contact.title);
+    }
+    if (merged.team && merged.team.title) {
+      merged.team.title = ensureBoldTags(merged.team.title);
     }
 
     return NextResponse.json(merged);
@@ -182,25 +211,25 @@ export async function GET() {
         buttonTitle: "Explore Products",
         buttonLink: "/products",
         videos: [
-          "/videos/hero-1.mp4",
-          "/videos/hero-2.mp4",
-          "/videos/hero-3.mp4",
-          "/videos/hero-4.mp4",
-          "/videos/hero-2.mp4"
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-1.mp4",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-2.mp4",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-3.mp4",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-4.mp4",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-2.mp4"
         ]
       },
       about: {
-        imageUrl: "/img/sub-hero.png",
+        imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/sub-hero.webp",
         title: "Disc<b>o</b>ver the world of <br /> W<b>o</b>rld with Meemstonex",
         subtext: "Welcome to Meemstonex",
         trailImages: [
-          "/products/P1.jpg",
-          "/products/P2.jpg",
-          "/products/P3.jpg",
-          "/products/P4.jpg",
-          "/products/P5.jpg",
-          "/products/P6.jpg",
-          "/products/P7.jpg"
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P1.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P2.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P3.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P4.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P5.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P6.webp",
+          "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P7.webp"
         ]
       },
       ourProcess: {
@@ -217,10 +246,20 @@ export async function GET() {
       },
       features: {
         subtitle: "Where Everyday Elegance Meets a World of Interconnected Luxury",
-        description: "Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home"
+        description: "Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home",
+        tilesOrder: [
+          "MARBLE TEMPLE",
+          "INLAY WORK",
+          "FOUNTAINS",
+          "STONE WALL PANELS",
+          "ART / CRAFT / HANDICRAFT",
+          "MOSQUE WORKS",
+          "WASH BASIN",
+          "TABLE TOP"
+        ]
       },
       stats: {
-        imageUrl: "/img/numbersBG.jpg",
+        imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/numbersBG.webp",
         subtitle: "Completed Custom Projects",
         title: "COMPLETED CUSTOM PROJECTS",
         items: [
@@ -236,10 +275,22 @@ export async function GET() {
         buttonTitle: "discover products"
       },
       contact: {
-        imageUrl: "/img/abdul.jpg",
+        imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/abdul.webp",
         subtitle: "Contact Meemstonex",
         title: "Let's b<b>u</b>ild the <br /> new e<b>r</b>a of <br /> ma<b>r</b>bles toge<b>t</b>her",
         buttonTitle: "contact us"
+      },
+      team: {
+        visible: true,
+        subtitle: "The Minds Behind the Craft",
+        title: "MEET THE TEAM",
+        members: [
+          {
+            name: "Abdul",
+            position: "Founder & Master Carver",
+            photo: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/abdul.webp"
+          }
+        ]
       }
     });
   }

@@ -7,7 +7,7 @@ import { motion, useInView } from "framer-motion";
 import { getHomepageSettings } from "../services/api";
 
 export default function Stats() {
-  const [imageUrl, setImageUrl] = useState("/img/numbersBG.jpg");
+  const [imageUrl, setImageUrl] = useState("https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/numbersBG.webp");
   const [subtitle, setSubtitle] = useState("Completed Custom Projects");
   const [title, setTitle] = useState("COMPLETED CUSTOM PROJECTS");
   const [items, setItems] = useState([

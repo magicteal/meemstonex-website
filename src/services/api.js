@@ -167,17 +167,42 @@ export async function resetAllCategories() {
   return res.json();
 }
 
+let homepageSettingsPromise = null;
+let homepageSettingsCache = null;
+let homepageSettingsCacheTime = 0;
+const CACHE_TTL = 5000; // Cache settings for 5 seconds to deduplicate parallel requests
+
 export async function getHomepageSettings() {
   if (USE_MOCK) return mockGetHomepageSettings();
-  try {
-    const res = await fetch(`/api/homepage`, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to load settings (${res.status})`);
-    return res.json();
-  } catch (e) {
-    if (!USE_MOCK) throw e;
-    return mockGetHomepageSettings();
+
+  const now = Date.now();
+  if (homepageSettingsCache && (now - homepageSettingsCacheTime < CACHE_TTL)) {
+    return homepageSettingsCache;
   }
+
+  if (homepageSettingsPromise) {
+    return homepageSettingsPromise;
+  }
+
+  homepageSettingsPromise = (async () => {
+    try {
+      const res = await fetch(`/api/homepage`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Failed to load settings (${res.status})`);
+      const data = await res.json();
+      homepageSettingsCache = data;
+      homepageSettingsCacheTime = Date.now();
+      return data;
+    } catch (e) {
+      if (!USE_MOCK) throw e;
+      return mockGetHomepageSettings();
+    } finally {
+      homepageSettingsPromise = null;
+    }
+  })();
+
+  return homepageSettingsPromise;
 }
+
 
 export async function updateHomepageSettings(settings) {
   if (USE_MOCK) return mockUpdateHomepageSettings(settings);

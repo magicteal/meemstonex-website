@@ -2,46 +2,32 @@
 import React from "react";
 import dynamic from "next/dynamic";
 
-const Navbar = dynamic(() => import("./Navbar"), {
-  ssr: false,
-  loading: () => <div className="h-16" />,
-});
-const Hero = dynamic(() => import("./Hero"), {
-  ssr: false,
-  loading: () => <div className="h-96 bg-gray-50" />,
-});
-const About = dynamic(() => import("./About"), {
-  ssr: false,
-  loading: () => <div className="h-80" />,
-});
+import Navbar from "./Navbar";
+import Hero from "./Hero";
+import About from "./About";
+import Footer from "./Footer";
+
 const OurProcess = dynamic(() => import("./OurProcess"), {
-  ssr: false,
   loading: () => <div className="h-96" />,
 });
 const CoverFlowCarousel = dynamic(() => import("./CoverFlowCarousel"), {
-  ssr: false,
   loading: () => <div className="h-80" />,
 });
 const Features = dynamic(() => import("./Features"), {
-  ssr: false,
   loading: () => <div className="h-96" />,
 });
 
 const Stats = dynamic(() => import("./Stats"), {
-  ssr: false,
   loading: () => <div className="h-48" />,
 });
 const Story = dynamic(() => import("./Story"), {
-  ssr: false,
   loading: () => <div className="h-72" />,
 });
-const Contact = dynamic(() => import("./Contact"), {
-  ssr: false,
+const Team = dynamic(() => import("./Team"), {
   loading: () => <div className="h-48" />,
 });
-const Footer = dynamic(() => import("./Footer"), {
-  ssr: false,
-  loading: () => <div className="h-24" />,
+const Contact = dynamic(() => import("./Contact"), {
+  loading: () => <div className="h-48" />,
 });
 
 export default function HomeClient() {
@@ -56,8 +42,10 @@ export default function HomeClient() {
 
       <Stats />
       <Story />
+      <Team />
       <Contact />
       <Footer />
     </div>
   );
 }
+

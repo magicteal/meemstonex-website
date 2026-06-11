@@ -7,8 +7,8 @@ import { FaWhatsapp } from "react-icons/fa";
  * Reads NEXT_PUBLIC_WHATSAPP_NUMBER and optional NEXT_PUBLIC_WHATSAPP_MESSAGE
  */
 export default function WhatsAppFloating() {
-  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919214597877";
-  const defaultMsg = "Hello Meemstonex, I would like to know more.";
+  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918302997877";
+  const defaultMsg = "Whatsapp enquiry me";
   const message = process.env.NEXT_PUBLIC_WHATSAPP_MESSAGE || defaultMsg;
   const href = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 

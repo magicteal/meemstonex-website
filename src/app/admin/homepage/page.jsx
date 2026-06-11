@@ -4,6 +4,17 @@ import React, { useEffect, useState } from "react";
 import { getHomepageSettings, updateHomepageSettings, mockUpload } from "../../../services/api";
 import { useToast } from "../../../components/products/ToastProvider";
 
+const ALL_CATEGORIES = [
+  "MARBLE TEMPLE",
+  "INLAY WORK",
+  "FOUNTAINS",
+  "STONE WALL PANELS",
+  "ART / CRAFT / HANDICRAFT",
+  "MOSQUE WORKS",
+  "WASH BASIN",
+  "TABLE TOP"
+];
+
 export default function HomepageCMSEditor() {
   const [heading, setHeading] = useState("");
   const [paragraph, setParagraph] = useState("");
@@ -30,6 +41,7 @@ export default function HomepageCMSEditor() {
   // Features CMS States
   const [featuresSubtitle, setFeaturesSubtitle] = useState("");
   const [featuresDescription, setFeaturesDescription] = useState("");
+  const [featuresTilesOrder, setFeaturesTilesOrder] = useState(ALL_CATEGORIES);
 
   // Stats CMS States
   const [statsImageUrl, setStatsImageUrl] = useState("");
@@ -58,6 +70,15 @@ export default function HomepageCMSEditor() {
   const [contactTitleL3, setContactTitleL3] = useState("");
   const [contactButtonTitle, setContactButtonTitle] = useState("");
   const [uploadingContactImage, setUploadingContactImage] = useState(false);
+
+  // Team CMS States
+  const [teamVisible, setTeamVisible] = useState(true);
+  const [teamSubtitle, setTeamSubtitle] = useState("");
+  const [teamTitleL1, setTeamTitleL1] = useState("");
+  const [teamTitleL2, setTeamTitleL2] = useState("");
+  const [teamTitleL3, setTeamTitleL3] = useState("");
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [uploadingMemberPhoto, setUploadingMemberPhoto] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -114,6 +135,13 @@ export default function HomepageCMSEditor() {
         if (data?.features) {
           setFeaturesSubtitle(data.features.subtitle || "");
           setFeaturesDescription(data.features.description || "");
+          
+          const loadedTilesOrder = data.features.tilesOrder || [];
+          const validatedOrder = [
+            ...loadedTilesOrder.filter(name => ALL_CATEGORIES.includes(name)),
+            ...ALL_CATEGORIES.filter(name => !loadedTilesOrder.includes(name))
+          ];
+          setFeaturesTilesOrder(validatedOrder);
         }
         if (data?.stats) {
           setStatsImageUrl(data.stats.imageUrl || "");
@@ -144,6 +172,17 @@ export default function HomepageCMSEditor() {
           setContactTitleL2(lines[1] || "");
           setContactTitleL3(lines[2] || "");
           setContactButtonTitle(data.contact.buttonTitle || "");
+        }
+        if (data?.team) {
+          setTeamVisible(typeof data.team.visible === "boolean" ? data.team.visible : true);
+          setTeamSubtitle(data.team.subtitle || "");
+          const cleanTitle = (data.team.title || "").replace(/<\/?b>/gi, "");
+          const lines = cleanTitle.split(/<br\s*\/?>/i).map(l => l.trim());
+          setTeamTitleL1(lines[0] || "");
+          setTeamTitleL2(lines[1] || "");
+          setTeamTitleL3(lines[2] || "");
+          setTeamMembers(Array.isArray(data.team.members) ? data.team.members : []);
+          setUploadingMemberPhoto(Array.isArray(data.team.members) ? data.team.members.map(() => false) : []);
         }
       } catch (err) {
         if (mounted) setError(err.message || "Failed to load homepage settings");
@@ -362,6 +401,75 @@ export default function HomepageCMSEditor() {
     }
   };
 
+  const handleMemberPhotoUpload = async (index, file) => {
+    if (!file) return;
+
+    setUploadingMemberPhoto((prev) => {
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
+
+    const toastId = push({
+      title: `Uploading Photo for Member ${index + 1}…`,
+      description: "Optimizing image and saving to S3",
+      duration: 0,
+    });
+
+    try {
+      const uploadedUrl = await mockUpload(file);
+      if (uploadedUrl) {
+        setTeamMembers((prev) => {
+          const next = [...prev];
+          next[index] = { ...next[index], photo: uploadedUrl };
+          return next;
+        });
+        push({
+          title: `Member ${index + 1} photo uploaded`,
+          type: "success",
+        });
+      }
+    } catch (err) {
+      push({
+        title: "Upload failed",
+        description: err.message,
+        type: "error",
+      });
+    } finally {
+      remove(toastId);
+      setUploadingMemberPhoto((prev) => {
+        const next = [...prev];
+        next[index] = false;
+        return next;
+      });
+    }
+  };
+
+  const removeMemberPhotoAt = (index) => {
+    setTeamMembers((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], photo: "" };
+      return next;
+    });
+    push({
+      title: `Member ${index + 1} photo removed`,
+      type: "success",
+    });
+  };
+
+  const addTeamMember = () => {
+    setTeamMembers((prev) => [
+      ...prev,
+      { name: "", position: "", photo: "" }
+    ]);
+    setUploadingMemberPhoto((prev) => [...prev, false]);
+  };
+
+  const removeTeamMember = (index) => {
+    setTeamMembers((prev) => prev.filter((_, i) => i !== index));
+    setUploadingMemberPhoto((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -410,7 +518,8 @@ export default function HomepageCMSEditor() {
         },
         features: {
           subtitle: featuresSubtitle.trim(),
-          description: featuresDescription.trim()
+          description: featuresDescription.trim(),
+          tilesOrder: featuresTilesOrder
         },
         stats: {
           imageUrl: statsImageUrl.trim(),
@@ -432,6 +541,16 @@ export default function HomepageCMSEditor() {
           subtitle: contactSubtitle.trim(),
           title: [contactTitleL1, contactTitleL2, contactTitleL3].map(s => s.trim()).filter(Boolean).join(" <br /> "),
           buttonTitle: contactButtonTitle.trim()
+        },
+        team: {
+          visible: teamVisible,
+          subtitle: teamSubtitle.trim(),
+          title: [teamTitleL1, teamTitleL2, teamTitleL3].map(s => s.trim()).filter(Boolean).join(" <br /> "),
+          members: teamMembers.map(m => ({
+            name: m.name.trim(),
+            position: m.position.trim(),
+            photo: m.photo.trim()
+          }))
         }
       };
       await updateHomepageSettings(payload);
@@ -556,6 +675,17 @@ export default function HomepageCMSEditor() {
           }`}
         >
           Contact
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("team")}
+          className={`flex-1 min-w-[100px] py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer ${
+            activeTab === "team"
+              ? "bg-white text-black shadow-lg"
+              : "text-neutral-400 hover:text-white hover:bg-white/5"
+          }`}
+        >
+          Team
         </button>
       </div>
 
@@ -954,6 +1084,65 @@ export default function HomepageCMSEditor() {
                 />
               </div>
             </div>
+
+            {/* Category Ordering Section */}
+            <div className="border-t border-white/5 pt-6 space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-blue-100">Category Display Order</h3>
+              <p className="text-xs text-neutral-400">
+                Arrange the order of categories displayed in the homepage bento grid. Use the Up (↑) and Down (↓) buttons to move categories.
+              </p>
+              
+              <div className="space-y-2 max-w-xl">
+                {featuresTilesOrder.map((name, index) => (
+                  <div 
+                    key={name} 
+                    className="flex items-center justify-between border border-white/5 rounded-xl p-3 bg-neutral-900/30 hover:border-white/10 transition-all animate-fade-in"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold text-neutral-500 w-5">
+                        {index + 1}
+                      </span>
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">
+                        {name}
+                      </span>
+                    </div>
+                    
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        disabled={index === 0}
+                        onClick={() => {
+                          const nextOrder = [...featuresTilesOrder];
+                          const temp = nextOrder[index];
+                          nextOrder[index] = nextOrder[index - 1];
+                          nextOrder[index - 1] = temp;
+                          setFeaturesTilesOrder(nextOrder);
+                        }}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-white hover:bg-white/10 transition-all border border-white/10 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move Up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        disabled={index === featuresTilesOrder.length - 1}
+                        onClick={() => {
+                          const nextOrder = [...featuresTilesOrder];
+                          const temp = nextOrder[index];
+                          nextOrder[index] = nextOrder[index + 1];
+                          nextOrder[index + 1] = temp;
+                          setFeaturesTilesOrder(nextOrder);
+                        }}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-white hover:bg-white/10 transition-all border border-white/10 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move Down"
+                      >
+                        ↓
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -1285,11 +1474,210 @@ export default function HomepageCMSEditor() {
           </div>
         )}
 
+        {activeTab === "team" && (
+          <div className="space-y-8">
+            {/* Team Settings Card */}
+            <div className="bg-neutral-900/40 border border-white/10 p-6 rounded-[2rem] shadow-[0_0_30px_rgba(0,0,0,0.5)] space-y-6 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <h2 className="text-md font-bold uppercase tracking-wider text-blue-50">Team Section General Settings</h2>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70">Section Visible:</span>
+                  <input
+                    type="checkbox"
+                    checked={teamVisible}
+                    onChange={(e) => setTeamVisible(e.target.checked)}
+                    className="rounded border-white/10 bg-white/5 text-blue-600 focus:ring-0 w-4 h-4 cursor-pointer"
+                  />
+                </label>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label htmlFor="team-subtitle" className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2">
+                    Team Subtitle
+                  </label>
+                  <input
+                    id="team-subtitle"
+                    type="text"
+                    value={teamSubtitle}
+                    onChange={(e) => setTeamSubtitle(e.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  />
+                </div>
+
+                <div className="md:col-span-2 space-y-3">
+                  <label className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70">
+                    Team Section Title (Line by Line)
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label htmlFor="team-title-l1" className="block text-[9px] uppercase text-neutral-500 mb-1">Line 1</label>
+                      <input
+                        id="team-title-l1"
+                        type="text"
+                        value={teamTitleL1}
+                        onChange={(e) => setTeamTitleL1(e.target.value)}
+                        placeholder="e.g. MEET THE"
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="team-title-l2" className="block text-[9px] uppercase text-neutral-500 mb-1">Line 2</label>
+                      <input
+                        id="team-title-l2"
+                        type="text"
+                        value={teamTitleL2}
+                        onChange={(e) => setTeamTitleL2(e.target.value)}
+                        placeholder="e.g. TEAM"
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="team-title-l3" className="block text-[9px] uppercase text-neutral-500 mb-1">Line 3 (Optional)</label>
+                      <input
+                        id="team-title-l3"
+                        type="text"
+                        value={teamTitleL3}
+                        onChange={(e) => setTeamTitleL3(e.target.value)}
+                        placeholder="Optional Line 3"
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Team Members List Card */}
+            <div className="bg-neutral-900/40 border border-white/10 p-6 rounded-[2rem] shadow-[0_0_30px_rgba(0,0,0,0.5)] space-y-6 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <h2 className="text-md font-bold uppercase tracking-wider text-blue-50">Team Members</h2>
+                <button
+                  type="button"
+                  onClick={addTeamMember}
+                  className="rounded-xl border border-blue-500 bg-blue-500/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-blue-200 hover:bg-blue-500 hover:text-white transition-all cursor-pointer shadow-md"
+                >
+                  + Add Member
+                </button>
+              </div>
+
+              {teamMembers.length === 0 ? (
+                <div className="text-center py-10 border-2 border-dashed border-white/10 rounded-2xl bg-black/20">
+                  <p className="text-xs text-neutral-500 uppercase tracking-widest font-bold mb-1">No Team Members Configured</p>
+                  <p className="text-[10px] text-neutral-600">Click the button above to add your first team member.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {teamMembers.map((member, idx) => (
+                    <div key={idx} className="border border-white/10 rounded-3xl p-5 bg-neutral-950/40 space-y-4 shadow-inner relative flex flex-col justify-between">
+                      <button
+                        type="button"
+                        onClick={() => removeTeamMember(idx)}
+                        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-all shadow-md cursor-pointer"
+                        title="Remove Member"
+                      >
+                        ×
+                      </button>
+                      <div className="space-y-4">
+                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest block">Member #{idx + 1}</span>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div className="sm:col-span-1 flex flex-col items-center">
+                            <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-black aspect-square w-24 h-24 flex items-center justify-center mb-2">
+                              {member.photo ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={member.photo}
+                                  alt={`Preview of ${member.name || 'member'}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="text-[9px] text-neutral-600 font-bold uppercase tracking-wider">No Photo</span>
+                              )}
+                            </div>
+                            
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleMemberPhotoUpload(idx, e.target.files?.[0])}
+                              disabled={uploadingMemberPhoto[idx] || saving}
+                              className="hidden"
+                              id={`member-photo-input-${idx}`}
+                            />
+                            <div className="flex gap-1.5 w-full justify-center">
+                              <label
+                                htmlFor={`member-photo-input-${idx}`}
+                                className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[9px] font-bold uppercase tracking-wider cursor-pointer text-center flex-1 transition-all"
+                              >
+                                {uploadingMemberPhoto[idx] ? "Uploading…" : "Upload"}
+                              </label>
+                              {member.photo && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeMemberPhotoAt(idx)}
+                                  className="px-2.5 py-1.5 bg-red-950/20 hover:bg-red-950/40 border border-red-500/20 text-red-400 rounded-lg text-[9px] font-bold uppercase tracking-wider cursor-pointer transition-all"
+                                >
+                                  Remove
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="sm:col-span-2 space-y-3">
+                            <div>
+                              <label htmlFor={`member-name-${idx}`} className="block text-[9px] uppercase font-black tracking-[0.2em] text-neutral-500 mb-1">Name</label>
+                              <input
+                                id={`member-name-${idx}`}
+                                type="text"
+                                value={member.name}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setTeamMembers((prev) => {
+                                    const next = [...prev];
+                                    next[idx] = { ...next[idx], name: val };
+                                    return next;
+                                  });
+                                }}
+                                required
+                                placeholder="e.g. Abdul"
+                                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor={`member-pos-${idx}`} className="block text-[9px] uppercase font-black tracking-[0.2em] text-neutral-500 mb-1">Position / Role</label>
+                              <input
+                                id={`member-pos-${idx}`}
+                                type="text"
+                                value={member.position}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setTeamMembers((prev) => {
+                                    const next = [...prev];
+                                    next[idx] = { ...next[idx], position: val };
+                                    return next;
+                                  });
+                                }}
+                                required
+                                placeholder="e.g. Master Carver"
+                                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Action Button */}
         <div className="flex justify-end pt-4">
           <button
             type="submit"
-            disabled={saving || uploading.some(Boolean) || uploadingAboutImage || uploadingTrail.some(Boolean) || uploadingStatsImage || uploadingContactImage}
+            disabled={saving || uploading.some(Boolean) || uploadingAboutImage || uploadingTrail.some(Boolean) || uploadingStatsImage || uploadingContactImage || uploadingMemberPhoto.some(Boolean)}
             className="rounded-xl bg-white text-black hover:bg-blue-600 hover:text-white transition-all px-6 py-3.5 text-xs font-black uppercase tracking-wider cursor-pointer disabled:opacity-50 shadow-lg"
           >
             {saving ? "Saving Changes…" : "Save Homepage Settings"}

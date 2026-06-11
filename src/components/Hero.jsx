@@ -22,11 +22,11 @@ const Hero = () => {
   const [heroButtonTitle, setHeroButtonTitle] = useState("Explore Products");
   const [heroButtonLink, setHeroButtonLink] = useState("/products");
   const [videos, setVideos] = useState([
-    "/videos/hero-1.mp4",
-    "/videos/hero-2.mp4",
-    "/videos/hero-3.mp4",
-    "/videos/hero-4.mp4",
-    "/videos/hero-2.mp4"
+    "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-1.mp4",
+    "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-2.mp4",
+    "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-3.mp4",
+    "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-4.mp4",
+    "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/videos/hero-2.mp4"
   ]);
 
   const miniVideoRef = useRef(null);

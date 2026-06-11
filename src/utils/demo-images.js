@@ -1,9 +1,9 @@
 export const exampleImages = [
-  { url: "/products/P1.jpg" },
-  { url: "/products/P2.jpg" },
-  { url: "/products/P3.jpg" },
-  { url: "/products/P4.jpg" },
-  { url: "/products/P5.jpg" },
-  { url: "/products/P6.jpg" },
-  { url: "/products/P7.jpg" },
+  { url: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P1.webp" },
+  { url: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P2.webp" },
+  { url: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P3.webp" },
+  { url: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P4.webp" },
+  { url: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P5.webp" },
+  { url: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P6.webp" },
+  { url: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/products/P7.webp" },
 ];

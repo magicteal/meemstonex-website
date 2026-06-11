@@ -8,7 +8,7 @@ import { getHomepageSettings } from "../services/api";
 
 // Simple image section with a black film overlay; text styling retained
 const About = () => {
-  const [imageUrl, setImageUrl] = useState("/img/sub-hero.png");
+  const [imageUrl, setImageUrl] = useState("https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/sub-hero.webp");
   const [title, setTitle] = useState("Disc<b>o</b>ver the world of <br /> W<b>o</b>rld with Meemstonex");
   const [subtext, setSubtext] = useState("Welcome to Meemstonex");
   const [trailImages, setTrailImages] = useState([]);

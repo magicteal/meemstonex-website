@@ -6,7 +6,7 @@ import { getHomepageSettings } from "../services/api";
 
 const Contact = () => {
   const [contactOpen, setContactOpen] = useState(false);
-  const [imageUrl, setImageUrl] = useState("/img/abdul.jpg");
+  const [imageUrl, setImageUrl] = useState("https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/abdul.webp");
   const [subtitle, setSubtitle] = useState("Contact Meemstonex");
   const [title, setTitle] = useState(
     "Let's b<b>u</b>ild the <br /> new e<b>r</b>a of <br /> ma<b>r</b>bles toge<b>t</b>her"
