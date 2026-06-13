@@ -24,16 +24,23 @@ export default function ProductsEditorPage() {
   const newBtnRef = useRef(null);
   const [resettingCats, setResettingCats] = useState(false);
 
-  const load = async () => {
+  const PAGE_SIZE = 100;
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const load = async (targetPage = page) => {
     setLoading(true);
     setError(null);
     try {
       const res = await listProducts({
-        page: 1,
-        pageSize: 100,
+        page: targetPage,
+        pageSize: PAGE_SIZE,
         sort: "name:asc",
       });
       setItems(res.items);
+      setTotal(res.total ?? 0);
+      setPage(targetPage);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -42,7 +49,7 @@ export default function ProductsEditorPage() {
   };
 
   useEffect(() => {
-    load();
+    load(1);
   }, []);
 
   useEffect(() => {
@@ -62,8 +69,8 @@ export default function ProductsEditorPage() {
       duration: 0,
     });
     try {
-      const created = await createProduct(payload);
-      setItems((prev) => [created, ...prev]);
+      await createProduct(payload);
+      await load(page);
       push({ title: "Product created", type: "success" });
       setOpenCreate(false);
     } catch (e) {
@@ -92,15 +99,15 @@ export default function ProductsEditorPage() {
   };
 
   const onDelete = async (id) => {
-    let deleted;
     try {
-      deleted = await deleteProduct(id);
+      await deleteProduct(id);
     } catch (e) {
       push({ title: "Delete failed", description: e.message, type: "error" });
       return;
     }
 
-    setItems((prev) => prev.filter((p) => p.id !== id));
+    const targetPage = items.length === 1 && page > 1 ? page - 1 : page;
+    await load(targetPage);
     push({
       title: "Product deleted",
       description: "Item has been successfully removed",
@@ -235,7 +242,7 @@ export default function ProductsEditorPage() {
                   exit={{ opacity: 0, y: 4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                 >
-                  <td className="px-5 py-4 font-mono text-neutral-500">{String(index + 1).padStart(2, "0")}</td>
+                  <td className="px-5 py-4 font-mono text-neutral-500">{String((page - 1) * PAGE_SIZE + index + 1).padStart(2, "0")}</td>
                   <td className="px-5 py-4">
                     <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-white/10 bg-black">
                       <Image
@@ -288,6 +295,30 @@ export default function ProductsEditorPage() {
           <p className="p-8 text-sm text-neutral-500 uppercase tracking-widest text-center font-robert-regular">No products in inventory.</p>
         )}
       </div>
+
+      {!loading && total > 0 && (
+        <div className="mt-4 flex items-center justify-between gap-4 flex-wrap text-xs">
+          <p className="text-neutral-500 uppercase tracking-wider font-bold">
+            Page {page} of {totalPages} &middot; {total} products
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => load(page - 1)}
+              disabled={page <= 1}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold uppercase hover:bg-white/10 text-white cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => load(page + 1)}
+              disabled={page >= totalPages}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold uppercase hover:bg-white/10 text-white cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       <Modal
         open={openCreate}
