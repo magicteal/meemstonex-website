@@ -29,7 +29,7 @@ html,
 :root,
 body,
 #__next {
-  /* overflow-x removed */
+  overflow-x: hidden;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -47,7 +47,7 @@ body,
 }
 
 body {
-  width: 100dvw;
+  width: 100%;
   background-color: #dfdff0;
   font-family: var(--font-general), sans-serif;
 }
@@ -221,8 +221,8 @@ html.dark .nav-hover-btn::after {
   gap: 0.25rem; /* gap-1 */
   text-transform: uppercase;
   color: #fff;
-  font-size: 4.5rem; /* text-7xl */
-  line-height: 0.8;
+  font-size: 3rem; /* text-5xl */
+  line-height: 0.9;
   padding-left: 0;
   padding-right: 0;
 }
@@ -234,7 +234,12 @@ html.dark .nav-hover-btn::after {
 }
 @media (min-width: 768px) {
   .animated-title {
-    font-size: 6rem;
+    font-size: 4.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .animated-title {
+    font-size: 5rem;
   }
 }
 

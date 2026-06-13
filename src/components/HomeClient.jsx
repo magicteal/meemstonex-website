@@ -26,13 +26,16 @@ const Story = dynamic(() => import("./Story"), {
 const Team = dynamic(() => import("./Team"), {
   loading: () => <div className="h-48" />,
 });
+const Testimonials = dynamic(() => import("./Testimonials"), {
+  loading: () => <div className="h-48" />,
+});
 const Contact = dynamic(() => import("./Contact"), {
   loading: () => <div className="h-48" />,
 });
 
 export default function HomeClient() {
   return (
-    <div className="relative min-h-screen w-screen overflow-x-hidden">
+    <div className="relative min-h-screen w-full overflow-x-hidden">
       <Navbar />
       <Hero />
       <About />
@@ -43,6 +46,7 @@ export default function HomeClient() {
       <Stats />
       <Story />
       <Team />
+      <Testimonials />
       <Contact />
       <Footer />
     </div>

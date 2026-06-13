@@ -10,6 +10,7 @@
  */
 
 import { v4 as uuidv4 } from "uuid";
+import { rawCategories } from "../lib/categories";
 
 const STORAGE_KEY = "mock_products_v1";
 const STORAGE_CATS_KEY = "mock_categories_v1";
@@ -79,77 +80,7 @@ function withoutPrice(item) {
   return rest;
 }
 
-// Seed data
-const seedCategories = [
-  "Accessories",
-  "Apparel",
-  "Electronics",
-  "Home",
-  "Outdoor",
-  "Sports",
-  "Office",
-];
-
-const samplePhotos = [
-  "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1526178611754-5403e6f7e859?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1517059224940-d4af9eec41e5?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1514328355161-9f2e1e233b76?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop",
-];
-
-function seedProducts() {
-  const names = [
-    "Aurora Headphones",
-    "Nimbus Hoodie",
-    "Cascade Backpack",
-    "Lumen Desk Lamp",
-    "Pulse Smartwatch",
-    "Summit Water Bottle",
-    "Voyager Sunglasses",
-    "Harbor Mug",
-    "Breeze T-Shirt",
-    "Echo Bluetooth Speaker",
-    "Orbit Mouse",
-    "Trek Running Shoes",
-  ];
-  const categories = [
-    ["Electronics", "Accessories"],
-    ["Apparel"],
-    ["Outdoor", "Sports"],
-    ["Home", "Office"],
-    ["Electronics"],
-    ["Sports", "Outdoor"],
-    ["Accessories"],
-    ["Home"],
-    ["Apparel"],
-    ["Electronics"],
-    ["Electronics", "Office"],
-    ["Sports", "Apparel"],
-  ];
-
-  return names.map((name, i) => ({
-    id: uuidv4(),
-    name,
-    categories: categories[i],
-    photos: [
-      samplePhotos[i % samplePhotos.length],
-      samplePhotos[(i + 1) % samplePhotos.length],
-      samplePhotos[(i + 2) % samplePhotos.length],
-    ],
-    photo: samplePhotos[i % samplePhotos.length],
-    description:
-      "High-quality product designed for everyday use. Durable materials, modern aesthetic, and great performance.",
-    featured: false,
-  }));
-}
-
-let DB = { items: seedProducts(), categories: [...seedCategories] };
+let DB = { items: [], categories: [...rawCategories] };
 const persisted = loadState();
 if (persisted && Array.isArray(persisted.items) && persisted.items.length) {
   DB = {
@@ -409,6 +340,12 @@ const defaultSettings = {
     subtitle: "Contact Meemstonex",
     title: "Let's b<b>u</b>ild the <br /> new e<b>r</b>a of <br /> ma<b>r</b>bles toge<b>t</b>her",
     buttonTitle: "contact us"
+  },
+  testimonials: {
+    visible: false,
+    subtitle: "What Our Clients Say",
+    title: "TESTIMONIALS",
+    items: []
   }
 };
 

@@ -76,34 +76,34 @@ export default function ExpandableCardDemo({ items = [] }) {
         ctaText: "View",
         ctaLink: "#",
         content: () => (
-          <div className="space-y-8">
-            <p className="text-white/80 text-lg leading-relaxed font-robert-regular">
+          <div className="space-y-3 sm:space-y-8">
+            <p className="text-white/80 text-sm sm:text-lg leading-snug sm:leading-relaxed font-robert-regular">
               {p.description}
             </p>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+
+            <div className="grid grid-cols-2 gap-x-4 sm:gap-x-12 gap-y-3 sm:gap-y-6">
               {[
                 { label: "Dimensions", value: `${(p.size_feet || "N/A")} / ${(p.size_inches || "N/A")}` },
                 { label: "Material", value: p.material || "100% Natural Marble" },
                 { label: "Customization", value: p.customization || "Available" },
                 { label: "Services", value: p.service || "End to End Facility" }
               ].map((spec, i) => (
-                <div key={i} className="group/spec flex flex-col gap-1 border-b border-white/5 pb-4 transition-colors hover:border-blue-500/30">
+                <div key={i} className="group/spec flex flex-col gap-1 border-b border-white/5 pb-2 sm:pb-4 transition-colors hover:border-blue-500/30">
                   <span className="text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70">
                     {spec.label}
                   </span>
-                  <span className="text-white/90 text-sm font-bold uppercase tracking-wide font-general">
+                  <span className="text-white/90 text-xs sm:text-sm font-bold uppercase tracking-wide font-general">
                     {spec.value}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-2 pt-4">
+            <div className="flex flex-wrap gap-2 pt-1 sm:pt-4">
               {(p.categories || []).map((c) => (
                 <span
                   key={c}
-                  className="rounded-full bg-white/5 border border-white/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white/50 backdrop-blur-sm transition-all hover:bg-blue-600/20 hover:text-white hover:border-blue-500/50"
+                  className="rounded-full bg-white/5 border border-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] font-black uppercase tracking-widest text-white/50 backdrop-blur-sm transition-all hover:bg-blue-600/20 hover:text-white hover:border-blue-500/50"
                 >
                   # {c}
                 </span>
@@ -132,14 +132,14 @@ export default function ExpandableCardDemo({ items = [] }) {
       </AnimatePresence>
       <AnimatePresence>
         {active && typeof active === "object" ? (
-          <div className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto p-4 sm:p-8">
+          <div className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto p-0 sm:p-2">
             <motion.div
               layoutId={`card-${keyOf(active)}-${id}`}
               ref={ref}
-              className="w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row bg-black/80 backdrop-blur-3xl rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/10"
+              className="w-full h-[100dvh] sm:h-auto sm:max-h-[96vh] max-w-4xl flex flex-col md:flex-row bg-black/80 backdrop-blur-3xl rounded-none sm:rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/10"
             >
               {/* Image Section (Left on md+) */}
-              <div className="relative w-full md:w-1/2 h-64 md:h-auto overflow-hidden bg-neutral-900">
+              <div className="relative w-full md:w-1/2 aspect-square sm:h-64 md:h-auto md:aspect-auto overflow-hidden bg-neutral-900 shrink-0">
                 <motion.div layoutId={`image-${keyOf(active)}-${id}`} className="h-full w-full">
                   <Image
                     width={1000}
@@ -192,7 +192,7 @@ export default function ExpandableCardDemo({ items = [] }) {
                   layout
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="absolute top-6 left-6 z-50 flex items-center justify-center bg-black/40 hover:bg-red-500/80 backdrop-blur-xl text-white rounded-full h-10 w-10 transition-colors shadow-lg border border-white/10"
+                  className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50 flex items-center justify-center bg-black/40 hover:bg-red-500/80 backdrop-blur-xl text-white rounded-full h-9 w-9 sm:h-10 sm:w-10 transition-colors shadow-lg border border-white/10"
                   onClick={() => setActive(null)}
                 >
                   <CloseIcon />
@@ -200,12 +200,12 @@ export default function ExpandableCardDemo({ items = [] }) {
               </div>
 
               {/* Content Section (Right on md+) */}
-              <div className="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar">
-                <div className="flex flex-col gap-6 p-8 md:p-12">
-                  <div className="space-y-4">
+              <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+                <div className="flex flex-col gap-3 sm:gap-6 p-4 sm:p-8 md:p-12">
+                  <div className="space-y-2 sm:space-y-4">
                     <motion.h3
                       layoutId={`title-${keyOf(active)}-${id}`}
-                      className="font-black text-white text-4xl md:text-6xl uppercase tracking-tighter special-font leading-tight"
+                      className="font-black text-white text-2xl sm:text-4xl md:text-6xl uppercase tracking-tighter special-font leading-tight"
                     >
                       {active.title}
                     </motion.h3>
@@ -218,8 +218,8 @@ export default function ExpandableCardDemo({ items = [] }) {
                     </div>
                   </div>
 
-                  <div className="px-8 pb-12">
-                    <div className="text-white/70 text-base leading-relaxed font-robert-regular border-t border-white/10 pt-8">
+                  <div className="sm:px-8 pb-2 sm:pb-12">
+                    <div className="text-white/70 text-base leading-relaxed font-robert-regular border-t border-white/10 pt-3 sm:pt-8">
                       {typeof active.content === "function"
                         ? active.content()
                         : active.content}
@@ -230,7 +230,7 @@ export default function ExpandableCardDemo({ items = [] }) {
                     layoutId={`button-${keyOf(active)}-${id}`}
                     href={`https://wa.me/918302997877?text=Whatsapp%20enquiry%20me.%20I%20am%20interested%20in%20${encodeURIComponent(active.title || "")}`}
                     target="_blank"
-                    className="group/btn w-full flex items-center justify-center gap-3 px-8 py-5 text-[10px] tracking-[0.3em] uppercase rounded-full font-black bg-white text-black hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-[0_20px_40px_rgba(0,0,0,0.3)] mt-4"
+                    className="group/btn w-full flex items-center justify-center gap-3 px-8 py-3 sm:py-5 text-[10px] tracking-[0.3em] uppercase rounded-full font-black bg-white text-black hover:bg-blue-600 hover:text-white transition-all duration-500 shadow-[0_20px_40px_rgba(0,0,0,0.3)] mt-1 sm:mt-4"
                   >
                     <span>Whatsapp enquiry me</span>
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="transition-transform group-hover/btn:translate-x-1">

@@ -108,7 +108,7 @@ const LazyVideo = ({ src, className = "", ...rest }) => {
 
 const BentoCard = ({ src, title, description, href, label }) => {
   return (
-    <div className="relative w-full h-48 md:h-[55vh] overflow-hidden rounded-md transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105 z-20 group-hover:z-40 bg-black">
+    <div className="relative w-full h-48 md:h-auto md:aspect-square overflow-hidden rounded-md transition-transform duration-300 ease-out will-change-transform transform-gpu group-hover:scale-105 z-20 group-hover:z-40 bg-black">
       <LazyVideo
         src={src}
         className="absolute inset-0 size-full object-cover object-center"
@@ -258,7 +258,7 @@ const Features = () => {
         </div>
 
         {/* Categories grid: show TABLE TOP alongside others as equal tiles on md+ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
           {orderedTiles.map((t, index) => {
             const isVisible = visible[index];
             const fromLeft = index % 2 === 0;
@@ -289,7 +289,7 @@ const Features = () => {
           })}
 
           {/* More coming soon tile */}
-          <div className="group bento-tilt md:col-span-2">
+          <div className="group bento-tilt md:col-span-3">
             <BentoTilt>
               <div className="relative flex h-40 w-full rounded-md bg-violet-300 p-5 md:h-[30vh] overflow-hidden transition-transform duration-300 transform-gpu group-hover:scale-105">
                 {/* Black film overlay */}

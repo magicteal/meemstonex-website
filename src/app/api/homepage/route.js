@@ -144,6 +144,12 @@ export async function GET() {
             photo: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/abdul.webp"
           }
         ]
+      },
+      testimonials: {
+        visible: false,
+        subtitle: "What Our Clients Say",
+        title: "TESTIMONIALS",
+        items: []
       }
     };
 
@@ -184,6 +190,10 @@ export async function GET() {
       team: {
         ...defaults.team,
         ...(doc.team || {})
+      },
+      testimonials: {
+        ...defaults.testimonials,
+        ...(doc.testimonials || {})
       }
     };
 
@@ -291,6 +301,12 @@ export async function GET() {
             photo: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/abdul.webp"
           }
         ]
+      },
+      testimonials: {
+        visible: false,
+        subtitle: "What Our Clients Say",
+        title: "TESTIMONIALS",
+        items: []
       }
     });
   }

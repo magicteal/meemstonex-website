@@ -4,10 +4,10 @@ import { getCollection } from "../../../../lib/mongodb";
 export async function PUT(req) {
   try {
     const body = await req.json();
-    const { hero, about, ourProcess, features, stats, story, contact, team } = body || {};
+    const { hero, about, ourProcess, features, stats, story, contact, team, testimonials } = body || {};
 
-    if (!hero && !about && !ourProcess && !features && !stats && !story && !contact && !team) {
-      return NextResponse.json({ error: "Missing settings payload (hero, about, ourProcess, features, stats, story, contact, or team)" }, { status: 400 });
+    if (!hero && !about && !ourProcess && !features && !stats && !story && !contact && !team && !testimonials) {
+      return NextResponse.json({ error: "Missing settings payload (hero, about, ourProcess, features, stats, story, contact, team, or testimonials)" }, { status: 400 });
     }
 
     const updateDoc = {
@@ -115,6 +115,22 @@ export async function PUT(req) {
               position: String(m?.position || "").trim(),
               photo: String(m?.photo || "").trim()
             })).filter(m => m.name || m.position || m.photo)
+          : []
+      };
+    }
+
+    if (testimonials) {
+      const { visible, subtitle, title, items } = testimonials;
+      updateDoc.testimonials = {
+        visible: typeof visible === "boolean" ? visible : false,
+        subtitle: String(subtitle || "").trim(),
+        title: String(title || "").trim(),
+        items: Array.isArray(items)
+          ? items.map((t) => ({
+              name: String(t?.name || "").trim(),
+              role: String(t?.role || "").trim(),
+              video: String(t?.video || "").trim()
+            })).filter(t => t.video).slice(0, 15)
           : []
       };
     }

@@ -14,6 +14,7 @@ const Navbar = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [contactOpen, setContactOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const navContainerRef = useRef(null);
   const audioElementRef = useRef(null);
@@ -23,6 +24,10 @@ const Navbar = () => {
   const isProductsPage = pathname.startsWith("/products");
   const isHome = pathname === "/" || pathname === "";
   const t = useTranslation();
+
+  // avoid hydration mismatch from scroll-dependent styles (browser restores
+  // scroll position before React hydrates)
+  useEffect(() => { setMounted(true); }, []);
 
   // close mobile menu on route change
   useEffect(() => { setMobileOpen(false); }, [pathname]);
@@ -68,7 +73,7 @@ const Navbar = () => {
   }, [isAudioPlaying]);
 
   // nav text colour based on page + scroll state
-  const hasScrolled = currentScrollY > 0;
+  const hasScrolled = mounted && currentScrollY > 0;
   const isDarkThemePage = isProductsPage || pathname.startsWith("/categories");
   const navTextClass = isDarkThemePage
     ? "text-blue-50"
@@ -91,10 +96,10 @@ const Navbar = () => {
       {/* ── Main nav bar ── */}
       <div
         ref={navContainerRef}
-        className="fixed inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6"
+        className="fixed inset-x-4 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6"
       >
         <header className="absolute top-1/2 w-full -translate-y-1/2">
-          <nav className="flex size-full items-center justify-between p-4">
+          <nav className="flex size-full items-center justify-between px-3 sm:px-6 py-4">
             {/* Logo slot */}
             <div className="flex items-center gap-7">
               <Link href="/" aria-label="Home" />
@@ -116,7 +121,7 @@ const Navbar = () => {
 
               {/* Hamburger — mobile only */}
               <button
-                className={`ml-4 md:hidden inline-flex items-center justify-center w-10 h-10 ${navTextClass}`}
+                className={`ml-2 sm:ml-4 md:hidden inline-flex items-center justify-center w-10 h-10 ${navTextClass}`}
                 aria-controls="mobile-menu"
                 aria-expanded={mobileOpen}
                 aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -129,7 +134,7 @@ const Navbar = () => {
               </button>
 
               {/* Audio bars */}
-              <button className="ml-6 flex items-center space-x-0.5" onClick={toggleAudioIndicator} aria-label="Toggle audio">
+              <button className="ml-3 sm:ml-6 flex items-center space-x-0.5" onClick={toggleAudioIndicator} aria-label="Toggle audio">
                 <audio ref={audioElementRef} className="hidden" src="/audio/loop.mp3" loop />
                 {[1, 2, 3, 4].map((bar) => (
                   <div

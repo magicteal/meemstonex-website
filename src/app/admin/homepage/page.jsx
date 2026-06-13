@@ -80,6 +80,13 @@ export default function HomepageCMSEditor() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [uploadingMemberPhoto, setUploadingMemberPhoto] = useState([]);
 
+  // Testimonials CMS States
+  const [testimonialsVisible, setTestimonialsVisible] = useState(false);
+  const [testimonialsSubtitle, setTestimonialsSubtitle] = useState("");
+  const [testimonialsTitle, setTestimonialsTitle] = useState("");
+  const [testimonialsItems, setTestimonialsItems] = useState([]);
+  const [uploadingTestimonialVideo, setUploadingTestimonialVideo] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState([false, false, false, false, false]);
@@ -183,6 +190,13 @@ export default function HomepageCMSEditor() {
           setTeamTitleL3(lines[2] || "");
           setTeamMembers(Array.isArray(data.team.members) ? data.team.members : []);
           setUploadingMemberPhoto(Array.isArray(data.team.members) ? data.team.members.map(() => false) : []);
+        }
+        if (data?.testimonials) {
+          setTestimonialsVisible(typeof data.testimonials.visible === "boolean" ? data.testimonials.visible : false);
+          setTestimonialsSubtitle(data.testimonials.subtitle || "");
+          setTestimonialsTitle(data.testimonials.title || "");
+          setTestimonialsItems(Array.isArray(data.testimonials.items) ? data.testimonials.items : []);
+          setUploadingTestimonialVideo(Array.isArray(data.testimonials.items) ? data.testimonials.items.map(() => false) : []);
         }
       } catch (err) {
         if (mounted) setError(err.message || "Failed to load homepage settings");
@@ -470,6 +484,82 @@ export default function HomepageCMSEditor() {
     setUploadingMemberPhoto((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleTestimonialVideoUpload = async (index, file) => {
+    if (!file) return;
+
+    setUploadingTestimonialVideo((prev) => {
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
+
+    const toastId = push({
+      title: `Uploading Video for Testimonial ${index + 1}…`,
+      description: "Optimizing video and saving to S3",
+      duration: 0,
+    });
+
+    try {
+      const uploadedUrl = await mockUpload(file);
+      if (uploadedUrl) {
+        setTestimonialsItems((prev) => {
+          const next = [...prev];
+          next[index] = { ...next[index], video: uploadedUrl };
+          return next;
+        });
+        push({
+          title: `Testimonial ${index + 1} video uploaded`,
+          type: "success",
+        });
+      }
+    } catch (err) {
+      push({
+        title: "Upload failed",
+        description: err.message,
+        type: "error",
+      });
+    } finally {
+      remove(toastId);
+      setUploadingTestimonialVideo((prev) => {
+        const next = [...prev];
+        next[index] = false;
+        return next;
+      });
+    }
+  };
+
+  const removeTestimonialVideoAt = (index) => {
+    setTestimonialsItems((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], video: "" };
+      return next;
+    });
+    push({
+      title: `Testimonial ${index + 1} video removed`,
+      type: "success",
+    });
+  };
+
+  const addTestimonial = () => {
+    setTestimonialsItems((prev) => {
+      if (prev.length >= 15) {
+        push({
+          title: "Limit reached",
+          description: "You can add up to 15 testimonials",
+          type: "error",
+        });
+        return prev;
+      }
+      return [...prev, { name: "", role: "", video: "" }];
+    });
+    setUploadingTestimonialVideo((prev) => (prev.length >= 15 ? prev : [...prev, false]));
+  };
+
+  const removeTestimonial = (index) => {
+    setTestimonialsItems((prev) => prev.filter((_, i) => i !== index));
+    setUploadingTestimonialVideo((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -550,6 +640,16 @@ export default function HomepageCMSEditor() {
             name: m.name.trim(),
             position: m.position.trim(),
             photo: m.photo.trim()
+          }))
+        },
+        testimonials: {
+          visible: testimonialsVisible,
+          subtitle: testimonialsSubtitle.trim(),
+          title: testimonialsTitle.trim(),
+          items: testimonialsItems.map(t => ({
+            name: (t.name || "").trim(),
+            role: (t.role || "").trim(),
+            video: (t.video || "").trim()
           }))
         }
       };
@@ -686,6 +786,17 @@ export default function HomepageCMSEditor() {
           }`}
         >
           Team
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("testimonials")}
+          className={`flex-1 min-w-[100px] py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer ${
+            activeTab === "testimonials"
+              ? "bg-white text-black shadow-lg"
+              : "text-neutral-400 hover:text-white hover:bg-white/5"
+          }`}
+        >
+          Testimonials
         </button>
       </div>
 
@@ -1673,11 +1784,196 @@ export default function HomepageCMSEditor() {
           </div>
         )}
 
+        {activeTab === "testimonials" && (
+          <div className="space-y-8">
+            {/* Testimonials Settings Card */}
+            <div className="bg-neutral-900/40 border border-white/10 p-6 rounded-[2rem] shadow-[0_0_30px_rgba(0,0,0,0.5)] space-y-6 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <h2 className="text-md font-bold uppercase tracking-wider text-blue-50">Testimonials Section General Settings</h2>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70">Section Visible:</span>
+                  <input
+                    type="checkbox"
+                    checked={testimonialsVisible}
+                    onChange={(e) => setTestimonialsVisible(e.target.checked)}
+                    className="rounded border-white/10 bg-white/5 text-blue-600 focus:ring-0 w-4 h-4 cursor-pointer"
+                  />
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="testimonials-subtitle" className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2">
+                    Testimonials Subtitle
+                  </label>
+                  <input
+                    id="testimonials-subtitle"
+                    type="text"
+                    value={testimonialsSubtitle}
+                    onChange={(e) => setTestimonialsSubtitle(e.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="testimonials-title" className="block text-[10px] uppercase font-black tracking-[0.2em] text-blue-400 opacity-70 mb-2">
+                    Testimonials Title
+                  </label>
+                  <input
+                    id="testimonials-title"
+                    type="text"
+                    value={testimonialsTitle}
+                    onChange={(e) => setTestimonialsTitle(e.target.value)}
+                    placeholder="e.g. TESTIMONIALS"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-blue-200/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonials List Card */}
+            <div className="bg-neutral-900/40 border border-white/10 p-6 rounded-[2rem] shadow-[0_0_30px_rgba(0,0,0,0.5)] space-y-6 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <h2 className="text-md font-bold uppercase tracking-wider text-blue-50">Testimonials</h2>
+                <div className="flex items-center gap-3">
+                  <span className="rounded-full bg-white/5 border border-white/10 px-2.5 py-1 text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+                    {testimonialsItems.length} / 15
+                  </span>
+                  <button
+                    type="button"
+                    onClick={addTestimonial}
+                    disabled={testimonialsItems.length >= 15}
+                    className="rounded-xl border border-blue-500 bg-blue-500/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-blue-200 hover:bg-blue-500 hover:text-white transition-all cursor-pointer shadow-md disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    + Add Testimonial
+                  </button>
+                </div>
+              </div>
+
+              {testimonialsItems.length === 0 ? (
+                <div className="text-center py-10 border-2 border-dashed border-white/10 rounded-2xl bg-black/20">
+                  <p className="text-xs text-neutral-500 uppercase tracking-widest font-bold mb-1">No Testimonials Configured</p>
+                  <p className="text-[10px] text-neutral-600">Click the button above to add your first testimonial.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {testimonialsItems.map((item, idx) => (
+                    <div key={idx} className="border border-white/10 rounded-3xl p-5 bg-neutral-950/40 space-y-4 shadow-inner relative flex flex-col justify-between">
+                      <button
+                        type="button"
+                        onClick={() => removeTestimonial(idx)}
+                        className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-all shadow-md cursor-pointer"
+                        title="Remove Testimonial"
+                      >
+                        ×
+                      </button>
+                      <div className="space-y-4">
+                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest block">Testimonial #{idx + 1}</span>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div className="sm:col-span-1 flex flex-col items-center">
+                            <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[9/16] w-24 flex items-center justify-center mb-2">
+                              {item.video ? (
+                                <video
+                                  src={item.video}
+                                  className="w-full h-full object-cover"
+                                  muted
+                                  loop
+                                  playsInline
+                                  autoPlay
+                                />
+                              ) : (
+                                <span className="text-[9px] text-neutral-600 font-bold uppercase tracking-wider">No Video</span>
+                              )}
+                            </div>
+
+                            <input
+                              type="file"
+                              accept="video/*"
+                              onChange={(e) => handleTestimonialVideoUpload(idx, e.target.files?.[0])}
+                              disabled={uploadingTestimonialVideo[idx] || saving}
+                              className="hidden"
+                              id={`testimonial-video-input-${idx}`}
+                            />
+                            <div className="flex gap-1.5 w-full justify-center">
+                              <label
+                                htmlFor={`testimonial-video-input-${idx}`}
+                                className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[9px] font-bold uppercase tracking-wider cursor-pointer text-center flex-1 transition-all"
+                              >
+                                {uploadingTestimonialVideo[idx] ? "Uploading…" : "Upload"}
+                              </label>
+                              {item.video && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeTestimonialVideoAt(idx)}
+                                  className="px-2.5 py-1.5 bg-red-950/20 hover:bg-red-950/40 border border-red-500/20 text-red-400 rounded-lg text-[9px] font-bold uppercase tracking-wider cursor-pointer transition-all"
+                                >
+                                  Remove
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="sm:col-span-2 space-y-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                <label htmlFor={`testimonial-name-${idx}`} className="block text-[9px] uppercase font-black tracking-[0.2em] text-neutral-500 mb-1">Name</label>
+                                <input
+                                  id={`testimonial-name-${idx}`}
+                                  type="text"
+                                  value={item.name}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setTestimonialsItems((prev) => {
+                                      const next = [...prev];
+                                      next[idx] = { ...next[idx], name: val };
+                                      return next;
+                                    });
+                                  }}
+                                  placeholder="e.g. Rohan Sharma"
+                                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                                />
+                              </div>
+                              <div>
+                                <label htmlFor={`testimonial-role-${idx}`} className="block text-[9px] uppercase font-black tracking-[0.2em] text-neutral-500 mb-1">Role / Location</label>
+                                <input
+                                  id={`testimonial-role-${idx}`}
+                                  type="text"
+                                  value={item.role}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setTestimonialsItems((prev) => {
+                                      const next = [...prev];
+                                      next[idx] = { ...next[idx], role: val };
+                                      return next;
+                                    });
+                                  }}
+                                  placeholder="e.g. Mumbai, Maharashtra"
+                                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                                />
+                              </div>
+                            </div>
+                            {!item.video && (
+                              <p className="text-[10px] text-amber-400/80 font-bold uppercase tracking-wider">
+                                A video is required for this testimonial to appear on the homepage.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Action Button */}
         <div className="flex justify-end pt-4">
           <button
             type="submit"
-            disabled={saving || uploading.some(Boolean) || uploadingAboutImage || uploadingTrail.some(Boolean) || uploadingStatsImage || uploadingContactImage || uploadingMemberPhoto.some(Boolean)}
+            disabled={saving || uploading.some(Boolean) || uploadingAboutImage || uploadingTrail.some(Boolean) || uploadingStatsImage || uploadingContactImage || uploadingMemberPhoto.some(Boolean) || uploadingTestimonialVideo.some(Boolean)}
             className="rounded-xl bg-white text-black hover:bg-blue-600 hover:text-white transition-all px-6 py-3.5 text-xs font-black uppercase tracking-wider cursor-pointer disabled:opacity-50 shadow-lg"
           >
             {saving ? "Saving Changes…" : "Save Homepage Settings"}
