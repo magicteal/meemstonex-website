@@ -22,6 +22,7 @@ const Navbar = () => {
   const { y: currentScrollY } = useWindowScroll();
   const pathname = usePathname?.() || "/";
   const isProductsPage = pathname.startsWith("/products");
+  const isBlogPage = pathname.startsWith("/blog");
   const isHome = pathname === "/" || pathname === "";
   const t = useTranslation();
 
@@ -74,7 +75,7 @@ const Navbar = () => {
 
   // nav text colour based on page + scroll state
   const hasScrolled = mounted && currentScrollY > 0;
-  const isDarkThemePage = isProductsPage || pathname.startsWith("/categories");
+  const isDarkThemePage = isProductsPage || isBlogPage || pathname.startsWith("/categories");
   const navTextClass = isDarkThemePage
     ? "text-blue-50"
     : isHome
@@ -84,11 +85,13 @@ const Navbar = () => {
   const desktopLinks = [
     { label: t("home") || "Home", href: "/" },
     { label: t("products") || "Products", href: "/products" },
+    { label: t("blog") || "Blog", href: "/blog" },
   ];
 
   const mobileLinks = [
     { label: "Home", href: "/" },
     { label: "Products", href: "/products" },
+    { label: "Blog", href: "/blog" },
   ];
 
   return (

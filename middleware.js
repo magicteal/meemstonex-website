@@ -29,10 +29,11 @@ export function middleware(req) {
     return NextResponse.next();
   }
 
-  // Protect mutating endpoints (POST, PUT, DELETE) for products, categories, and uploads
+  // Protect mutating endpoints (POST, PUT, DELETE) for products, categories, blogs, and uploads
   if (
     (pathname.startsWith("/api/products") ||
       pathname.startsWith("/api/categories") ||
+      pathname.startsWith("/api/blogs") ||
       pathname.startsWith("/api/upload")) &&
     ["POST", "PUT", "DELETE"].includes(req.method)
   ) {

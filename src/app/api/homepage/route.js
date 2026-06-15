@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCollection } from "../../../lib/mongodb";
+import { DEFAULT_FEATURE_TILES, mergeFeatureTiles } from "../../../lib/featureTiles";
 
 export const dynamic = "force-dynamic";
 
@@ -109,7 +110,8 @@ export async function GET() {
           "MOSQUE WORKS",
           "WASH BASIN",
           "TABLE TOP"
-        ]
+        ],
+        tiles: DEFAULT_FEATURE_TILES
       },
       stats: {
         imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/numbersBG.webp",
@@ -173,7 +175,8 @@ export async function GET() {
       },
       features: {
         ...defaults.features,
-        ...(doc.features || {})
+        ...(doc.features || {}),
+        tiles: mergeFeatureTiles(doc.features?.tiles)
       },
       stats: {
         ...defaults.stats,
@@ -266,7 +269,8 @@ export async function GET() {
           "MOSQUE WORKS",
           "WASH BASIN",
           "TABLE TOP"
-        ]
+        ],
+        tiles: DEFAULT_FEATURE_TILES
       },
       stats: {
         imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/numbersBG.webp",

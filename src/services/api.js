@@ -167,6 +167,53 @@ export async function resetAllCategories() {
   return res.json();
 }
 
+export async function listBlogs({ page = 1, pageSize = 12 } = {}) {
+  const res = await fetch(`/api/blogs${toQuery({ page, pageSize })}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to list blogs (${res.status})`);
+  return res.json();
+}
+
+export async function getBlogBySlug(slug) {
+  const res = await fetch(`/api/blogs${toQuery({ slug })}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to load blog (${res.status})`);
+  return res.json();
+}
+
+export async function createBlog(payload) {
+  const res = await fetch(`/api/blogs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || `Failed to create blog (${res.status})`);
+  return data;
+}
+
+export async function updateBlog(id, payload) {
+  const res = await fetch(`/api/blogs/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || `Failed to update blog (${res.status})`);
+  return data;
+}
+
+export async function deleteBlog(id) {
+  const res = await fetch(`/api/blogs/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || `Failed to delete blog (${res.status})`);
+  return data;
+}
+
 let homepageSettingsPromise = null;
 let homepageSettingsCache = null;
 let homepageSettingsCacheTime = 0;

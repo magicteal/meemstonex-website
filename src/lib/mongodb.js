@@ -49,6 +49,13 @@ async function ensureIndexes(db) {
         .collection("categories")
         .createIndex({ name: 1 }, { unique: true, name: "name_unique" })
         .catch(() => {}),
+      db
+        .collection("blogs")
+        .createIndexes([
+          { key: { slug: 1 }, name: "slug_unique", unique: true },
+          { key: { createdAt: -1 }, name: "createdAt_desc" },
+        ])
+        .catch(() => {}),
     ]);
   } catch (e) {
     console.warn("Index creation warning:", e?.message || e);

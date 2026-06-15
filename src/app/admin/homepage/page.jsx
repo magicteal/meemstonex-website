@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { getHomepageSettings, updateHomepageSettings, mockUpload } from "../../../services/api";
 import { useToast } from "../../../components/products/ToastProvider";
+import { DEFAULT_FEATURE_TILES, mergeFeatureTiles } from "../../../lib/featureTiles";
 
 const ALL_CATEGORIES = [
   "MARBLE TEMPLE",
@@ -42,6 +43,10 @@ export default function HomepageCMSEditor() {
   const [featuresSubtitle, setFeaturesSubtitle] = useState("");
   const [featuresDescription, setFeaturesDescription] = useState("");
   const [featuresTilesOrder, setFeaturesTilesOrder] = useState(ALL_CATEGORIES);
+  const [featuresTiles, setFeaturesTiles] = useState(DEFAULT_FEATURE_TILES);
+  const [uploadingTileVideo, setUploadingTileVideo] = useState(
+    DEFAULT_FEATURE_TILES.map(() => false)
+  );
 
   // Stats CMS States
   const [statsImageUrl, setStatsImageUrl] = useState("");
@@ -149,6 +154,7 @@ export default function HomepageCMSEditor() {
             ...ALL_CATEGORIES.filter(name => !loadedTilesOrder.includes(name))
           ];
           setFeaturesTilesOrder(validatedOrder);
+          setFeaturesTiles(mergeFeatureTiles(data.features.tiles));
         }
         if (data?.stats) {
           setStatsImageUrl(data.stats.imageUrl || "");
@@ -247,6 +253,50 @@ export default function HomepageCMSEditor() {
     } finally {
       remove(toastId);
       setUploading((prev) => {
+        const next = [...prev];
+        next[index] = false;
+        return next;
+      });
+    }
+  };
+
+  const handleTileVideoUpload = async (index, file) => {
+    if (!file) return;
+
+    setUploadingTileVideo((prev) => {
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
+
+    const toastId = push({
+      title: `Uploading Tile Video ${index + 1}…`,
+      description: "Optimizing video and saving to S3",
+      duration: 0,
+    });
+
+    try {
+      const uploadedUrl = await mockUpload(file);
+      if (uploadedUrl) {
+        setFeaturesTiles((prev) => {
+          const next = [...prev];
+          next[index] = { ...next[index], video: uploadedUrl };
+          return next;
+        });
+        push({
+          title: `Tile ${index + 1} video uploaded`,
+          type: "success",
+        });
+      }
+    } catch (err) {
+      push({
+        title: "Upload failed",
+        description: err.message,
+        type: "error",
+      });
+    } finally {
+      remove(toastId);
+      setUploadingTileVideo((prev) => {
         const next = [...prev];
         next[index] = false;
         return next;
@@ -609,7 +659,13 @@ export default function HomepageCMSEditor() {
         features: {
           subtitle: featuresSubtitle.trim(),
           description: featuresDescription.trim(),
-          tilesOrder: featuresTilesOrder
+          tilesOrder: featuresTilesOrder,
+          tiles: featuresTiles.map(t => ({
+            key: t.key,
+            name: t.name.trim(),
+            video: t.video.trim(),
+            desc: t.desc.trim()
+          }))
         },
         stats: {
           imageUrl: statsImageUrl.trim(),
@@ -1249,6 +1305,97 @@ export default function HomepageCMSEditor() {
                       >
                         ↓
                       </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tile Content Section */}
+            <div className="border-t border-white/5 pt-6 space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-blue-100">Tile Content (Video, Heading &amp; Description)</h3>
+              <p className="text-xs text-neutral-400">
+                Customize the background video, heading, and description shown on each bento grid tile.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {featuresTiles.map((tile, idx) => (
+                  <div key={tile.key} className="border border-white/10 rounded-3xl p-5 bg-neutral-950/40 space-y-4 shadow-inner">
+                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest block">
+                      {tile.key}
+                    </span>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="sm:col-span-1 flex flex-col items-center">
+                        <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-black aspect-square w-full flex items-center justify-center mb-2">
+                          {tile.video ? (
+                            <video
+                              src={tile.video}
+                              className="w-full h-full object-cover"
+                              muted
+                              loop
+                              playsInline
+                              autoPlay
+                            />
+                          ) : (
+                            <span className="text-[9px] text-neutral-600 font-bold uppercase tracking-wider">No Video</span>
+                          )}
+                        </div>
+
+                        <input
+                          type="file"
+                          accept="video/*"
+                          onChange={(e) => handleTileVideoUpload(idx, e.target.files?.[0])}
+                          disabled={uploadingTileVideo[idx] || saving}
+                          className="hidden"
+                          id={`tile-video-input-${idx}`}
+                        />
+                        <label
+                          htmlFor={`tile-video-input-${idx}`}
+                          className="w-full px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[9px] font-bold uppercase tracking-wider cursor-pointer text-center transition-all"
+                        >
+                          {uploadingTileVideo[idx] ? "Uploading…" : "Upload Video"}
+                        </label>
+                      </div>
+
+                      <div className="sm:col-span-2 space-y-3">
+                        <div>
+                          <label htmlFor={`tile-heading-${idx}`} className="block text-[9px] uppercase font-black tracking-[0.2em] text-neutral-500 mb-1">Heading</label>
+                          <input
+                            id={`tile-heading-${idx}`}
+                            type="text"
+                            value={tile.name}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setFeaturesTiles((prev) => {
+                                const next = [...prev];
+                                next[idx] = { ...next[idx], name: val };
+                                return next;
+                              });
+                            }}
+                            required
+                            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor={`tile-desc-${idx}`} className="block text-[9px] uppercase font-black tracking-[0.2em] text-neutral-500 mb-1">Description</label>
+                          <textarea
+                            id={`tile-desc-${idx}`}
+                            value={tile.desc}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setFeaturesTiles((prev) => {
+                                const next = [...prev];
+                                next[idx] = { ...next[idx], desc: val };
+                                return next;
+                              });
+                            }}
+                            required
+                            rows={4}
+                            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}

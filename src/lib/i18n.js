@@ -5,6 +5,7 @@ const translations = {
   en: {
     home: "Home",
     products: "Products",
+    blog: "Blog",
     privacy_policy: "Privacy Policy",
     contact: "Contact us",
     footer_copyright: "© Meemstonex 2025, All rights reserved",
@@ -14,6 +15,7 @@ const translations = {
   hi: {
     home: "होम",
     products: "उत्पाद",
+    blog: "ब्लॉग",
     privacy_policy: "गोपनीयता नीति",
     contact: "संपर्क करें",
     footer_copyright: "© 2025 मीमस्टोनेक्स, सर्वाधिकार सुरक्षित",

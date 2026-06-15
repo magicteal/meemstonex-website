@@ -20,6 +20,7 @@ export default function AdminLayout({ children }) {
   const menuItems = [
     { name: "Products", href: "/admin/products" },
     { name: "Categories", href: "/admin/categories" },
+    { name: "Blogs", href: "/admin/blogs" },
     { name: "Homepage CMS", href: "/admin/homepage" },
   ];
 
