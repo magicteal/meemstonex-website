@@ -3,18 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { getHomepageSettings, updateHomepageSettings, mockUpload } from "../../../services/api";
 import { useToast } from "../../../components/products/ToastProvider";
-import { DEFAULT_FEATURE_TILES, mergeFeatureTiles } from "../../../lib/featureTiles";
-
-const ALL_CATEGORIES = [
-  "MARBLE TEMPLE",
-  "INLAY WORK",
-  "FOUNTAINS",
-  "STONE WALL PANELS",
-  "ART / CRAFT / HANDICRAFT",
-  "MOSQUE WORKS",
-  "WASH BASIN",
-  "TABLE TOP"
-];
 
 export default function HomepageCMSEditor() {
   const [heading, setHeading] = useState("");
@@ -42,11 +30,9 @@ export default function HomepageCMSEditor() {
   // Features CMS States
   const [featuresSubtitle, setFeaturesSubtitle] = useState("");
   const [featuresDescription, setFeaturesDescription] = useState("");
-  const [featuresTilesOrder, setFeaturesTilesOrder] = useState(ALL_CATEGORIES);
-  const [featuresTiles, setFeaturesTiles] = useState(DEFAULT_FEATURE_TILES);
-  const [uploadingTileVideo, setUploadingTileVideo] = useState(
-    DEFAULT_FEATURE_TILES.map(() => false)
-  );
+  const [featuresTilesOrder, setFeaturesTilesOrder] = useState([]);
+  const [featuresTiles, setFeaturesTiles] = useState([]);
+  const [uploadingTileVideo, setUploadingTileVideo] = useState([]);
 
   // Stats CMS States
   const [statsImageUrl, setStatsImageUrl] = useState("");
@@ -147,14 +133,11 @@ export default function HomepageCMSEditor() {
         if (data?.features) {
           setFeaturesSubtitle(data.features.subtitle || "");
           setFeaturesDescription(data.features.description || "");
-          
-          const loadedTilesOrder = data.features.tilesOrder || [];
-          const validatedOrder = [
-            ...loadedTilesOrder.filter(name => ALL_CATEGORIES.includes(name)),
-            ...ALL_CATEGORIES.filter(name => !loadedTilesOrder.includes(name))
-          ];
-          setFeaturesTilesOrder(validatedOrder);
-          setFeaturesTiles(mergeFeatureTiles(data.features.tiles));
+
+          const loadedTiles = Array.isArray(data.features.tiles) ? data.features.tiles : [];
+          setFeaturesTilesOrder(loadedTiles.map((t) => t.key));
+          setFeaturesTiles(loadedTiles);
+          setUploadingTileVideo(loadedTiles.map(() => false));
         }
         if (data?.stats) {
           setStatsImageUrl(data.stats.imageUrl || "");

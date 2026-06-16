@@ -1,8 +1,25 @@
 import { NextResponse } from "next/server";
 import { getCollection } from "../../../lib/mongodb";
-import { DEFAULT_FEATURE_TILES, mergeFeatureTiles } from "../../../lib/featureTiles";
+import {
+  DEFAULT_FEATURE_TILES,
+  buildFeatureTiles,
+  resolveCategoryFeatured,
+} from "../../../lib/featureTiles";
 
 export const dynamic = "force-dynamic";
+
+// Categories marked as "featured" (shown in the homepage Features bento grid),
+// sorted alphabetically as the default display order.
+async function getFeaturedCategoryNames() {
+  const catCol = await getCollection("categories");
+  const docs = await catCol
+    .find({}, { projection: { _id: 0, name: 1, featured: 1 } })
+    .toArray();
+  return (docs || [])
+    .filter((d) => d?.name && resolveCategoryFeatured(d))
+    .map((d) => d.name)
+    .sort((a, b) => a.localeCompare(b));
+}
 
 function ensureBoldTags(text) {
   if (!text) return "";
@@ -57,6 +74,7 @@ export async function GET() {
   try {
     const col = await getCollection("settings");
     const doc = await col.findOne({ _id: "homepage" });
+    const featuredCategoryNames = await getFeaturedCategoryNames();
 
     const defaults = {
       hero: {
@@ -101,17 +119,8 @@ export async function GET() {
       features: {
         subtitle: "Where Everyday Elegance Meets a World of Interconnected Luxury",
         description: "Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home",
-        tilesOrder: [
-          "MARBLE TEMPLE",
-          "INLAY WORK",
-          "FOUNTAINS",
-          "STONE WALL PANELS",
-          "ART / CRAFT / HANDICRAFT",
-          "MOSQUE WORKS",
-          "WASH BASIN",
-          "TABLE TOP"
-        ],
-        tiles: DEFAULT_FEATURE_TILES
+        tilesOrder: featuredCategoryNames,
+        tiles: buildFeatureTiles(featuredCategoryNames, null, featuredCategoryNames)
       },
       stats: {
         imageUrl: "https://meemstonex-bucket.s3.ap-south-1.amazonaws.com/meemstonex-static/img/numbersBG.webp",
@@ -173,11 +182,19 @@ export async function GET() {
         ...defaults.ourProcess,
         ...(doc.ourProcess || {})
       },
-      features: {
-        ...defaults.features,
-        ...(doc.features || {}),
-        tiles: mergeFeatureTiles(doc.features?.tiles)
-      },
+      features: (() => {
+        const tiles = buildFeatureTiles(
+          featuredCategoryNames,
+          doc.features?.tiles,
+          doc.features?.tilesOrder
+        );
+        return {
+          ...defaults.features,
+          ...(doc.features || {}),
+          tilesOrder: tiles.map((t) => t.key),
+          tiles,
+        };
+      })(),
       stats: {
         ...defaults.stats,
         ...(doc.stats || {})

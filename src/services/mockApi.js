@@ -11,9 +11,15 @@
 
 import { v4 as uuidv4 } from "uuid";
 import { rawCategories } from "../lib/categories";
+import { DEFAULT_FEATURE_TILES, buildFeatureTiles } from "../lib/featureTiles";
+
+const LEGACY_FEATURED_CATEGORY_NAMES = new Set(
+  DEFAULT_FEATURE_TILES.map((t) => t.key)
+);
 
 const STORAGE_KEY = "mock_products_v1";
 const STORAGE_CATS_KEY = "mock_categories_v1";
+const STORAGE_CATS_META_KEY = "mock_categories_meta_v1";
 
 const randomDelay = () => 200 + Math.floor(Math.random() * 600);
 // Default simulated network error rate. Can be overridden by
@@ -60,17 +66,28 @@ function loadState() {
   try {
     const items = JSON.parse(ls.getItem(STORAGE_KEY) || "[]");
     const categories = JSON.parse(ls.getItem(STORAGE_CATS_KEY) || "[]");
-    return { items, categories };
+    const categoryMeta = JSON.parse(ls.getItem(STORAGE_CATS_META_KEY) || "{}");
+    return { items, categories, categoryMeta };
   } catch {
     return null;
   }
 }
 
-function saveState(items, categories) {
+function saveState(items, categories, categoryMeta) {
   const ls = getStorage();
   if (!ls) return;
   ls.setItem(STORAGE_KEY, JSON.stringify(items));
   ls.setItem(STORAGE_CATS_KEY, JSON.stringify(categories));
+  ls.setItem(STORAGE_CATS_META_KEY, JSON.stringify(categoryMeta || DB.categoryMeta));
+}
+
+// A category is featured if explicitly set, otherwise default to true only
+// for the original homepage bento categories (mirrors server-side behavior).
+function isCategoryFeatured(name) {
+  if (Object.prototype.hasOwnProperty.call(DB.categoryMeta, name)) {
+    return !!DB.categoryMeta[name];
+  }
+  return LEGACY_FEATURED_CATEGORY_NAMES.has(name);
 }
 
 function withoutPrice(item) {
@@ -80,12 +97,15 @@ function withoutPrice(item) {
   return rest;
 }
 
-let DB = { items: [], categories: [...rawCategories] };
+let DB = { items: [], categories: [...rawCategories], categoryMeta: {} };
 const persisted = loadState();
 if (persisted && Array.isArray(persisted.items) && persisted.items.length) {
   DB = {
     items: persisted.items.map(withoutPrice),
     categories: Array.isArray(persisted.categories) ? persisted.categories : [],
+    categoryMeta: persisted.categoryMeta && typeof persisted.categoryMeta === "object"
+      ? persisted.categoryMeta
+      : {},
   };
 }
 
@@ -212,11 +232,27 @@ export async function listCategories() {
   return withLatency([...DB.categories]);
 }
 
-export async function addCategory(name) {
+export async function listCategoriesFull() {
+  const full = DB.categories
+    .map((name) => ({ name, featured: isCategoryFeatured(name) }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  return withLatency(full);
+}
+
+export async function addCategory(name, featured = false) {
   if (!name) throw new Error("Category name required");
   if (!DB.categories.includes(name)) DB.categories.push(name);
-  saveState(DB.items, DB.categories);
+  DB.categoryMeta[name] = !!featured;
+  saveState(DB.items, DB.categories, DB.categoryMeta);
   return withLatency(name);
+}
+
+export async function setCategoryFeatured(name, featured) {
+  if (!name) throw new Error("Category name required");
+  if (!DB.categories.includes(name)) throw new Error("Category not found");
+  DB.categoryMeta[name] = !!featured;
+  saveState(DB.items, DB.categories, DB.categoryMeta);
+  return withLatency({ ok: true, name, featured: !!featured });
 }
 
 export const mockUpload = async (fileOrUrl) => {
@@ -409,6 +445,21 @@ try {
 
 export async function getHomepageSettings() {
   const copy = JSON.parse(JSON.stringify(mockHomepageSettings));
+
+  const featuredCategoryNames = DB.categories
+    .filter((name) => isCategoryFeatured(name))
+    .sort((a, b) => a.localeCompare(b));
+  const tiles = buildFeatureTiles(
+    featuredCategoryNames,
+    copy.features?.tiles,
+    copy.features?.tilesOrder
+  );
+  copy.features = {
+    ...copy.features,
+    tilesOrder: tiles.map((t) => t.key),
+    tiles,
+  };
+
   if (copy.about && copy.about.title) {
     copy.about.title = ensureBoldTags(copy.about.title);
   }

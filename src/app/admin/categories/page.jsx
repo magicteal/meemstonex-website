@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import {
-  listCategories,
+  listCategoriesFull,
   addCategory,
   renameCategory,
   deleteCategory,
+  setCategoryFeatured,
 } from "../../../services/api";
 import { useToast } from "../../../components/products/ToastProvider";
 import Modal from "../../../components/products/Modal";
@@ -13,21 +14,23 @@ export default function CategoriesEditorPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const [openCreate, setOpenCreate] = useState(false);
   const [newCatName, setNewCatName] = useState("");
-  
+  const [newCatFeatured, setNewCatFeatured] = useState(false);
+
   const [editItem, setEditItem] = useState(null);
   const [editName, setEditName] = useState("");
-  
+
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [togglingFeatured, setTogglingFeatured] = useState(null);
   const { push, remove } = useToast();
 
   const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      const cats = await listCategories();
+      const cats = await listCategoriesFull();
       setCategories(cats || []);
     } catch (e) {
       setError(e.message);
@@ -45,15 +48,36 @@ export default function CategoriesEditorPage() {
     if (!newCatName.trim()) return;
     const toastId = push({ title: "Creating…", duration: 0 });
     try {
-      await addCategory(newCatName.trim());
+      await addCategory(newCatName.trim(), newCatFeatured);
       await load();
       setOpenCreate(false);
       setNewCatName("");
+      setNewCatFeatured(false);
       push({ title: "Category created", type: "success" });
     } catch (err) {
       push({ title: "Failed to create", description: err.message, type: "error" });
     } finally {
       remove(toastId);
+    }
+  };
+
+  const handleToggleFeatured = async (name, featured) => {
+    setTogglingFeatured(name);
+    try {
+      await setCategoryFeatured(name, featured);
+      setCategories((prev) =>
+        prev.map((c) => (c.name === name ? { ...c, featured } : c))
+      );
+      push({
+        title: featured
+          ? `${name} added to homepage Features`
+          : `${name} removed from homepage Features`,
+        type: "success",
+      });
+    } catch (err) {
+      push({ title: "Failed to update category", description: err.message, type: "error" });
+    } finally {
+      setTogglingFeatured(null);
     }
   };
 
@@ -105,6 +129,7 @@ export default function CategoriesEditorPage() {
         <button
           onClick={() => {
             setNewCatName("");
+            setNewCatFeatured(false);
             setOpenCreate(true);
           }}
           className="rounded-xl bg-white text-black hover:bg-blue-600 hover:text-white transition-all duration-300 px-5 py-2.5 text-xs font-black uppercase tracking-wider cursor-pointer"
@@ -125,27 +150,42 @@ export default function CategoriesEditorPage() {
             <tr>
               <th className="px-5 py-4 w-20">Sr. No.</th>
               <th className="px-5 py-4">Category Name</th>
+              <th className="px-5 py-4">Homepage Features</th>
               <th className="px-5 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {categories.map((c, index) => (
-              <tr key={c} className="border-b border-white/5 hover:bg-white/5 transition-colors align-middle">
+              <tr key={c.name} className="border-b border-white/5 hover:bg-white/5 transition-colors align-middle">
                 <td className="px-5 py-4 font-mono text-neutral-500">{String(index + 1).padStart(2, "0")}</td>
-                <td className="px-5 py-4 font-bold text-white uppercase tracking-wide text-sm">{c}</td>
+                <td className="px-5 py-4 font-bold text-white uppercase tracking-wide text-sm">{c.name}</td>
+                <td className="px-5 py-4">
+                  <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={!!c.featured}
+                      disabled={togglingFeatured === c.name}
+                      onChange={(e) => handleToggleFeatured(c.name, e.target.checked)}
+                      className="h-4 w-4 rounded border-white/20 bg-white/5 accent-blue-500 cursor-pointer disabled:cursor-not-allowed"
+                    />
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-neutral-400">
+                      {c.featured ? "Shown on homepage" : "Hidden"}
+                    </span>
+                  </label>
+                </td>
                 <td className="px-5 py-4 text-right">
                   <div className="inline-flex gap-2">
                     <button
                       onClick={() => {
-                        setEditItem(c);
-                        setEditName(c);
+                        setEditItem(c.name);
+                        setEditName(c.name);
                       }}
                       className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold uppercase hover:bg-white/10 text-white cursor-pointer transition-all"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => setConfirmDelete(c)}
+                      onClick={() => setConfirmDelete(c.name)}
                       className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-2 text-xs font-bold uppercase hover:bg-red-500/20 text-red-400 cursor-pointer transition-all"
                     >
                       Delete
@@ -178,6 +218,19 @@ export default function CategoriesEditorPage() {
               required
               autoFocus
             />
+          </div>
+          <div>
+            <label className="inline-flex items-center gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={newCatFeatured}
+                onChange={(e) => setNewCatFeatured(e.target.checked)}
+                className="h-4 w-4 rounded border-white/20 bg-white/5 accent-blue-500 cursor-pointer"
+              />
+              <span className="text-xs text-neutral-300 font-robert-regular">
+                Show on homepage Features section
+              </span>
+            </label>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
             <button

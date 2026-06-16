@@ -6,7 +6,9 @@ import {
   updateProduct as mockUpdateProduct,
   deleteProduct as mockDeleteProduct,
   listCategories as mockListCategories,
+  listCategoriesFull as mockListCategoriesFull,
   addCategory as mockAddCategory,
+  setCategoryFeatured as mockSetCategoryFeatured,
   getHomepageSettings as mockGetHomepageSettings,
   updateHomepageSettings as mockUpdateHomepageSettings,
 } from "./mockApi";
@@ -116,13 +118,13 @@ export async function listCategories() {
   }
 }
 
-export async function addCategory(name) {
-  if (USE_MOCK) return mockAddCategory(name);
+export async function addCategory(name, featured = false) {
+  if (USE_MOCK) return mockAddCategory(name, featured);
   try {
     const res = await fetch(`/api/categories`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, featured }),
     });
     if (!res.ok && res.status !== 200)
       throw new Error(`Failed to add category (${res.status})`);
@@ -133,8 +135,37 @@ export async function addCategory(name) {
       "addCategory: falling back to mock due to error:",
       e?.message || e
     );
-    return mockAddCategory(name);
+    return mockAddCategory(name, featured);
   }
+}
+
+// Returns [{ name, featured }] — used by the admin categories editor and
+// homepage CMS to manage which categories appear in the Features section.
+export async function listCategoriesFull() {
+  if (USE_MOCK) return mockListCategoriesFull();
+  try {
+    const res = await fetch(`/api/categories?full=1`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to list categories (${res.status})`);
+    return res.json();
+  } catch (e) {
+    console.warn(
+      "listCategoriesFull: falling back to mock due to error:",
+      e?.message || e
+    );
+    return mockListCategoriesFull();
+  }
+}
+
+// Toggle whether a category appears in the homepage Features section.
+export async function setCategoryFeatured(name, featured) {
+  if (USE_MOCK) return mockSetCategoryFeatured(name, featured);
+  const res = await fetch(`/api/categories`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, featured }),
+  });
+  if (!res.ok) throw new Error(`Failed to update category (${res.status})`);
+  return res.json();
 }
 
 // Re-export mockUpload so ProductForm keeps working without change

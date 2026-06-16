@@ -58,12 +58,22 @@ export async function PUT(req) {
     }
 
     if (features) {
-      const { subtitle, description, tilesOrder } = features;
+      const { subtitle, description, tilesOrder, tiles } = features;
       updateDoc.features = {
         subtitle: String(subtitle || "").trim(),
         description: String(description || "").trim(),
         tilesOrder: Array.isArray(tilesOrder)
           ? tilesOrder.map((t) => String(t || "").trim()).filter(Boolean)
+          : [],
+        tiles: Array.isArray(tiles)
+          ? tiles
+              .map((t) => ({
+                key: String(t?.key || "").trim(),
+                name: String(t?.name || "").trim(),
+                video: String(t?.video || "").trim(),
+                desc: String(t?.desc || "").trim(),
+              }))
+              .filter((t) => t.key)
           : []
       };
     }

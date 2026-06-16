@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { categories } from "../../lib/categories";
+import { slugify } from "../../lib/categories";
+import { listCategories } from "../../services/api";
 
 const Navbar = dynamic(() => import("../../components/Navbar"), {
   ssr: false,
@@ -10,6 +12,27 @@ const Navbar = dynamic(() => import("../../components/Navbar"), {
 });
 
 export default function CategoriesIndexPage() {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        const names = await listCategories();
+        if (!mounted) return;
+        setCategories(
+          (names || []).map((name) => ({ name, slug: slugify(name) }))
+        );
+      } catch (err) {
+        console.error("Failed to load categories:", err);
+      }
+    }
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-10">
       <Navbar />

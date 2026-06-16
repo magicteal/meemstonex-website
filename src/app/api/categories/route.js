@@ -1,13 +1,33 @@
 import { NextResponse } from "next/server";
 import { getCollection } from "../../../lib/mongodb";
+import { resolveCategoryFeatured } from "../../../lib/featureTiles";
 
 // GET /api/categories - return explicit categories only (admin-managed)
-export async function GET() {
+// GET /api/categories?full=1 - return [{ name, featured }] objects
+export async function GET(req) {
   try {
+    const { searchParams } = new URL(req.url);
+    const full = ["1", "true"].includes(
+      (searchParams.get("full") || "").toLowerCase()
+    );
+
     const catCol = await getCollection("categories");
     const explicit = await catCol
-      .find({}, { projection: { _id: 0, name: 1 } })
+      .find({}, { projection: { _id: 0, name: 1, featured: 1 } })
       .toArray();
+
+    if (full) {
+      const byName = new Map();
+      for (const doc of explicit || []) {
+        if (!doc?.name) continue;
+        byName.set(doc.name, { name: doc.name, featured: resolveCategoryFeatured(doc) });
+      }
+      const sorted = Array.from(byName.values()).sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+      return NextResponse.json(sorted);
+    }
+
     const sorted = Array.from(
       new Set((explicit || []).map((c) => c?.name).filter(Boolean))
     ).sort((a, b) => a.localeCompare(b));
@@ -19,20 +39,44 @@ export async function GET() {
   }
 }
 
-// POST /api/categories { name }
+// POST /api/categories { name, featured }
 export async function POST(req) {
   try {
-    const { name } = await req.json();
+    const { name, featured } = await req.json();
     const n = (name || "").trim();
     if (!n)
       return NextResponse.json({ error: "Name required" }, { status: 400 });
     const col = await getCollection("categories");
     const existing = await col.findOne({ name: n });
     if (existing) return NextResponse.json(n);
-    await col.insertOne({ name: n, createdAt: new Date() });
+    await col.insertOne({ name: n, featured: !!featured, createdAt: new Date() });
     return NextResponse.json(n, { status: 201 });
   } catch (err) {
     console.error("POST /api/categories error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+// PATCH /api/categories { name, featured }
+// Toggle whether a category appears in the homepage Features section.
+export async function PATCH(req) {
+  try {
+    const { name, featured } = await req.json();
+    const n = (name || "").trim();
+    if (!n)
+      return NextResponse.json({ error: "name is required" }, { status: 400 });
+
+    const col = await getCollection("categories");
+    const res = await col.updateOne(
+      { name: n },
+      { $set: { featured: !!featured } }
+    );
+    if (res.matchedCount === 0)
+      return NextResponse.json({ error: "Category not found" }, { status: 404 });
+
+    return NextResponse.json({ ok: true, name: n, featured: !!featured });
+  } catch (err) {
+    console.error("PATCH /api/categories error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
@@ -51,10 +95,16 @@ export async function PUT(req) {
     if (from === to)
       return NextResponse.json({ ok: true, renamed: 0, updatedProducts: 0 });
 
-    // Update categories collection
+    // Update categories collection (carry over the featured flag)
     const catCol = await getCollection("categories");
+    const fromDoc = await catCol.findOne({ name: from });
     const exists = await catCol.findOne({ name: to });
-    if (!exists) await catCol.insertOne({ name: to, createdAt: new Date() });
+    if (!exists)
+      await catCol.insertOne({
+        name: to,
+        featured: resolveCategoryFeatured(fromDoc),
+        createdAt: new Date(),
+      });
     await catCol.deleteOne({ name: from });
 
     // Update products referencing the old name

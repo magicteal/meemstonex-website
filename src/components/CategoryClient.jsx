@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { categoryBySlug } from "../lib/categories";
-import { listProducts } from "../services/api";
+import { slugify } from "../lib/categories";
+import { listCategories, listProducts } from "../services/api";
 
 const Navbar = dynamic(() => import("./Navbar"), {
   ssr: false,
@@ -20,10 +20,33 @@ const Footer = dynamic(() => import("./Footer"), {
 });
 
 export default function CategoryClient({ slug }) {
-  const cat = categoryBySlug(slug);
+  const [cat, setCat] = useState(null);
+  const [catLoading, setCatLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    async function resolveCategory() {
+      setCatLoading(true);
+      try {
+        const names = await listCategories();
+        if (!mounted) return;
+        const match = (names || []).find((name) => slugify(name) === slug);
+        setCat(match ? { name: match, slug: slugify(match) } : null);
+      } catch (err) {
+        console.error("Failed to load categories:", err);
+        if (mounted) setCat(null);
+      } finally {
+        if (mounted) setCatLoading(false);
+      }
+    }
+    resolveCategory();
+    return () => {
+      mounted = false;
+    };
+  }, [slug]);
 
   useEffect(() => {
     let mounted = true;
@@ -81,7 +104,7 @@ export default function CategoryClient({ slug }) {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-16 min-h-[40vh]">
-        {!cat && (
+        {!catLoading && !cat && (
           <p className="text-center text-blue-50/70 py-20 font-robert-regular text-lg">
             This realm expands beyond known coordinates.{" "}
             <Link href="/" className="text-blue-400 hover:text-blue-300 transition-colors underline">

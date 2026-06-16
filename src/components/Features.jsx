@@ -4,7 +4,6 @@ import Link from "next/link";
 import { slugify } from "../lib/categories";
 import { TiLocationArrow } from "react-icons/ti";
 import { getHomepageSettings } from "../services/api";
-import { DEFAULT_FEATURE_TILES, mergeFeatureTiles } from "../lib/featureTiles";
 
 const BentoTilt = ({ children, className = "" }) => {
   const itemRef = useRef();
@@ -138,7 +137,7 @@ const BentoCard = ({ src, title, description, href, label }) => {
 const Features = () => {
   const [subtitle, setSubtitle] = useState("Where Everyday Elegance Meets a World of Interconnected Luxury");
   const [description, setDescription] = useState("Immerse yourself in a rich and ever-expanding universe where our vibrant array of marble products seamlessly converge, creating an interconnected overlay of refined experiences within your home");
-  const [orderedTiles, setOrderedTiles] = useState(DEFAULT_FEATURE_TILES);
+  const [orderedTiles, setOrderedTiles] = useState([]);
 
   useEffect(() => {
     let mounted = true;
@@ -150,18 +149,9 @@ const Features = () => {
           if (data.features.subtitle) setSubtitle(data.features.subtitle);
           if (data.features.description) setDescription(data.features.description);
 
-          let tiles = mergeFeatureTiles(data.features.tiles);
-          if (Array.isArray(data.features.tilesOrder) && data.features.tilesOrder.length > 0) {
-            const order = data.features.tilesOrder;
-            tiles = [...tiles].sort((a, b) => {
-              const idxA = order.indexOf(a.key);
-              const idxB = order.indexOf(b.key);
-              const valA = idxA === -1 ? 999 : idxA;
-              const valB = idxB === -1 ? 999 : idxB;
-              return valA - valB;
-            });
+          if (Array.isArray(data.features.tiles)) {
+            setOrderedTiles(data.features.tiles);
           }
-          setOrderedTiles(tiles);
         }
       } catch (err) {
         console.error("Failed to load features settings:", err);
@@ -174,9 +164,14 @@ const Features = () => {
   }, []);
 
   const tileRefs = useRef([]);
-  const [visible, setVisible] = useState(() =>
-    new Array(DEFAULT_FEATURE_TILES.length).fill(false)
-  );
+  const [visible, setVisible] = useState([]);
+
+  useEffect(() => {
+    setVisible((prev) => {
+      if (prev.length === orderedTiles.length) return prev;
+      return new Array(orderedTiles.length).fill(false);
+    });
+  }, [orderedTiles.length]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
